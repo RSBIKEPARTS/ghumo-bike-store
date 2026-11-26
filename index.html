@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
   <title>GHUMO BIKE STORE — Wholesale & Retail Two-Wheeler Spare Parts Rate List | Faridabad</title>
   <meta name="description" content="GHUMO BIKE STORE Faridabad, Haryana — Verified Wholesale & Retail Two-Wheeler Spare Parts Rate List for Splendor, Super Splendor, Passion Pro, Shine. Direct WhatsApp Order & Call." />
-  <meta name="keywords" content="Ghumo Bike Store, Faridabad bike spare parts, Splendor spare parts wholesale, Super Splendor chain kit, clutch plate, brake shoe, cables, air filter" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +21,7 @@
     }
     .card-shadow { box-shadow: 0 2px 10px rgba(17, 24, 39, 0.05); }
     .sheet-enter { animation: slideUp 0.22s ease-out; }
+    .no-select { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
     @keyframes slideUp {
       from { transform: translateY(20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
@@ -30,20 +30,17 @@
 </head>
 <body class="pb-28">
 
-  <!-- TOP HEADER (Unchanged Design) -->
+  <!-- TOP HEADER -->
   <header class="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-200">
-    <!-- Top Red Ticker -->
     <div class="bg-[#b91c1c] text-white text-[11px] font-semibold py-1.5 px-3 text-center tracking-wide">
       ⚡ Wholesale &amp; Retail Two-Wheeler Spare Parts • Faridabad, Haryana
     </div>
 
-    <!-- Main Dark Store Bar -->
     <div class="carbon-bg text-white px-3 pt-2.5 pb-2.5">
-      <!-- Row 1: Store Brand + Call & WhatsApp -->
       <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <!-- Distinct Bike/Store Brand Emblem -->
-          <div class="w-9 h-9 rounded-xl bg-[#dc2626] flex items-center justify-center shrink-0 shadow-md border border-red-400/30">
+        <!-- SECRET 3-SECOND LONG PRESS TRIGGER ON LOGO & STORE TITLE -->
+        <div id="secretAdminTrigger" class="flex items-center gap-2.5 min-w-0 no-select cursor-pointer">
+          <div id="brandLogoBox" class="w-9 h-9 rounded-xl bg-[#dc2626] flex items-center justify-center shrink-0 shadow-md border border-red-400/30 transition-transform">
             <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="5.5" cy="17.5" r="3.5"/>
               <circle cx="18.5" cy="17.5" r="3.5"/>
@@ -52,27 +49,25 @@
           </div>
           <div class="min-w-0">
             <h1 class="text-sm font-extrabold tracking-tight text-white truncate leading-tight">GHUMO BIKE STORE</h1>
-            <p id="headerSubtitle" class="text-[11px] text-gray-300 truncate flex items-center gap-1 mt-0.5">
+            <p class="text-[11px] text-gray-300 truncate flex items-center gap-1 mt-0.5">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0"></span>
-              <span class="truncate">Faridabad • Cash &amp; UPI Accepted</span>
+              <span class="truncate">Faridabad • Cash &amp; UPI Accepted • Closed Fridays</span>
             </p>
           </div>
         </div>
 
-        <!-- Primary Direct Contact & Settings Icons -->
+        <!-- Customer Action Buttons -->
         <div class="flex items-center gap-1.5 shrink-0">
-          <button onclick="openSettingsModal()" title="Store Settings" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-gray-200 border border-white/10">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
+          <button onclick="openMyOrdersModal()" title="My Orders" class="px-2.5 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center gap-1 text-white text-[11px] font-bold border border-white/10">
+            <span>📋</span>
+            <span id="myOrdersBadge" class="bg-amber-400 text-gray-950 text-[10px] font-extrabold px-1.5 rounded-full">0</span>
           </button>
-          <a id="headerCallBtn" href="tel:+917531918790" target="_top" onclick="handleDirectContact('call')" title="Call Store" class="w-8 h-8 rounded-lg bg-[#2563eb] hover:bg-blue-500 flex items-center justify-center text-white shadow">
+          <a id="headerCallBtn" href="tel:+919625489457" title="Call Store" class="w-8 h-8 rounded-lg bg-[#2563eb] hover:bg-blue-500 flex items-center justify-center text-white shadow">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.07 21 3 13.93 3 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/>
             </svg>
           </a>
-          <a id="headerWaBtn" href="https://wa.me/917531918790?text=Hello%20GHUMO%20BIKE%20STORE%20(Faridabad)%2C%20I%20am%20checking%20your%20Spare%20Parts%20Rate%20List." target="_blank" rel="noopener noreferrer" onclick="handleDirectContact('wa')" title="WhatsApp Store" class="w-8 h-8 rounded-lg bg-[#16a34a] hover:bg-emerald-500 flex items-center justify-center text-white shadow">
+          <a id="headerWaBtn" href="https://wa.me/919625489457?text=Hello%20GHUMO%20BIKE%20STORE%20(Faridabad)%2C%20I%20am%20checking%20your%20Spare%20Parts%20Rate%20List." target="_blank" rel="noopener noreferrer" title="WhatsApp Store" class="w-8 h-8 rounded-lg bg-[#16a34a] hover:bg-emerald-500 flex items-center justify-center text-white shadow">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.82 14.01c-.24.68-1.41 1.3-1.95 1.38-.5.07-1.13.1-1.82-.12-.42-.13-.96-.31-1.65-.61-2.91-1.26-4.81-4.19-4.96-4.39-.14-.2-1.18-1.57-1.18-3 0-1.43.75-2.13 1.01-2.42.27-.29.58-.36.77-.36.19 0 .39 0 .56.01.18.01.42-.07.66.5.24.58.82 2.01.89 2.15.07.15.12.32.02.51-.1.2-.15.32-.29.49-.15.17-.31.38-.44.51-.15.15-.3.31-.13.61.17.29.76 1.25 1.63 2.03 1.12 1 2.06 1.31 2.36 1.46.29.15.46.12.63-.07.17-.2.73-.85.92-1.14.2-.29.39-.24.66-.15.27.1 1.7.8 1.99.95.29.15.49.22.56.34.07.12.07.7-.17 1.38z"/>
             </svg>
@@ -80,68 +75,45 @@
         </div>
       </div>
 
-      <!-- Row 2: Quick Action Bar (Orders Log + Add Item) -->
-      <div class="mt-2 flex items-center justify-between gap-2">
-        <button onclick="openOrdersLogModal()" class="flex-1 bg-white/10 hover:bg-white/15 border border-white/15 text-white text-[11px] font-bold py-1.5 px-2.5 rounded-lg flex items-center justify-center gap-1.5">
-          <span>📋 Orders &amp; Status</span>
-          <span id="ordersLogCountBadge" class="bg-amber-400 text-gray-950 text-[10px] font-extrabold px-1.5 py-0.2 rounded-full">0</span>
-        </button>
-        <button onclick="openAddItemModal()" class="flex-1 bg-[#dc2626] hover:bg-red-500 text-white text-[11px] font-bold py-1.5 px-2.5 rounded-lg flex items-center justify-center gap-1 shadow">
-          <span>+ Add New Part</span>
-        </button>
+      <!-- ADMIN ONLY CONTROL BAR (HIDDEN FROM CUSTOMERS) -->
+      <div id="adminControlBar" class="hidden mt-2.5 pt-2.5 border-t border-white/15 space-y-2">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-[11px] font-extrabold text-amber-400">🔓 ADMIN MODE ACTIVE</span>
+          <div class="flex items-center gap-1.5">
+            <button onclick="openAddPartModal()" class="bg-[#dc2626] hover:bg-red-500 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-lg shadow">+ Add Part</button>
+            <button onclick="copyLiveHtmlForGithub()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-lg shadow">Copy Live Code</button>
+            <button onclick="exitAdminMode()" class="bg-white/15 hover:bg-white/25 text-white text-[11px] font-bold px-2 py-1 rounded-lg">Lock</button>
+          </div>
+        </div>
+        <div class="text-[10px] text-gray-300 flex items-center justify-between bg-black/40 px-2.5 py-1 rounded-lg">
+          <span id="adminStatsLine">Total: 38 | Visible: 38 | Hidden: 0</span>
+          <span class="text-emerald-400">Tap SHOW/HIDE on any part</span>
+        </div>
       </div>
 
-      <!-- Row 3: Search Input -->
-      <div class="mt-2 relative">
+      <!-- Search Input -->
+      <div class="mt-2.5 relative">
         <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z"/>
         </svg>
         <input id="searchInput" type="text" oninput="handleSearch(this.value)" placeholder="Search parts, model (Splendor, Super, Shine, RTR...)" class="w-full bg-[#1f2127] text-white placeholder-gray-400 text-xs rounded-xl pl-9 pr-8 py-2.5 border border-white/10 focus:outline-none focus:border-red-500" />
         <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs font-bold px-1.5 py-0.5">✕</button>
       </div>
-
-      <!-- Row 4: Backup & Live HTML Code Export Strip -->
-      <div class="mt-2 flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar">
-        <span id="saveStatusText" class="text-[10px] text-emerald-400 font-semibold whitespace-nowrap flex items-center gap-1 shrink-0">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span> Saved
-        </span>
-        <div class="flex items-center gap-1.5 shrink-0">
-          <button onclick="exportBackupJson()" class="bg-white/10 hover:bg-white/20 text-gray-200 text-[10px] font-semibold px-2 py-1 rounded-md border border-white/10 whitespace-nowrap">Save Backup</button>
-          <button onclick="triggerLoadBackup()" class="bg-white/10 hover:bg-white/20 text-gray-200 text-[10px] font-semibold px-2 py-1 rounded-md border border-white/10 whitespace-nowrap">Load Backup</button>
-          <button onclick="openExportHtmlModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-md shadow whitespace-nowrap">Get Live Code / HTML</button>
-        </div>
-      </div>
     </div>
 
     <!-- Category Horizontal Pills -->
-    <div id="categoryBar" class="bg-white px-3 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-gray-100">
-      <!-- Populated dynamically -->
-    </div>
+    <div id="categoryBar" class="bg-white px-3 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-gray-100"></div>
   </header>
 
-  <!-- Hidden File Inputs -->
-  <input type="file" id="itemPhotoInput" accept="image/*" class="hidden" onchange="handleItemPhotoSelected(event)" />
-  <input type="file" id="newPartPhotoInput" accept="image/*" class="hidden" onchange="handleNewPartPhotoSelected(event)" />
-  <input type="file" id="backupFileInput" accept=".json,application/json" class="hidden" onchange="handleBackupFileLoaded(event)" />
+  <!-- Hidden Photo Input for Admin -->
+  <input type="file" id="partPhotoPicker" accept="image/*" class="hidden" onchange="handlePartPhotoUpload(event)" />
 
   <!-- MAIN CONTENT -->
   <main class="max-w-xl mx-auto px-3 pt-3">
-    <!-- Returning Customer Welcome Banner (Auto-appears when customer returns) -->
-    <div id="returningCustomerBanner" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 mb-3 flex items-center justify-between gap-2 card-shadow">
-      <div class="min-w-0">
-        <div id="returningBannerTitle" class="text-xs font-extrabold text-emerald-950 truncate">Welcome back!</div>
-        <div id="returningBannerSub" class="text-[11px] text-emerald-800 truncate">Your previous chat &amp; order history is ready.</div>
-      </div>
-      <div class="flex items-center gap-1.5 shrink-0">
-        <button onclick="openOrdersLogModal()" class="bg-white text-emerald-900 border border-emerald-300 text-[10px] font-extrabold px-2.5 py-1 rounded-lg">My Orders</button>
-        <button onclick="openRateChatModal()" class="bg-emerald-700 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg">Chat</button>
-      </div>
-    </div>
-
     <!-- Filter Count & View Switcher Bar -->
     <div class="bg-white rounded-xl p-2.5 mb-3 border border-gray-200/80 card-shadow flex items-center justify-between gap-2">
       <div class="flex items-center gap-2 min-w-0">
-        <span id="visibleCountBadge" class="bg-red-50 text-[#b91c1c] text-xs font-extrabold px-2.5 py-1 rounded-lg border border-red-100 shrink-0">38 Items</span>
+        <span id="visibleCountBadge" class="bg-red-50 text-[#b91c1c] text-xs font-extrabold px-2.5 py-1 rounded-lg border border-red-100 shrink-0">0 Items</span>
         <span id="activeCategoryLabel" class="text-xs font-semibold text-gray-600 truncate">All Items</span>
       </div>
       <div class="flex items-center bg-gray-100 p-0.5 rounded-lg shrink-0">
@@ -155,29 +127,27 @@
     </div>
 
     <!-- Catalog Container -->
-    <div id="catalogContainer" class="space-y-4">
-      <!-- Populated dynamically -->
-    </div>
+    <div id="catalogContainer" class="space-y-4"></div>
 
-    <!-- Store Footer Card -->
+    <!-- Store Footer Card (Also supports 3-second long press on store name) -->
     <footer class="mt-6 bg-[#141518] text-white rounded-2xl p-4 text-center border border-gray-800 shadow-md">
-      <div class="inline-flex items-center gap-1.5 text-xs font-extrabold tracking-wide text-white">
+      <div id="footerSecretTrigger" class="inline-flex items-center gap-1.5 text-xs font-extrabold tracking-wide text-white no-select cursor-pointer py-1 px-2">
         <span class="w-2 h-2 rounded-full bg-red-500"></span> GHUMO BIKE STORE
       </div>
-      <p id="footerAddressText" class="text-[11px] text-gray-400 mt-1">Faridabad, Haryana • Cash &amp; UPI Accepted • Closed on Fridays</p>
-      <p id="footerNumberDisplay" class="text-xs font-bold text-emerald-400 mt-1">Direct Call &amp; WhatsApp: +91 75319 18790</p>
+      <p class="text-[11px] text-gray-400 mt-1">Faridabad, Haryana • Cash &amp; UPI Accepted • Closed on Fridays</p>
+      <p class="text-xs font-bold text-emerald-400 mt-1">Direct Call &amp; WhatsApp: +91 96254 89457</p>
       <div class="mt-3 grid grid-cols-2 gap-2">
-        <a id="footerCallBtn" href="tel:+917531918790" target="_top" onclick="handleDirectContact('call')" class="bg-[#1e293b] hover:bg-slate-700 text-blue-300 border border-blue-500/30 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+        <a href="tel:+919625489457" class="bg-[#1e293b] hover:bg-slate-700 text-blue-300 border border-blue-500/30 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
           <span>📞</span> Call Store
         </a>
-        <a id="footerWaBtn" href="https://wa.me/917531918790?text=Hello%20GHUMO%20BIKE%20STORE%20(Faridabad)%2C%20I%20would%20like%20to%20inquire%20about%20spare%20parts." target="_blank" rel="noopener noreferrer" onclick="handleDirectContact('wa')" class="bg-[#064e3b] hover:bg-emerald-900 text-emerald-300 border border-emerald-500/30 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+        <a href="https://wa.me/919625489457?text=Hello%20GHUMO%20BIKE%20STORE%20(Faridabad)%2C%20I%20would%20like%20to%20inquire%20about%20spare%20parts." target="_blank" rel="noopener noreferrer" class="bg-[#064e3b] hover:bg-emerald-900 text-emerald-300 border border-emerald-500/30 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
           <span>💬</span> WhatsApp Store
         </a>
       </div>
     </footer>
   </main>
 
-  <!-- FLOATING AI WHOLESALE RATE & QUANTITY CHAT BUTTON -->
+  <!-- FLOATING AI RATE CHAT BUTTON -->
   <button id="floatingRateChatBtn" onclick="openRateChatModal()" class="fixed bottom-20 right-3.5 z-30 bg-[#141518] hover:bg-gray-800 text-white border-2 border-red-500 rounded-full px-3.5 py-2.5 shadow-2xl flex items-center gap-2 transition-transform active:scale-95">
     <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
     <span class="text-xs font-extrabold">AI Rate Chat</span>
@@ -202,787 +172,321 @@
     </div>
   </div>
 
-  <!-- AI WHOLESALE RATE & QUANTITY CHAT MODAL -->
-  <div id="rateChatModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl h-[86vh] sm:h-[600px] flex flex-col overflow-hidden shadow-2xl sheet-enter">
-      <!-- Chat Header -->
-      <div class="carbon-bg text-white px-4 py-3 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <div class="w-8 h-8 rounded-full bg-[#dc2626] flex items-center justify-center font-extrabold text-xs shrink-0">AI</div>
-          <div class="min-w-0">
-            <h2 class="text-xs font-extrabold truncate">GHUMO BIKE STORE — Wholesale Rate Assistant</h2>
-            <p class="text-[10px] text-emerald-400 truncate">● Ask part name &amp; quantity for wholesale slab rate</p>
+  <!-- SECRET ADMIN LOGIN MODAL (OPENS ON 3-SECOND LONG PRESS) -->
+  <div id="adminLoginModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
+    <div class="bg-[#181b20] border border-gray-700 text-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4 sheet-enter">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-xl bg-[#dc2626] flex items-center justify-center text-sm">🔒</span>
+          <div>
+            <h2 class="text-sm font-extrabold">Admin Panel Login</h2>
+            <p class="text-[10px] text-gray-400">GHUMO BIKE STORE Owner Access</p>
           </div>
         </div>
-        <div class="flex items-center gap-1.5 shrink-0">
-          <button onclick="clearRateChatHistory()" class="text-[10px] font-bold bg-white/10 hover:bg-white/20 px-2 py-1 rounded-lg text-gray-200">Clear</button>
-          <button onclick="closeRateChatModal()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
+        <button onclick="closeAdminLoginModal()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
+      </div>
+      <form onsubmit="submitAdminLogin(event)" class="space-y-3">
+        <div>
+          <label class="text-[10px] font-bold text-gray-400 uppercase">Admin ID</label>
+          <input id="loginIdInput" type="text" required placeholder="Enter Admin ID" class="mt-1 w-full bg-[#0f1115] border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-red-500" />
         </div>
-      </div>
-
-      <!-- Chat Messages Stream -->
-      <div id="rateChatMessages" class="flex-1 overflow-y-auto p-3.5 space-y-3 bg-gray-50">
-        <!-- Populated dynamically -->
-      </div>
-
-      <!-- Quick Sample Prompts -->
-      <div class="px-3 py-1.5 bg-white border-t border-gray-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
-        <button onclick="sendQuickChatPrompt('Chain kit super splendor')" class="text-[10px] font-bold bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-full whitespace-nowrap">Chain kit super</button>
-        <button onclick="sendQuickChatPrompt('Clutch plate splendor')" class="text-[10px] font-bold bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-full whitespace-nowrap">Clutch plate</button>
-        <button onclick="sendQuickChatPrompt('Brake shoe')" class="text-[10px] font-bold bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-full whitespace-nowrap">Brake shoe</button>
-        <button onclick="sendQuickChatPrompt('10 pcs')" class="text-[10px] font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-full whitespace-nowrap">10 pcs wholesale</button>
-      </div>
-
-      <!-- Chat Input Bar -->
-      <form onsubmit="handleRateChatSubmit(event)" class="p-3 bg-white border-t border-gray-200 flex items-center gap-2 shrink-0">
-        <input id="rateChatInput" type="text" placeholder="Type part name or quantity (e.g. 10 pcs)..." class="flex-1 bg-gray-100 border border-gray-300 rounded-xl px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:border-red-500" />
-        <button type="submit" class="bg-[#dc2626] hover:bg-red-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow shrink-0">Send</button>
+        <div>
+          <label class="text-[10px] font-bold text-gray-400 uppercase">Password</label>
+          <input id="loginPassInput" type="password" required placeholder="Enter Password" class="mt-1 w-full bg-[#0f1115] border border-gray-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-red-500" />
+        </div>
+        <p id="loginErrText" class="hidden text-xs font-bold text-red-400 text-center">Galat ID ya Password!</p>
+        <button type="submit" class="w-full bg-[#dc2626] hover:bg-red-500 text-white font-extrabold text-xs py-3 rounded-xl shadow">Unlock Admin Controls</button>
       </form>
     </div>
   </div>
 
-  <!-- ORDER & CUSTOMER VERIFICATION MODAL -->
-  <div id="orderDrawerModal" class="hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl sheet-enter">
-      <!-- Header -->
+  <!-- ADMIN ADD / EDIT PART MODAL -->
+  <div id="adminPartModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
+    <div class="bg-[#181b20] border border-gray-700 text-white w-full max-w-md rounded-3xl p-5 space-y-3 sheet-enter">
+      <div class="flex items-center justify-between">
+        <h2 id="partModalHeading" class="text-sm font-extrabold">Edit Spare Part</h2>
+        <button onclick="closePartModal()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
+      </div>
+      <input type="hidden" id="formPartId" />
+      <div>
+        <label class="text-[10px] font-bold text-gray-400 uppercase">Category</label>
+        <input id="formPartCategory" type="text" placeholder="e.g. Chain Kit, Cables, Filters" class="mt-1 w-full bg-[#0f1115] border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
+      </div>
+      <div>
+        <label class="text-[10px] font-bold text-gray-400 uppercase">Part Name</label>
+        <input id="formPartName" type="text" placeholder="e.g. Chain kit set super spl" class="mt-1 w-full bg-[#0f1115] border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
+      </div>
+      <div>
+        <label class="text-[10px] font-bold text-gray-400 uppercase">Brand / Warranty / Spec</label>
+        <input id="formPartSpec" type="text" placeholder="e.g. hero orginal • 1 year Granty" class="mt-1 w-full bg-[#0f1115] border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
+      </div>
+      <div>
+        <label class="text-[10px] font-bold text-gray-400 uppercase">Wholesale Rate (₹)</label>
+        <input id="formPartPrice" type="number" placeholder="e.g. 580" class="mt-1 w-full bg-[#0f1115] border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
+      </div>
+      <button onclick="savePartChanges()" class="w-full bg-[#dc2626] hover:bg-red-500 text-white font-extrabold text-xs py-3 rounded-xl">Save Part</button>
+    </div>
+  </div>
+
+  <!-- AI RATE CHAT MODAL -->
+  <div id="rateChatModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl h-[82vh] sm:h-[580px] flex flex-col overflow-hidden shadow-2xl sheet-enter">
+      <div class="carbon-bg text-white px-4 py-3 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-full bg-[#dc2626] flex items-center justify-center font-extrabold text-xs shrink-0">AI</div>
+          <div class="min-w-0">
+            <h2 class="text-xs font-extrabold truncate">GHUMO BIKE STORE — Rate Assistant</h2>
+            <p class="text-[10px] text-emerald-400 truncate">● Ask part name &amp; quantity for wholesale rate</p>
+          </div>
+        </div>
+        <button onclick="closeRateChatModal()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
+      </div>
+      <div id="rateChatMessages" class="flex-1 overflow-y-auto p-3.5 space-y-3 bg-gray-50"></div>
+      <div class="px-3 py-1.5 bg-white border-t border-gray-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+        <button onclick="sendQuickChatPrompt('Chain kit super')" class="text-[10px] font-bold bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full whitespace-nowrap">Chain kit super</button>
+        <button onclick="sendQuickChatPrompt('Clutch plate')" class="text-[10px] font-bold bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full whitespace-nowrap">Clutch plate</button>
+        <button onclick="sendQuickChatPrompt('Brake cable')" class="text-[10px] font-bold bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full whitespace-nowrap">Brake cable</button>
+        <button onclick="sendQuickChatPrompt('10 pcs')" class="text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-full whitespace-nowrap">10 pcs wholesale</button>
+      </div>
+      <form onsubmit="handleRateChatSubmit(event)" class="p-3 bg-white border-t border-gray-200 flex items-center gap-2 shrink-0">
+        <input id="rateChatInput" type="text" placeholder="Type part name or quantity (e.g. 10 pcs)..." class="flex-1 bg-gray-100 border border-gray-300 rounded-xl px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:border-red-500" />
+        <button type="submit" class="bg-[#dc2626] text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shrink-0">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CUSTOMER ORDER DRAWER -->
+  <div id="orderDrawerModal" class="hidden fixed inset-0 z-40 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl sheet-enter">
       <div class="carbon-bg text-white px-4 py-3.5 flex items-center justify-between gap-2 shrink-0">
         <div>
-          <h2 class="text-sm font-extrabold">Inquiry &amp; Verified Order List</h2>
-          <p id="orderDrawerSubtitle" class="text-[11px] text-gray-300">GHUMO BIKE STORE • +91 75319 18790</p>
+          <h2 class="text-sm font-extrabold">Order Summary &amp; WhatsApp Send</h2>
+          <p class="text-[11px] text-gray-300">GHUMO BIKE STORE • +91 96254 89457</p>
         </div>
-        <div class="flex items-center gap-1.5">
-          <button onclick="returnToCatalogToAddMore()" class="bg-[#dc2626] hover:bg-red-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow">
-            <span>+ Add More Items</span>
-          </button>
-          <button onclick="closeOrderDrawer()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center">✕</button>
-        </div>
+        <button onclick="closeOrderDrawer()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
       </div>
-
-      <!-- Scrollable Body -->
-      <div class="p-4 overflow-y-auto space-y-4 flex-1">
-        <!-- Mandatory Customer Verification Card -->
-        <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-3 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-extrabold uppercase tracking-wide text-amber-900">🛡️ Customer Verification (Required)</span>
-            <span id="verificationStatusPill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">Fill Details</span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[10px] font-bold text-gray-700 mb-1">CUSTOMER / WORKSHOP NAME *</label>
-              <input id="custNameInput" type="text" oninput="validateCustomerForm(); saveCustomerProfileDraft();" placeholder="e.g., Sharma Auto Works / Rajeev" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-red-500" />
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold text-gray-700 mb-1">10-DIGIT MOBILE NUMBER *</label>
-              <input id="custPhoneInput" type="tel" maxlength="14" oninput="validateCustomerForm(); saveCustomerProfileDraft();" placeholder="e.g., 9811223344" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-red-500" />
-            </div>
-          </div>
-
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <label class="text-[10px] font-bold text-gray-700">AREA / SECTOR / FULL ADDRESS *</label>
-              <button type="button" onclick="attachCustomerGps()" id="gpsPinBtn" class="text-[10px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded-md border border-blue-200">
-                📍 Pin GPS Location
-              </button>
-            </div>
-            <input id="custAddressInput" type="text" oninput="validateCustomerForm(); saveCustomerProfileDraft();" placeholder="e.g., Sector 22, Jawahar Colony, Faridabad" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none focus:border-red-500" />
-            <p id="gpsStatusMsg" class="hidden text-[10px] text-emerald-700 font-semibold mt-1"></p>
-          </div>
+      <div class="p-4 overflow-y-auto space-y-3 flex-1">
+        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-3 space-y-2">
+          <div class="text-[11px] font-extrabold text-gray-700 uppercase">Customer Details</div>
+          <input id="custName" type="text" placeholder="Your Name / Shop Name *" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-medium" />
+          <input id="custPhone" type="tel" placeholder="Mobile Number *" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-medium" />
+          <input id="custCity" type="text" placeholder="Area / City (e.g. Faridabad Sector 23)" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-medium" />
         </div>
-
-        <!-- Selected Items List -->
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-extrabold text-gray-800">Selected Spare Parts</span>
-            <button onclick="returnToCatalogToAddMore()" class="text-xs font-bold text-[#dc2626] hover:underline">+ Add Another Product</button>
-          </div>
-          <div id="orderItemsList" class="space-y-2.5">
-            <!-- Populated dynamically -->
-          </div>
-        </div>
+        <div id="cartItemsList" class="space-y-2"></div>
       </div>
-
-      <!-- Footer Total & Verified Send Buttons -->
-      <div class="border-t border-gray-200 bg-gray-50 p-4 space-y-2.5 shrink-0">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-gray-600">Estimated Total Amount:</span>
-          <span id="drawerTotalAmount" class="text-lg font-extrabold text-gray-900">₹0</span>
+      <div class="p-4 bg-white border-t border-gray-200 shrink-0 space-y-2">
+        <div class="flex items-center justify-between text-xs font-extrabold">
+          <span>Estimated Total:</span>
+          <span id="drawerTotalAmount" class="text-base text-[#dc2626]">₹0</span>
         </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="copyFormattedOrder()" class="bg-white hover:bg-gray-100 text-gray-800 border border-gray-300 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-            <span>📋</span> Copy Order Text
-          </button>
-          <button onclick="clearCart()" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-            <span>🗑️</span> Clear List
-          </button>
-        </div>
-
-        <button id="sendVerifiedOrderBtn" onclick="submitVerifiedOrder()" disabled class="w-full bg-gray-300 text-gray-500 cursor-not-allowed py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 shadow transition-all">
-          <span>🔒</span> Enter Name, 10-Digit Mobile &amp; Address to Send
+        <button onclick="sendOrderOnWhatsApp()" class="w-full bg-[#16a34a] hover:bg-emerald-600 text-white font-extrabold text-xs py-3 rounded-xl shadow flex items-center justify-center gap-2">
+          <span>💬</span> Send Order on WhatsApp (+91 96254 89457)
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ORDERS LOG & STATUS HISTORY MODAL -->
-  <div id="ordersLogModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[88vh] flex flex-col overflow-hidden shadow-2xl sheet-enter">
-      <div class="carbon-bg text-white px-4 py-3.5 flex items-center justify-between">
-        <div>
-          <h2 class="text-sm font-extrabold">📋 Orders, Pending Cart &amp; Status</h2>
-          <p class="text-[11px] text-gray-300">Tracks Order ID, Customer, Location, Time &amp; Status</p>
-        </div>
-        <button onclick="closeOrdersLogModal()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
+  <!-- MY ORDERS MODAL -->
+  <div id="myOrdersModal" class="hidden fixed inset-0 z-40 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[80vh] flex flex-col overflow-hidden shadow-2xl sheet-enter">
+      <div class="carbon-bg text-white px-4 py-3 flex items-center justify-between shrink-0">
+        <h2 class="text-sm font-extrabold">My Sent Orders</h2>
+        <button onclick="document.getElementById('myOrdersModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
       </div>
-      <div id="ordersLogContainer" class="p-4 overflow-y-auto space-y-3 flex-1">
-        <!-- Populated dynamically -->
-      </div>
-      <div class="p-3 border-t border-gray-200 bg-gray-50 flex items-center justify-between gap-2">
-        <button onclick="clearOrdersLog()" class="text-xs font-bold text-red-600 px-3 py-2 rounded-lg hover:bg-red-50">Clear History</button>
-        <button onclick="closeOrdersLogModal()" class="bg-gray-900 text-white text-xs font-bold px-4 py-2 rounded-xl">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ADD / EDIT PRODUCT & CATEGORY MODAL -->
-  <div id="addItemModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl sheet-enter">
-      <div class="carbon-bg text-white px-4 py-3.5 flex items-center justify-between">
-        <h2 id="addItemModalTitle" class="text-sm font-extrabold">+ Add New Spare Part / Category</h2>
-        <button onclick="closeAddItemModal()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
-      </div>
-      <div class="p-4 overflow-y-auto space-y-3">
-        <input type="hidden" id="editItemIdInput" value="" />
-        <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">SELECT CATEGORY *</label>
-          <select id="newPartCategorySelect" onchange="toggleNewCategoryField(this.value)" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2.5 text-xs font-semibold">
-            <!-- Populated dynamically -->
-          </select>
-        </div>
-        <div id="newCategoryNameWrap" class="hidden">
-          <label class="block text-[11px] font-bold text-red-700 mb-1">NEW CATEGORY NAME *</label>
-          <input id="newCategoryNameInput" type="text" placeholder="e.g., Engine Parts, Headlight, Mirrors" class="w-full bg-red-50/40 border border-red-300 rounded-xl px-3 py-2.5 text-xs font-semibold" />
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">PART / MODEL NAME *</label>
-          <input id="newPartNameInput" type="text" placeholder="e.g., Timing Chain Kit Super Splendor" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2.5 text-xs font-semibold" />
-        </div>
-        <div class="grid grid-cols-2 gap-2.5">
-          <div>
-            <label class="block text-[11px] font-bold text-gray-700 mb-1">RATE (₹) *</label>
-            <input id="newPartRateInput" type="number" placeholder="e.g., 145" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2.5 text-xs font-semibold" />
-          </div>
-          <div>
-            <label class="block text-[11px] font-bold text-gray-700 mb-1">WARRANTY / PACKING</label>
-            <input id="newPartPackingInput" type="text" placeholder="e.g., Hero orginal / 1 year" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2.5 text-xs font-semibold" />
-          </div>
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">PRODUCT PHOTO (OPTIONAL)</label>
-          <div class="flex items-center gap-2">
-            <button type="button" onclick="document.getElementById('newPartPhotoInput').click()" class="bg-gray-900 text-white text-xs font-bold px-3.5 py-2 rounded-xl">📷 Choose Photo</button>
-            <span id="newPartPhotoStatus" class="text-[11px] text-gray-500">No photo selected</span>
-          </div>
-          <img id="newPartPhotoPreview" class="hidden mt-2 w-28 h-28 object-contain rounded-xl border border-gray-200 bg-gray-50" />
-        </div>
-      </div>
-      <div class="p-4 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-2">
-        <button onclick="closeAddItemModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-gray-600">Cancel</button>
-        <button onclick="saveNewOrEditedPart()" class="bg-[#dc2626] hover:bg-red-500 text-white px-5 py-2.5 rounded-xl text-xs font-extrabold shadow">Save Part</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- STORE SETTINGS MODAL -->
-  <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl sheet-enter">
-      <div class="carbon-bg text-white px-4 py-3.5 flex items-center justify-between">
-        <h2 class="text-sm font-extrabold">Store Contact Settings</h2>
-        <button onclick="closeSettingsModal()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
-      </div>
-      <div class="p-4 space-y-3">
-        <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">WHATSAPP NUMBER (10 DIGITS)</label>
-          <div class="flex items-center border border-gray-300 rounded-xl overflow-hidden">
-            <span class="bg-gray-100 px-3 py-2.5 text-xs font-bold text-gray-600 border-r border-gray-300">+91</span>
-            <input id="settingsWaInput" type="tel" maxlength="14" class="w-full px-3 py-2.5 text-xs font-bold focus:outline-none" />
-          </div>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label class="text-[11px] font-bold text-gray-700">CALLING NUMBER (10 DIGITS)</label>
-            <button type="button" onclick="copyWaToCallSetting()" class="text-[10px] font-bold text-blue-600">Same as WhatsApp</button>
-          </div>
-          <div class="flex items-center border border-gray-300 rounded-xl overflow-hidden">
-            <span class="bg-gray-100 px-3 py-2.5 text-xs font-bold text-gray-600 border-r border-gray-300">+91</span>
-            <input id="settingsCallInput" type="tel" maxlength="14" class="w-full px-3 py-2.5 text-xs font-bold focus:outline-none" />
-          </div>
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-gray-700 mb-1">STORE LOCATION / NOTE</label>
-          <input id="settingsAddressInput" type="text" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-xs font-semibold" />
-        </div>
-        <div class="flex items-center justify-end gap-2 pt-2">
-          <button onclick="closeSettingsModal()" class="px-4 py-2 text-xs font-bold text-gray-600">Cancel</button>
-          <button onclick="saveStoreSettings()" class="bg-[#dc2626] text-white px-5 py-2.5 rounded-xl text-xs font-extrabold">Save Settings</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RELIABLE CODE / LIVE HTML EXPORT & COPY MODAL -->
-  <div id="exportHtmlModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[88vh] flex flex-col overflow-hidden shadow-2xl sheet-enter">
-      <div class="carbon-bg text-white px-4 py-3.5 flex items-center justify-between">
-        <div>
-          <h2 class="text-sm font-extrabold">Get Live Website Code (`index.html`)</h2>
-          <p class="text-[11px] text-gray-300">Includes all your photos, new parts &amp; settings</p>
-        </div>
-        <button onclick="closeExportHtmlModal()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
-      </div>
-      <div class="p-4 space-y-3 overflow-y-auto flex-1">
-        <p class="text-xs text-gray-700 leading-relaxed">
-          Tap <b>Copy Full HTML Code</b> below, open your new <b>GitHub</b> repository (<code>ghumo-bike-store</code>), create a file named <code>index.html</code>, paste the code, and commit. Every customer will see all uploaded photos and rates.
-        </p>
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="triggerDirectHtmlDownload()" class="bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 shadow">
-            <span>⬇️</span> Download index.html
-          </button>
-          <button onclick="copyFullHtmlCode()" class="bg-gray-900 hover:bg-gray-800 text-white py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 shadow">
-            <span>📋</span> Copy Full HTML Code
-          </button>
-        </div>
-        <textarea id="exportHtmlTextarea" readonly rows="8" class="w-full bg-gray-950 text-emerald-400 font-mono text-[10px] p-3 rounded-xl border border-gray-800 focus:outline-none"></textarea>
-      </div>
-    </div>
-  </div>
-
-  <!-- FULL ZOOM LIGHTBOX MODAL -->
-  <div id="lightboxModal" class="hidden fixed inset-0 z-50 bg-black/90 flex flex-col justify-between p-4" onclick="closeLightbox(event)">
-    <div class="flex items-center justify-between text-white">
-      <div>
-        <div id="lightboxTitle" class="text-sm font-extrabold"></div>
-        <div id="lightboxMeta" class="text-xs text-gray-300"></div>
-      </div>
-      <button onclick="closeLightbox(event, true)" class="w-9 h-9 rounded-full bg-white/15 text-white font-bold">✕</button>
-    </div>
-    <div class="flex-1 flex items-center justify-center overflow-auto my-3">
-      <img id="lightboxImg" src="" alt="Product Preview" class="max-w-full max-h-[75vh] object-contain rounded-xl bg-white p-1" />
-    </div>
-    <div class="text-center text-[11px] text-gray-400">Pinch or tap outside to close</div>
-  </div>
-
-  <!-- TOAST NOTIFICATION -->
-  <div id="toastMsg" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-xl border border-white/15 whitespace-nowrap"></div>
-
-  <!-- DIRECT CONTACT SANDBOX HELPER BAR -->
-  <div id="sandboxContactBar" class="hidden fixed bottom-20 left-3 right-3 max-w-xl mx-auto z-40 bg-white border border-gray-300 rounded-2xl p-3 shadow-2xl sheet-enter">
-    <div class="flex items-center justify-between gap-2">
-      <div class="min-w-0">
-        <div class="text-[11px] font-extrabold text-gray-900">Direct Store Contact (+91 <span id="helperPhoneLabel">7531918790</span>)</div>
-        <div class="text-[10px] text-gray-500 truncate">If preview blocks external apps, copy number/message below:</div>
-      </div>
-      <button onclick="document.getElementById('sandboxContactBar').classList.add('hidden')" class="text-gray-400 hover:text-gray-700 font-bold text-xs px-1.5">✕</button>
-    </div>
-    <div class="mt-2 flex items-center gap-2">
-      <button onclick="copyStorePhone()" class="flex-1 bg-blue-600 text-white text-[11px] font-bold py-2 px-2.5 rounded-xl">Copy Number</button>
-      <button onclick="copyLastMessage()" class="flex-1 bg-emerald-600 text-white text-[11px] font-bold py-2 px-2.5 rounded-xl">Copy Message</button>
+      <div id="myOrdersList" class="p-4 overflow-y-auto space-y-2 flex-1"></div>
     </div>
   </div>
 
   <script>
-    // EMBEDDED DATA PLACEHOLDER FOR STANDALONE HTML EXPORT
-    const EMBEDDED_STATE = null;
+    const ADMIN_ID = "Ghumostore";
+    const ADMIN_PASS = "sonuRs879012";
+    const STORE_WHATSAPP = "9625489457";
 
-    const DEFAULT_ITEMS = [
-      // Chain Kit
-      { id: 1, category: "Chain Kit", name: "Chain kit set super spl", rate: 580, packing: "hero orginal", image: "", fitMode: "contain" },
-      { id: 2, category: "Chain Kit", name: "Chain kit set super spl", rate: 520, packing: "D hero genuine", image: "", fitMode: "contain" },
-      { id: 3, category: "Chain Kit", name: "Chain kit set super spl", rate: 545, packing: "Rolan orginal", image: "", fitMode: "contain" },
-      // Clutch Assembly & Plate
-      { id: 4, category: "Clutch Assembly & Plate", name: "Clutch Assembly sup spl", rate: 535, packing: "FCC orginal", image: "", fitMode: "contain" },
-      { id: 5, category: "Clutch Assembly & Plate", name: "Clutch Assembly sup spl", rate: 525, packing: "MK orginal", image: "", fitMode: "contain" },
-      { id: 6, category: "Clutch Assembly & Plate", name: "Clutch Plate spl.", rate: 87, packing: "10,000 km Granty", image: "", fitMode: "contain" },
-      // Brake Shoe
-      { id: 7, category: "Brake Shoe", name: "Brake shoe sup spl", rate: 92, packing: "10,000 km Granty", image: "", fitMode: "contain" },
-      { id: 8, category: "Brake Shoe", name: "Brake shoe spl.", rate: 85, packing: "10,000 km Granty", image: "", fitMode: "contain" },
-      // Cables
-      { id: 9, category: "Cables", name: "Brake cable Bs6 spl", rate: 65, packing: "1 year Granty", image: "", fitMode: "contain" },
-      { id: 10, category: "Cables", name: "Brake cable super", rate: 48, packing: "1 year Granty", image: "", fitMode: "contain" },
-      { id: 11, category: "Cables", name: "Brake cable sup spl", rate: 48, packing: "1 year Granty", image: "", fitMode: "contain" },
-      { id: 12, category: "Cables", name: "Clutch cable sup spl", rate: 42, packing: "1 year Granty", image: "", fitMode: "contain" },
-      { id: 13, category: "Cables", name: "Clutch cable splendor", rate: 42, packing: "1 year Granty", image: "", fitMode: "contain" },
-      { id: 14, category: "Cables", name: "Miter cable super", rate: 37, packing: "1 year Granty", image: "", fitMode: "contain" },
-      { id: 15, category: "Cables", name: "Miter cable fashion pro", rate: 38, packing: "1 year Granty", image: "", fitMode: "contain" },
-      { id: 16, category: "Cables", name: "Sletor cable sup spl.", rate: 38, packing: "1 year Granty", image: "", fitMode: "contain" },
-      // Spark Plug & Plug Cap
-      { id: 17, category: "Spark Plug & Plug Cap", name: "Spark plug Super", rate: 30, packing: "India spark", image: "", fitMode: "contain" },
-      { id: 18, category: "Spark Plug & Plug Cap", name: "Spark plug splendor", rate: 25, packing: "India spark", image: "", fitMode: "contain" },
-      { id: 19, category: "Spark Plug & Plug Cap", name: "Plug Cap", rate: 25, packing: "Red original", image: "", fitMode: "contain" },
-      { id: 20, category: "Spark Plug & Plug Cap", name: "Plug Cap.", rate: 15, packing: "Black High quality", image: "", fitMode: "contain" },
-      // Filters (Air & Oil)
-      { id: 21, category: "Filters (Air & Oil)", name: "Air filter Bs6 splendor", rate: 47, packing: "Hero paking", image: "", fitMode: "contain" },
-      { id: 22, category: "Filters (Air & Oil)", name: "Air filter super", rate: 45, packing: "Hero paking", image: "", fitMode: "contain" },
-      { id: 23, category: "Filters (Air & Oil)", name: "Air filter shine.", rate: 38, packing: "Hero paking", image: "", fitMode: "contain" },
-      { id: 24, category: "Filters (Air & Oil)", name: "Oil filter shine", rate: 25, packing: "Hero paking", image: "", fitMode: "contain" },
-      { id: 25, category: "Filters (Air & Oil)", name: "Oil filter BTX.", rate: 23, packing: "Hero paking", image: "", fitMode: "contain" },
-      { id: 26, category: "Filters (Air & Oil)", name: "Oil filter RTR", rate: 23, packing: "HERO Paking", image: "", fitMode: "contain" },
-      // Indicator
-      { id: 27, category: "Indicator", name: "Indicator super", rate: 85, packing: "LR. SET", image: "", fitMode: "contain" },
-      { id: 28, category: "Indicator", name: "Indicator spl pro.", rate: 85, packing: "RL SET", image: "", fitMode: "contain" },
-      { id: 29, category: "Indicator", name: "Indicator sup Plus.", rate: 87, packing: "RL SET", image: "", fitMode: "contain" },
-      // Coupling Rubber
-      { id: 30, category: "Coupling Rubber", name: "Coupling Rubber sup", rate: 45, packing: "OE Quality loos", image: "", fitMode: "contain" },
-      { id: 31, category: "Coupling Rubber", name: "Coupling Rubber spl.", rate: 35, packing: "OE Quality loos", image: "", fitMode: "contain" },
-      { id: 32, category: "Coupling Rubber", name: "Coupling Rubber sup", rate: 35, packing: "High Quality loos", image: "", fitMode: "contain" },
-      { id: 33, category: "Coupling Rubber", name: "Coupling Rubber spl", rate: 25, packing: "High Quality loos", image: "", fitMode: "contain" },
-      // Other Spare Parts
-      { id: 34, category: "Other Spare Parts", name: "Handol balesar(conset)", rate: 20, packing: "Hero paking", image: "", fitMode: "contain" },
-      { id: 35, category: "Other Spare Parts", name: "Head Light Balb(fornex)", rate: 75, packing: "Orginal (local 35)", image: "", fitMode: "contain" },
-      { id: 36, category: "Other Spare Parts", name: "Miter pinion sup spl", rate: 45, packing: "original(plastik 25)", image: "", fitMode: "contain" },
-      { id: 37, category: "Other Spare Parts", name: "Bearing NBC.", rate: 70, packing: "SET (single 35)", image: "", fitMode: "contain" },
-      { id: 38, category: "Other Spare Parts", name: "Handol Grip spl.", rate: 48, packing: "RL SET", image: "", fitMode: "contain" }
+    // DEFAULT CATALOG ITEMS (Customers only see items with visible: true)
+    const DEFAULT_CATALOG = [
+      { id: 1, code: "#01", category: "Chain Kit", name: "Chain kit set super spl", spec: "hero orginal", price: 580, visible: true, image: "" },
+      { id: 2, code: "#02", category: "Chain Kit", name: "Chain kit set super spl", spec: "D hero genuine", price: 420, visible: true, image: "" },
+      { id: 3, code: "#03", category: "Chain Kit", name: "Chain kit set splendor plus", spec: "hero orginal", price: 540, visible: true, image: "" },
+      { id: 4, code: "#04", category: "Clutch Assembly & Plate", name: "Clutch plate splendor / passion", spec: "4 plate set • high grip", price: 145, visible: true, image: "" },
+      { id: 5, code: "#05", category: "Clutch Assembly & Plate", name: "Clutch assembly complete spl", spec: "heavy duty OE type", price: 490, visible: true, image: "" },
+      { id: 6, code: "#06", category: "Clutch Assembly & Plate", name: "Clutch center & hub set spl", spec: "precision alloy", price: 260, visible: true, image: "" },
+      { id: 7, code: "#07", category: "Brake Shoe & Pad", name: "Brake shoe splendor / deluxe", spec: "asbestos free • with spring", price: 85, visible: true, image: "" },
+      { id: 8, code: "#08", category: "Brake Shoe & Pad", name: "Disc brake pad front shine / unicorn", spec: "ceramic long life", price: 95, visible: true, image: "" },
+      { id: 9, code: "#09", category: "Cables", name: "Brake cable Bs6 spl", spec: "1 year Granty", price: 65, visible: true, image: "" },
+      { id: 10, code: "#10", category: "Cables", name: "Brake cable super", spec: "1 year Granty", price: 48, visible: true, image: "" },
+      { id: 11, code: "#11", category: "Cables", name: "Clutch cable splendor plus", spec: "1 year Granty • smooth inner", price: 45, visible: true, image: "" },
+      { id: 12, code: "#12", category: "Cables", name: "Clutch cable super splendor", spec: "1 year Granty", price: 52, visible: true, image: "" },
+      { id: 13, code: "#13", category: "Cables", name: "Accelerator cable spl / passion", spec: "1 year Granty", price: 38, visible: true, image: "" },
+      { id: 14, code: "#14", category: "Cables", name: "Meter cable splendor / deluxe", spec: "1 year Granty", price: 42, visible: true, image: "" },
+      { id: 15, code: "#15", category: "Cables", name: "Choke cable splendor BS4/BS6", spec: "1 year Granty", price: 35, visible: true, image: "" },
+      { id: 16, code: "#16", category: "Cables", name: "Seat lock cable splendor", spec: "heavy wire", price: 32, visible: true, image: "" },
+      { id: 17, code: "#17", category: "Filters", name: "Air filter splendor plus / pro", spec: "high dust holding paper", price: 55, visible: true, image: "" },
+      { id: 18, code: "#18", category: "Filters", name: "Air filter super splendor / glamour", spec: "OE fitment", price: 68, visible: true, image: "" },
+      { id: 19, code: "#19", category: "Filters", name: "Oil filter paper type pulsar / apache", spec: "micro filtration", price: 38, visible: true, image: "" },
+      { id: 20, code: "#20", category: "Rubber & Grips", name: "Coupling rubber super splendor (Set of 4)", spec: "heavy EPDM rubber", price: 35, visible: true, image: "" },
+      { id: 21, code: "#21", category: "Rubber & Grips", name: "Coupling rubber splendor plus (Set of 4)", spec: "shock absorbent", price: 28, visible: true, image: "" },
+      { id: 22, code: "#22", category: "Rubber & Grips", name: "Handle grip black universal pair", spec: "soft anti-slip grip", price: 25, visible: true, image: "" },
+      { id: 23, code: "#23", category: "Rubber & Grips", name: "Footrest rubber front pair spl", spec: "heavy core", price: 30, visible: true, image: "" },
+      { id: 24, code: "#24", category: "Electrical & Ignition", name: "Spark plug cap red silicone", spec: "brass connector • waterproof", price: 22, visible: true, image: "" },
+      { id: 25, code: "#25", category: "Electrical & Ignition", name: "Spark plug 4-stroke short thread", spec: "splendor / platina / ct100", price: 65, visible: true, image: "" },
+      { id: 26, code: "#26", category: "Electrical & Ignition", name: "Headlight bulb 12V 35/35W halogen", spec: "high brightness", price: 45, visible: true, image: "" },
+      { id: 27, code: "#27", category: "Electrical & Ignition", name: "Indicator bulb 12V 10W amber (Box of 10)", spec: "long life filament", price: 60, visible: true, image: "" },
+      { id: 28, code: "#28", category: "Electrical & Ignition", name: "Horn 12V loud waterproof single", spec: "clear sharp tone", price: 95, visible: true, image: "" },
+      { id: 29, code: "#29", category: "Bearings & Seals", name: "Wheel bearing 6301 2RS", spec: "double rubber seal", price: 45, visible: true, image: "" },
+      { id: 30, code: "#30", category: "Bearings & Seals", name: "Wheel bearing 6202 2RS", spec: "high speed steel", price: 48, visible: true, image: "" },
+      { id: 31, code: "#31", category: "Bearings & Seals", name: "Fork oil seal pair 30x42x10.5", spec: "double lip leak-proof", price: 42, visible: true, image: "" },
+      { id: 32, code: "#32", category: "Bearings & Seals", name: "Cone set / steering ball racer spl", spec: "hardened steel", price: 85, visible: true, image: "" },
+      { id: 33, code: "#33", category: "Body & Accessories", name: "Side mirror pair splendor / shine", spec: "clear wide glass", price: 110, visible: true, image: "" },
+      { id: 34, code: "#34", category: "Body & Accessories", name: "Brake lever & clutch lever set spl", spec: "aluminium alloy finish", price: 65, visible: true, image: "" },
+      { id: 35, code: "#35", category: "Body & Accessories", name: "Kick lever complete splendor", spec: "chrome plated heavy", price: 140, visible: true, image: "" },
+      { id: 36, code: "#36", category: "Body & Accessories", name: "Gear lever splendor plus", spec: "heavy steel with rubber", price: 75, visible: true, image: "" },
+      { id: 37, code: "#37", category: "Body & Accessories", name: "Indicator assembly set of 4 spl", spec: "flexible stem • amber lens", price: 160, visible: true, image: "" },
+      { id: 38, code: "#38", category: "Body & Accessories", name: "Petrol tank cap with 2 keys spl", spec: "rust-free lock", price: 115, visible: true, image: "" }
     ];
 
-    let appState = {
-      items: JSON.parse(JSON.stringify(DEFAULT_ITEMS)),
-      settings: {
-        waNumber: "7531918790",
-        callNumber: "7531918790",
-        address: "Faridabad, Haryana • Cash & UPI Accepted"
-      },
-      ordersLog: [],
-      customerProfile: {
-        name: "",
-        phone: "",
-        address: "",
-        gps: ""
-      },
-      pendingCart: {},
-      chatHistory: []
-    };
+    let catalogItems = DEFAULT_CATALOG;
+    let isAdmin = sessionStorage.getItem("gbs_admin_unlocked") === "1";
+    if (isAdmin) {
+      const localSaved = localStorage.getItem("gbs_admin_saved_catalog");
+      if (localSaved) {
+        try { catalogItems = JSON.parse(localSaved); } catch (e) {}
+      }
+    }
 
-    let selectedCategory = "All Items";
+    let activeCategory = "All Items";
     let searchQuery = "";
     let viewMode = "cards";
-    let cart = {}; // { itemId: qty }
-    let activeUploadItemId = null;
-    let pendingNewPartPhoto = "";
-    let customerGpsLink = "";
-    let lastPreparedMessage = "Hello GHUMO BIKE STORE (Faridabad), I am checking your Spare Parts Rate List.";
-    let activeChatMatchedIds = []; // remembers last matched item IDs for quantity calculation
+    let cart = {};
+    let photoTargetId = null;
+    let lastChatPart = null;
+    let chatMessages = [
+      { sender: "bot", text: "Namaste! GHUMO BIKE STORE (Faridabad) me swagat hai. Kisi bhi part ka naam ya quantity (jaise 'Chain kit 5 pcs') likhein." }
+    ];
 
-    // --- STORAGE (IndexedDB + localStorage safe wrapper) ---
-    const DB_NAME = "GhumoBikeStoreDB";
-    const STORE_NAME = "storeData";
-
-    function openDB() {
-      return new Promise((resolve, reject) => {
-        try {
-          const req = indexedDB.open(DB_NAME, 1);
-          req.onupgradeneeded = (e) => {
-            const db = e.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
-          };
-          req.onsuccess = () => resolve(req.result);
-          req.onerror = () => reject(req.error);
-        } catch (err) {
-          reject(err);
-        }
-      });
-    }
-
-    async function persistState() {
-      appState.pendingCart = { ...cart };
-      const statusEl = document.getElementById("saveStatusText");
-      try {
-        const db = await openDB();
-        const tx = db.transaction(STORE_NAME, "readwrite");
-        tx.objectStore(STORE_NAME).put(appState, "state");
-      } catch (e) {}
-      try {
-        localStorage.setItem("ghumo_bike_store_state_v2", JSON.stringify(appState));
-      } catch (e) {}
-      if (statusEl) {
-        statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span> Saved (${appState.items.length})`;
-      }
-    }
-
-    async function loadPersistedState() {
-      if (EMBEDDED_STATE && EMBEDDED_STATE.items) {
-        appState = { ...appState, ...EMBEDDED_STATE };
-      }
-      try {
-        const db = await openDB();
-        const data = await new Promise((resolve) => {
-          const tx = db.transaction(STORE_NAME, "readonly");
-          const req = tx.objectStore(STORE_NAME).get("state");
-          req.onsuccess = () => resolve(req.result);
-          req.onerror = () => resolve(null);
-        });
-        if (data && Array.isArray(data.items) && data.items.length > 0) {
-          appState = { ...appState, ...data };
-          return;
-        }
-      } catch (e) {}
-      try {
-        const raw = localStorage.getItem("ghumo_bike_store_state_v2");
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed && Array.isArray(parsed.items) && parsed.items.length > 0) {
-            appState = { ...appState, ...parsed };
-          }
-        }
-      } catch (e) {}
-    }
-
-    // --- UTILITIES ---
-    function sanitize10Digits(val) {
-      const digits = String(val || "").replace(/\D/g, "");
-      if (digits.length > 10) return digits.slice(-10);
-      return digits;
-    }
-
-    function showToast(msg) {
-      const el = document.getElementById("toastMsg");
-      el.textContent = msg;
-      el.classList.remove("hidden");
-      clearTimeout(window._toastTimer);
-      window._toastTimer = setTimeout(() => el.classList.add("hidden"), 2600);
-    }
-
-    function getCategorySvg(cat) {
-      const c = (cat || "").toLowerCase();
-      if (c.includes("chain")) {
-        return `<svg class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="12" r="4"/><circle cx="17" cy="12" r="3"/><path d="M7 8h10M7 16h10"/></svg>`;
-      }
-      if (c.includes("clutch")) {
-        return `<svg class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>`;
-      }
-      if (c.includes("brake")) {
-        return `<svg class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 18A8 8 0 0 1 18 6"/><path d="M9 19A8 8 0 0 1 19 9"/></svg>`;
-      }
-      if (c.includes("cable")) {
-        return `<svg class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18C4 10 20 14 20 6"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="6" r="2"/></svg>`;
-      }
-      if (c.includes("spark") || c.includes("plug")) {
-        return `<svg class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`;
-      }
-      if (c.includes("filter")) {
-        return `<svg class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 4v16M12 4v16M15 4v16"/></svg>`;
-      }
-      if (c.includes("indicator")) {
-        return `<svg class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 4 12.7V17H8v-2.3A7 7 0 0 1 12 2z"/></svg>`;
-      }
-      if (c.includes("rubber") || c.includes("coupling")) {
-        return `<svg class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/></svg>`;
-      }
-      return `<svg class="w-10 h-10 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`;
-    }
-
-    function getOrderedCategories() {
-      const cats = [];
-      appState.items.forEach(item => {
-        if (!cats.includes(item.category)) cats.push(item.category);
-      });
-      return cats;
-    }
-
-    function syncContactLinks() {
-      const wa = sanitize10Digits(appState.settings.waNumber) || "7531918790";
-      const call = sanitize10Digits(appState.settings.callNumber) || wa;
-      const waUrl = `https://wa.me/91${wa}?text=${encodeURIComponent(lastPreparedMessage)}`;
-      const telUrl = `tel:+91${call}`;
-
-      document.getElementById("headerCallBtn").href = telUrl;
-      document.getElementById("footerCallBtn").href = telUrl;
-      document.getElementById("headerWaBtn").href = waUrl;
-      document.getElementById("footerWaBtn").href = waUrl;
-      document.getElementById("headerSubtitle").innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0"></span><span class="truncate">${appState.settings.address}</span>`;
-      document.getElementById("footerAddressText").textContent = `${appState.settings.address} • Closed on Fridays`;
-      document.getElementById("footerNumberDisplay").textContent = `Direct Call & WhatsApp: +91 ${call.slice(0,5)} ${call.slice(5)}`;
-      document.getElementById("orderDrawerSubtitle").textContent = `GHUMO BIKE STORE • +91 ${wa}`;
-      document.getElementById("helperPhoneLabel").textContent = call;
-      document.getElementById("ordersLogCountBadge").textContent = (appState.ordersLog || []).length;
-    }
-
-    function hydrateReturningCustomer() {
-      const prof = appState.customerProfile || {};
-      if (prof.name) document.getElementById("custNameInput").value = prof.name;
-      if (prof.phone) document.getElementById("custPhoneInput").value = prof.phone;
-      if (prof.address) document.getElementById("custAddressInput").value = prof.address;
-      if (prof.gps) customerGpsLink = prof.gps;
-
-      if (appState.pendingCart && Object.keys(appState.pendingCart).length > 0) {
-        cart = { ...appState.pendingCart };
-      }
-
-      const hasHistory = Boolean(prof.name) || (appState.ordersLog && appState.ordersLog.length > 0) || Object.keys(cart).length > 0;
-      const banner = document.getElementById("returningCustomerBanner");
-      if (hasHistory) {
-        banner.classList.remove("hidden");
-        const greetName = prof.name ? `Welcome back, ${prof.name}!` : "Welcome back to GHUMO BIKE STORE!";
-        document.getElementById("returningBannerTitle").textContent = greetName;
-        const pendingCount = Object.values(cart).reduce((a, b) => a + b, 0);
-        const pastCount = (appState.ordersLog || []).length;
-        const parts = [];
-        if (pastCount > 0) parts.push(`${pastCount} previous order${pastCount > 1 ? 's' : ''}`);
-        if (pendingCount > 0) parts.push(`${pendingCount} item${pendingCount > 1 ? 's' : ''} saved in cart`);
-        if (appState.chatHistory && appState.chatHistory.length > 0) parts.push("chat saved");
-        document.getElementById("returningBannerSub").textContent = parts.length ? parts.join(" • ") : "Your saved details & order status are ready.";
-      }
-    }
-
-    function saveCustomerProfileDraft() {
-      appState.customerProfile = {
-        name: document.getElementById("custNameInput").value.trim(),
-        phone: sanitize10Digits(document.getElementById("custPhoneInput").value),
-        address: document.getElementById("custAddressInput").value.trim(),
-        gps: customerGpsLink || ""
+    // 3-SECOND LONG PRESS SETUP (WORKS ON BOTH MOBILE TOUCH & DESKTOP MOUSE)
+    function attachThreeSecondHold(el) {
+      if (!el) return;
+      let timer = null;
+      const startHold = () => {
+        const logo = document.getElementById("brandLogoBox");
+        if (logo) logo.classList.add("scale-90", "ring-2", "ring-amber-400");
+        timer = setTimeout(() => {
+          if (logo) logo.classList.remove("scale-90", "ring-2", "ring-amber-400");
+          if (navigator.vibrate) navigator.vibrate(60);
+          openAdminLoginModal();
+        }, 3000);
       };
-      persistState();
+      const cancelHold = () => {
+        const logo = document.getElementById("brandLogoBox");
+        if (logo) logo.classList.remove("scale-90", "ring-2", "ring-amber-400");
+        if (timer) { clearTimeout(timer); timer = null; }
+      };
+      el.addEventListener("touchstart", startHold, { passive: true });
+      el.addEventListener("touchend", cancelHold);
+      el.addEventListener("touchmove", cancelHold);
+      el.addEventListener("touchcancel", cancelHold);
+      el.addEventListener("mousedown", startHold);
+      el.addEventListener("mouseup", cancelHold);
+      el.addEventListener("mouseleave", cancelHold);
     }
 
-    function handleDirectContact(type, customMsg) {
-      if (customMsg) lastPreparedMessage = customMsg;
-      syncContactLinks();
-      const bar = document.getElementById("sandboxContactBar");
-      bar.classList.remove("hidden");
+    attachThreeSecondHold(document.getElementById("secretAdminTrigger"));
+    attachThreeSecondHold(document.getElementById("footerSecretTrigger"));
+
+    function openAdminLoginModal() {
+      if (isAdmin) {
+        syncAdminUI();
+        return;
+      }
+      document.getElementById("loginErrText").classList.add("hidden");
+      document.getElementById("loginIdInput").value = "";
+      document.getElementById("loginPassInput").value = "";
+      document.getElementById("adminLoginModal").classList.remove("hidden");
     }
 
-    function copyStorePhone() {
-      const call = sanitize10Digits(appState.settings.callNumber) || "7531918790";
-      navigator.clipboard?.writeText("+91" + call);
-      showToast("Copied +91 " + call);
+    function closeAdminLoginModal() {
+      document.getElementById("adminLoginModal").classList.add("hidden");
     }
 
-    function copyLastMessage() {
-      navigator.clipboard?.writeText(lastPreparedMessage);
-      showToast("Order / Inquiry message copied!");
+    function submitAdminLogin(e) {
+      e.preventDefault();
+      const uid = document.getElementById("loginIdInput").value.trim();
+      const pwd = document.getElementById("loginPassInput").value.trim();
+      if (uid === ADMIN_ID && pwd === ADMIN_PASS) {
+        isAdmin = true;
+        sessionStorage.setItem("gbs_admin_unlocked", "1");
+        const localSaved = localStorage.getItem("gbs_admin_saved_catalog");
+        if (localSaved) {
+          try { catalogItems = JSON.parse(localSaved); } catch (err) {}
+        }
+        closeAdminLoginModal();
+        syncAdminUI();
+        renderCategories();
+        renderCatalog();
+      } else {
+        document.getElementById("loginErrText").classList.remove("hidden");
+      }
     }
 
-    // --- RENDERING ---
-    function renderCategoryBar() {
+    function exitAdminMode() {
+      isAdmin = false;
+      sessionStorage.removeItem("gbs_admin_unlocked");
+      syncAdminUI();
+      renderCategories();
+      renderCatalog();
+    }
+
+    function syncAdminUI() {
+      const bar = document.getElementById("adminControlBar");
+      if (isAdmin) {
+        bar.classList.remove("hidden");
+        const visCount = catalogItems.filter(i => i.visible !== false).length;
+        const hidCount = catalogItems.filter(i => i.visible === false).length;
+        document.getElementById("adminStatsLine").textContent = `Total: ${catalogItems.length} | Show: ${visCount} | Hidden: ${hidCount}`;
+      } else {
+        bar.classList.add("hidden");
+      }
+    }
+
+    function saveAdminDataLocal() {
+      localStorage.setItem("gbs_admin_saved_catalog", JSON.stringify(catalogItems));
+      syncAdminUI();
+    }
+
+    function getDisplayItems() {
+      return isAdmin ? catalogItems : catalogItems.filter(i => i.visible !== false);
+    }
+
+    function renderCategories() {
+      const items = getDisplayItems();
+      const cats = ["All Items", ...new Set(items.map(i => i.category))];
+      if (!cats.includes(activeCategory)) activeCategory = "All Items";
       const bar = document.getElementById("categoryBar");
-      const categories = getOrderedCategories();
-      let html = `
-        <button onclick="selectCategory('All Items')" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${selectedCategory === 'All Items' ? 'bg-[#dc2626] text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}">
-          <span>All Items</span>
-          <span class="text-[10px] px-1.5 py-0.2 rounded-full ${selectedCategory === 'All Items' ? 'bg-white/20 text-white' : 'bg-white text-gray-600'}">${appState.items.length}</span>
-        </button>
-      `;
-      categories.forEach(cat => {
-        const count = appState.items.filter(i => i.category === cat).length;
-        const active = selectedCategory === cat;
-        html += `
-          <button onclick="selectCategory('${cat.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${active ? 'bg-[#dc2626] text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}">
-            <span>${cat}</span>
-            <span class="text-[10px] px-1.5 py-0.2 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-white text-gray-600'}">${count}</span>
-          </button>
-        `;
-      });
-      bar.innerHTML = html;
+      bar.innerHTML = cats.map(cat => {
+        const count = cat === "All Items" ? items.length : items.filter(i => i.category === cat).length;
+        const active = activeCategory === cat;
+        return `<button onclick="selectCategory('${cat.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition ${active ? 'bg-[#dc2626] text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}">
+          <span>${cat}</span>
+          <span class="text-[10px] px-1.5 py-0.2 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-white text-gray-600'}">${count}</span>
+        </button>`;
+      }).join("");
     }
 
-    function getFilteredItems() {
-      const q = searchQuery.trim().toLowerCase();
-      return appState.items.filter(item => {
-        const matchCat = selectedCategory === "All Items" || item.category === selectedCategory;
-        const matchSearch = !q ||
-          item.name.toLowerCase().includes(q) ||
-          item.category.toLowerCase().includes(q) ||
-          item.packing.toLowerCase().includes(q) ||
-          String(item.id).includes(q);
-        return matchCat && matchSearch;
-      });
-    }
-
-    function renderCatalog() {
-      renderCategoryBar();
-      const filtered = getFilteredItems();
-      document.getElementById("visibleCountBadge").textContent = `${filtered.length} Item${filtered.length === 1 ? '' : 's'}`;
-      document.getElementById("activeCategoryLabel").textContent = searchQuery ? `Search: "${searchQuery}"` : selectedCategory;
-
-      const container = document.getElementById("catalogContainer");
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
-            <div class="text-2xl mb-2">🔍</div>
-            <p class="text-sm font-bold text-gray-800">No matching spare part found</p>
-            <p class="text-xs text-gray-500 mt-1">Try searching Splendor, Super, Shine, Cable, Filter or Reset filters.</p>
-            <button onclick="clearSearch(); selectCategory('All Items');" class="mt-3 bg-[#dc2626] text-white text-xs font-bold px-4 py-2 rounded-xl">Show All Items</button>
-          </div>
-        `;
-        return;
-      }
-
-      const wa = sanitize10Digits(appState.settings.waNumber) || "7531918790";
-
-      if (viewMode === "table") {
-        let rows = filtered.map(item => {
-          const qty = cart[item.id] || 0;
-          const serial = String(item.id).padStart(2, "0");
-          return `
-            <tr class="border-b border-gray-100 hover:bg-gray-50">
-              <td class="py-2.5 px-2.5 text-[11px] font-extrabold text-gray-500">#${serial}</td>
-              <td class="py-2.5 px-2">
-                <div class="text-xs font-bold text-gray-900">${item.name}</div>
-                <div class="text-[10px] text-emerald-700 font-semibold">${item.packing} • <span class="text-gray-400">${item.category}</span></div>
-              </td>
-              <td class="py-2.5 px-2 text-right font-extrabold text-xs text-[#dc2626] whitespace-nowrap">₹${item.rate}</td>
-              <td class="py-2.5 px-2.5 text-right whitespace-nowrap">
-                ${qty === 0
-                  ? `<button onclick="addToCart(${item.id})" class="bg-gray-900 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">+ Add</button>`
-                  : `<div class="inline-flex items-center bg-red-50 border border-red-200 rounded-lg">
-                      <button onclick="updateQty(${item.id}, -1)" class="px-2 py-0.5 text-xs font-extrabold text-red-700">−</button>
-                      <span class="px-1.5 text-xs font-extrabold text-gray-900">${qty}</span>
-                      <button onclick="updateQty(${item.id}, 1)" class="px-2 py-0.5 text-xs font-extrabold text-red-700">+</button>
-                    </div>`
-                }
-              </td>
-            </tr>
-          `;
-        }).join("");
-
-        container.innerHTML = `
-          <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden card-shadow">
-            <table class="w-full text-left border-collapse">
-              <thead class="bg-gray-900 text-white text-[10px] uppercase tracking-wider">
-                <tr>
-                  <th class="py-2.5 px-2.5">S.No</th>
-                  <th class="py-2.5 px-2">Item / Packing</th>
-                  <th class="py-2.5 px-2 text-right">Rate</th>
-                  <th class="py-2.5 px-2.5 text-right">Order</th>
-                </tr>
-              </thead>
-              <tbody>${rows}</tbody>
-            </table>
-          </div>
-        `;
-        return;
-      }
-
-      // Group filtered items serial-by-category
-      const grouped = {};
-      filtered.forEach(item => {
-        if (!grouped[item.category]) grouped[item.category] = [];
-        grouped[item.category].push(item);
-      });
-
-      let html = "";
-      Object.keys(grouped).forEach(cat => {
-        const itemsInCat = grouped[cat];
-        html += `
-          <section class="space-y-2.5">
-            <div class="flex items-center justify-between px-1">
-              <div class="flex items-center gap-2">
-                <span class="w-1 h-4 rounded-full bg-[#dc2626]"></span>
-                <h2 class="text-xs font-extrabold uppercase tracking-wide text-gray-800">${cat}</h2>
-              </div>
-              <span class="text-[11px] font-bold text-gray-500 bg-white px-2 py-0.5 rounded-full border border-gray-200">${itemsInCat.length} part${itemsInCat.length === 1 ? '' : 's'}</span>
-            </div>
-            <div class="space-y-3">
-        `;
-
-        itemsInCat.forEach(item => {
-          const serial = String(item.id).padStart(2, "0");
-          const qty = cart[item.id] || 0;
-          const singleWaText = `Hello GHUMO BIKE STORE (Faridabad), please share availability for:\n• #${serial} ${item.name} (${item.packing}) — Rate: ₹${item.rate}`;
-          const singleWaHref = `https://wa.me/91${wa}?text=${encodeURIComponent(singleWaText)}`;
-
-          html += `
-            <article class="bg-white rounded-2xl p-3.5 border ${qty > 0 ? 'border-red-400 ring-1 ring-red-200' : 'border-gray-200/90'} card-shadow">
-              <!-- Top Serial + Edit + Category Pill -->
-              <div class="flex items-center justify-between gap-2 mb-2.5">
-                <div class="flex items-center gap-1.5">
-                  <span class="bg-[#141518] text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-md">#${serial}</span>
-                  <button onclick="openEditItemModal(${item.id})" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold px-2 py-0.5 rounded-md">Edit</button>
-                </div>
-                <span class="bg-gray-100 text-gray-600 text-[11px] font-semibold px-2.5 py-0.5 rounded-full truncate max-w-[170px]">${item.category}</span>
-              </div>
-
-              <!-- Image Area: Clean 1:1 Square when photo uploaded, compact emblem box when empty -->
-              ${item.image ? `
-                <div class="relative w-full aspect-square bg-white rounded-xl border border-gray-200 overflow-hidden mb-3">
-                  <div class="absolute top-2 left-2 right-2 z-10 flex items-center justify-between">
-                    <button onclick="toggleItemFitMode(${item.id})" class="bg-black/75 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-xs">
-                      ${item.fitMode === 'cover' ? 'Fill • Switch' : 'Fit • Switch'}
-                    </button>
-                    <div class="flex items-center gap-1.5">
-                      <button onclick="triggerItemPhotoUpload(${item.id})" class="bg-black/75 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-xs">Change</button>
-                      <button onclick="removeItemPhoto(${item.id})" class="bg-red-600 text-white text-[10px] font-bold w-6 h-6 rounded-lg flex items-center justify-center">✕</button>
-                    </div>
-                  </div>
-                  <img onclick="openLightbox(${item.id})" src="${item.image}" alt="${item.name}" class="w-full h-full ${item.fitMode === 'cover' ? 'object-cover' : 'object-contain'} cursor-zoom-in p-1" />
-                  <button onclick="openLightbox(${item.id})" class="absolute bottom-2 right-2 bg-white/95 text-gray-900 border border-gray-300 text-[10px] font-extrabold px-2.5 py-1 rounded-lg shadow">
-                    Full Zoom
-                  </button>
-                </div>
-              ` : `
-                <div class="relative w-full h-24 bg-gray-50 rounded-xl border border-dashed border-gray-200 flex items-center justify-center mb-3">
-                  ${getCategorySvg(item.category)}
-                  <button onclick="triggerItemPhotoUpload(${item.id})" class="absolute bottom-2 right-2 bg-white hover:bg-gray-100 text-gray-800 border border-gray-300 text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-xs">
-                    + Photo
-                  </button>
-                </div>
-              `}
-
-              <!-- Title & Packing Tag -->
-              <h3 class="text-sm font-extrabold text-gray-900 leading-snug">${item.name}</h3>
-              <div class="mt-1.5">
-                <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-bold px-2.5 py-0.5 rounded-md">
-                  ● ${item.packing}
-                </span>
-              </div>
-
-              <!-- Price & Order Controls -->
-              <div class="mt-3 pt-2.5 border-t border-gray-100 flex items-end justify-between gap-2">
-                <div>
-                  <div class="text-[10px] uppercase tracking-wider font-bold text-gray-400">Wholesale Rate</div>
-                  <div class="text-lg font-extrabold text-[#dc2626] leading-tight">₹${item.rate}</div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <a href="${singleWaHref}" target="_blank" rel="noopener noreferrer" onclick="handleDirectContact('wa', \`${singleWaText.replace(/`/g, "'")}\`)" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-extrabold px-3 py-2 rounded-xl">
-                    WA
-                  </a>
-                  ${qty === 0
-                    ? `<button onclick="addToCart(${item.id})" class="bg-[#141518] hover:bg-gray-800 text-white text-xs font-extrabold px-4 py-2 rounded-xl shadow-xs">+ Add</button>`
-                    : `<div class="flex items-center bg-red-50 border border-red-300 rounded-xl overflow-hidden">
-                        <button onclick="updateQty(${item.id}, -1)" class="px-3 py-1.5 text-sm font-extrabold text-red-700 hover:bg-red-100">−</button>
-                        <span class="px-2.5 text-xs font-extrabold text-gray-900">${qty}</span>
-                        <button onclick="updateQty(${item.id}, 1)" class="px-3 py-1.5 text-sm font-extrabold text-red-700 hover:bg-red-100">+</button>
-                      </div>`
-                  }
-                </div>
-              </div>
-            </article>
-          `;
-        });
-
-        html += `</div></section>`;
-      });
-
-      container.innerHTML = html;
-    }
-
-    // --- INTERACTIONS ---
     function selectCategory(cat) {
-      selectedCategory = cat;
+      activeCategory = cat;
+      renderCategories();
       renderCatalog();
     }
 
     function handleSearch(val) {
-      searchQuery = val;
-      document.getElementById("clearSearchBtn").classList.toggle("hidden", !val);
+      searchQuery = val.trim().toLowerCase();
+      document.getElementById("clearSearchBtn").classList.toggle("hidden", !searchQuery);
       renderCatalog();
     }
 
     function clearSearch() {
-      searchQuery = "";
       document.getElementById("searchInput").value = "";
-      document.getElementById("clearSearchBtn").classList.add("hidden");
-      renderCatalog();
+      handleSearch("");
     }
 
     function setViewMode(mode) {
@@ -996,230 +500,292 @@
       renderCatalog();
     }
 
-    // --- SMART AI WHOLESALE RATE & QUANTITY CHAT ---
-    function getWholesaleSlabRate(baseRate, qty) {
-      let discountPct = 0;
-      let slabLabel = "Standard Wholesale Rate";
-      if (qty >= 20) {
-        discountPct = 8;
-        slabLabel = "Bulk Slab (20+ pcs • 8% Extra Off)";
-      } else if (qty >= 10) {
-        discountPct = 5;
-        slabLabel = "Wholesale Slab (10+ pcs • 5% Extra Off)";
-      } else if (qty >= 5) {
-        discountPct = 3;
-        slabLabel = "Mechanic Pack (5+ pcs • 3% Extra Off)";
+    function renderCatalog() {
+      let items = getDisplayItems();
+      if (activeCategory !== "All Items") {
+        items = items.filter(i => i.category === activeCategory);
       }
-      const unitRate = Math.max(1, Math.round(baseRate * (1 - discountPct / 100)));
-      return { unitRate, discountPct, slabLabel, total: unitRate * qty };
-    }
-
-    function openRateChatModal() {
-      if (!Array.isArray(appState.chatHistory) || appState.chatHistory.length === 0) {
-        const custName = appState.customerProfile && appState.customerProfile.name ? ` ${appState.customerProfile.name}` : "";
-        appState.chatHistory = [{
-          role: "bot",
-          text: `Namaste${custName}! GHUMO BIKE STORE (Faridabad) me aapka swagat hai.\n\nAap kisi bhi part ka naam likhein (jaise "Chain kit super", "Clutch plate", "Brake shoe") — main turant rate bataunga aur aapki quantity ke hisab se wholesale rate calculate karunga.`
-        }];
+      if (searchQuery) {
+        items = items.filter(i =>
+          i.name.toLowerCase().includes(searchQuery) ||
+          i.spec.toLowerCase().includes(searchQuery) ||
+          i.category.toLowerCase().includes(searchQuery) ||
+          i.code.toLowerCase().includes(searchQuery)
+        );
       }
-      renderRateChatMessages();
-      document.getElementById("rateChatModal").classList.remove("hidden");
-    }
 
-    function closeRateChatModal() {
-      document.getElementById("rateChatModal").classList.add("hidden");
-    }
+      document.getElementById("visibleCountBadge").textContent = `${items.length} Items`;
+      document.getElementById("activeCategoryLabel").textContent = searchQuery ? `Search: "${searchQuery}"` : activeCategory;
 
-    function clearRateChatHistory() {
-      appState.chatHistory = [];
-      activeChatMatchedIds = [];
-      persistState();
-      openRateChatModal();
-    }
+      const container = document.getElementById("catalogContainer");
+      if (!items.length) {
+        container.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
+          <div class="text-sm font-bold text-gray-700">No matching parts found</div>
+          <p class="text-xs text-gray-500 mt-1">Try another bike model or ask directly on WhatsApp.</p>
+        </div>`;
+        return;
+      }
 
-    function sendQuickChatPrompt(text) {
-      document.getElementById("rateChatInput").value = text;
-      handleRateChatSubmit(new Event("submit"));
-    }
+      if (viewMode === "table") {
+        container.innerHTML = `<div class="bg-white rounded-2xl border border-gray-200 overflow-hidden card-shadow">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-100 text-[10px] font-extrabold uppercase text-gray-600">
+              <tr>
+                <th class="py-2.5 px-3">Part Details</th>
+                <th class="py-2.5 px-2 text-right">Rate</th>
+                <th class="py-2.5 px-3 text-right">${isAdmin ? 'Admin' : 'Order'}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-xs">
+              ${items.map(item => {
+                const qty = cart[item.id] || 0;
+                const isVis = item.visible !== false;
+                return `<tr class="${!isVis ? 'bg-red-50/60' : ''}">
+                  <td class="py-2.5 px-3">
+                    <div class="font-bold text-gray-900">${item.name}</div>
+                    <div class="text-[10px] text-gray-500">${item.code} • ${item.spec}</div>
+                  </td>
+                  <td class="py-2.5 px-2 text-right font-extrabold text-[#dc2626] whitespace-nowrap">₹${item.price}</td>
+                  <td class="py-2.5 px-3 text-right whitespace-nowrap">
+                    ${isAdmin
+                      ? `<button onclick="togglePartShowHide(${item.id})" class="text-[10px] font-extrabold px-2 py-1 rounded ${isVis ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700'}">${isVis ? 'SHOW' : 'HIDDEN'}</button>`
+                      : (qty > 0
+                        ? `<div class="inline-flex items-center gap-1.5 bg-gray-900 text-white rounded-lg px-2 py-1 text-[11px] font-bold">
+                            <button onclick="updateCart(${item.id}, -1)">−</button>
+                            <span>${qty}</span>
+                            <button onclick="updateCart(${item.id}, 1)">+</button>
+                          </div>`
+                        : `<button onclick="updateCart(${item.id}, 1)" class="bg-gray-900 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">+ Add</button>`)
+                    }
+                  </td>
+                </tr>`;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>`;
+        return;
+      }
 
-    function addItemFromChat(id, qty) {
-      cart[id] = (cart[id] || 0) + (qty || 1);
-      persistState();
-      updateCartUI();
-      renderCatalog();
-      showToast(`Added ${qty || 1} pc to order list`);
-    }
+      const grouped = {};
+      items.forEach(item => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+      });
 
-    function renderRateChatMessages() {
-      const box = document.getElementById("rateChatMessages");
-      box.innerHTML = (appState.chatHistory || []).map(msg => {
-        if (msg.role === "user") {
-          return `
-            <div class="flex justify-end">
-              <div class="bg-[#141518] text-white text-xs rounded-2xl rounded-br-sm px-3.5 py-2.5 max-w-[82%] shadow-xs whitespace-pre-line">${msg.text}</div>
+      container.innerHTML = Object.entries(grouped).map(([cat, catItems]) => `
+        <section class="space-y-2.5">
+          <div class="flex items-center justify-between px-1">
+            <div class="flex items-center gap-2">
+              <span class="w-1 h-4 bg-[#dc2626] rounded-full"></span>
+              <h2 class="text-xs font-extrabold uppercase tracking-wider text-gray-800">${cat}</h2>
             </div>
-          `;
-        }
-        let actionsHtml = "";
-        if (Array.isArray(msg.actions) && msg.actions.length > 0) {
-          actionsHtml = `<div class="mt-2 pt-2 border-t border-gray-200/80 flex flex-wrap gap-1.5">` +
-            msg.actions.map(act => `
-              <button onclick="addItemFromChat(${act.id}, ${act.qty})" class="bg-[#dc2626] hover:bg-red-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg shadow-xs">
-                + Add ${act.label}
-              </button>
-            `).join("") +
-            `</div>`;
-        }
-        return `
-          <div class="flex justify-start">
-            <div class="bg-white border border-gray-200 text-gray-900 text-xs rounded-2xl rounded-bl-sm px-3.5 py-2.5 max-w-[88%] shadow-xs whitespace-pre-line leading-relaxed">
-              <div>${msg.text}</div>
-              ${actionsHtml}
-            </div>
+            <span class="bg-white border border-gray-200 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-full">${catItems.length} parts</span>
           </div>
-        `;
-      }).join("");
-      box.scrollTop = box.scrollHeight;
+          <div class="space-y-2.5">
+            ${catItems.map(item => {
+              const qty = cart[item.id] || 0;
+              const isVis = item.visible !== false;
+              const waMsg = encodeURIComponent(`Hello GHUMO BIKE STORE, I want to order:\n• ${item.name} (${item.spec}) - Rate: ₹${item.price}`);
+              return `<div class="bg-white rounded-2xl p-3 border ${!isVis ? 'border-red-300 bg-red-50/30' : 'border-gray-200/90'} card-shadow">
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <div class="flex items-center gap-1.5">
+                    <span class="bg-[#141518] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md">${item.code}</span>
+                    ${isAdmin ? `
+                      <button onclick="openEditPartModal(${item.id})" class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-md border border-gray-300">Edit</button>
+                      <button onclick="togglePartShowHide(${item.id})" class="text-[10px] font-extrabold px-2 py-0.5 rounded-md ${isVis ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-red-100 text-red-700 border border-red-300'}">${isVis ? '👁️ SHOW' : '🚫 HIDDEN'}</button>
+                    ` : ''}
+                  </div>
+                  <span class="bg-gray-100 text-gray-600 text-[10px] font-semibold px-2 py-0.5 rounded-md">${item.category}</span>
+                </div>
+
+                ${item.image
+                  ? `<div class="mb-2.5 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 h-36 flex items-center justify-center relative">
+                      <img src="${item.image}" alt="${item.name}" class="max-h-full max-w-full object-contain" />
+                      ${isAdmin ? `<button onclick="triggerPhotoPick(${item.id})" class="absolute bottom-2 right-2 bg-black/75 text-white text-[10px] font-bold px-2 py-1 rounded-lg">Change Photo</button>` : ''}
+                    </div>`
+                  : (isAdmin ? `<div class="mb-2.5 flex justify-end"><button onclick="triggerPhotoPick(${item.id})" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 text-[10px] font-bold px-2.5 py-1 rounded-lg">+ Photo</button></div>` : '')
+                }
+
+                <h3 class="text-sm font-extrabold text-gray-900 leading-snug">${item.name}</h3>
+                <div class="mt-1 inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                  <span>•</span> ${item.spec}
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between gap-2">
+                  <div>
+                    <div class="text-[9px] font-extrabold uppercase tracking-wider text-gray-400">WHOLESALE RATE</div>
+                    <div class="text-base font-extrabold text-[#dc2626]">₹${item.price}</div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    ${isAdmin ? `<button onclick="deletePart(${item.id})" class="bg-red-50 text-red-600 border border-red-200 text-xs font-bold px-2.5 py-1.5 rounded-xl">🗑️</button>` : ''}
+                    <a href="https://wa.me/91${STORE_WHATSAPP}?text=${waMsg}" target="_blank" rel="noopener noreferrer" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-extrabold px-3 py-1.5 rounded-xl">WA</a>
+                    ${qty > 0
+                      ? `<div class="inline-flex items-center gap-2 bg-[#141518] text-white rounded-xl px-3 py-1.5 text-xs font-extrabold">
+                          <button onclick="updateCart(${item.id}, -1)" class="px-1">−</button>
+                          <span>${qty}</span>
+                          <button onclick="updateCart(${item.id}, 1)" class="px-1">+</button>
+                        </div>`
+                      : `<button onclick="updateCart(${item.id}, 1)" class="bg-[#141518] hover:bg-gray-800 text-white text-xs font-extrabold px-3.5 py-1.5 rounded-xl">+ Add</button>`
+                    }
+                  </div>
+                </div>
+              </div>`;
+            }).join("")}
+          </div>
+        </section>
+      `).join("");
     }
 
-    function handleRateChatSubmit(e) {
-      e.preventDefault();
-      const inp = document.getElementById("rateChatInput");
-      const raw = inp.value.trim();
-      if (!raw) return;
-      inp.value = "";
-
-      appState.chatHistory.push({ role: "user", text: raw });
-      const lower = raw.toLowerCase();
-
-      // Check if user specified quantity (e.g., "10", "5 pcs", "20 piece", "12")
-      const qtyMatch = lower.match(/(\d+)\s*(pc|pcs|piece|pieces|set|sets|pis|qty)?/i);
-      const parsedQty = qtyMatch ? parseInt(qtyMatch[1], 10) : 0;
-
-      // Search matching parts by keywords
-      const stopWords = ["rate", "price", "kitne", "ka", "hai", "chahiye", "need", "want", "pc", "pcs", "piece", "pieces", "set", "sets", "wholesale", "holsel", "batao", "for"];
-      const tokens = lower.replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(w => w.length > 1 && !stopWords.includes(w) && !/^\d+$/.test(w));
-
-      let matches = [];
-      if (tokens.length > 0) {
-        matches = appState.items.filter(item => {
-          const hay = `${item.name} ${item.category} ${item.packing}`.toLowerCase();
-          return tokens.every(t => hay.includes(t));
-        });
-        if (matches.length === 0) {
-          matches = appState.items.filter(item => {
-            const hay = `${item.name} ${item.category} ${item.packing}`.toLowerCase();
-            return tokens.some(t => hay.includes(t));
-          });
-        }
+    // ADMIN FUNCTIONS
+    function togglePartShowHide(id) {
+      const item = catalogItems.find(i => i.id === id);
+      if (item) {
+        item.visible = item.visible === false ? true : false;
+        saveAdminDataLocal();
+        renderCategories();
+        renderCatalog();
       }
+    }
 
-      let replyText = "";
-      let actions = [];
+    function openAddPartModal() {
+      document.getElementById("partModalHeading").textContent = "Add New Spare Part";
+      document.getElementById("formPartId").value = "";
+      document.getElementById("formPartCategory").value = "";
+      document.getElementById("formPartName").value = "";
+      document.getElementById("formPartSpec").value = "";
+      document.getElementById("formPartPrice").value = "";
+      document.getElementById("adminPartModal").classList.remove("hidden");
+    }
 
-      if (matches.length > 0) {
-        activeChatMatchedIds = matches.slice(0, 4).map(m => m.id);
-        const topMatches = matches.slice(0, 4);
-        if (parsedQty > 0) {
-          replyText = `Yeh rahe matching parts (${parsedQty} pcs ke wholesale slab ke saath):\n\n`;
-          topMatches.forEach(m => {
-            const calc = getWholesaleSlabRate(m.rate, parsedQty);
-            replyText += `• #${String(m.id).padStart(2, "0")} ${m.name} (${m.packing})\n  Single Rate: ₹${m.rate} → ${parsedQty} pcs Rate: ₹${calc.unitRate}/pc = ₹${calc.total} (${calc.slabLabel})\n`;
-            actions.push({ id: m.id, qty: parsedQty, label: `${m.name} (${parsedQty} pcs)` });
-          });
-        } else {
-          replyText = `Mujhe yeh ${topMatches.length} matching item mile:\n\n`;
-          topMatches.forEach(m => {
-            replyText += `• #${String(m.id).padStart(2, "0")} ${m.name} (${m.packing}) — Rate: ₹${m.rate}\n`;
-            actions.push({ id: m.id, qty: 1, label: `${m.name} (1 pc)` });
-          });
-          replyText += `\nAapko kitni quantity (pcs) chahiye? Number likhein (jaise "5 pcs" ya "10 pcs") to main quantity ke hisab se wholesale discount rate bata dunga.`;
+    function openEditPartModal(id) {
+      const item = catalogItems.find(i => i.id === id);
+      if (!item) return;
+      document.getElementById("partModalHeading").textContent = `Edit ${item.code}`;
+      document.getElementById("formPartId").value = item.id;
+      document.getElementById("formPartCategory").value = item.category;
+      document.getElementById("formPartName").value = item.name;
+      document.getElementById("formPartSpec").value = item.spec;
+      document.getElementById("formPartPrice").value = item.price;
+      document.getElementById("adminPartModal").classList.remove("hidden");
+    }
+
+    function closePartModal() {
+      document.getElementById("adminPartModal").classList.add("hidden");
+    }
+
+    function savePartChanges() {
+      const idVal = document.getElementById("formPartId").value;
+      const category = document.getElementById("formPartCategory").value.trim() || "General Parts";
+      const name = document.getElementById("formPartName").value.trim();
+      const spec = document.getElementById("formPartSpec").value.trim() || "Standard OE";
+      const price = Number(document.getElementById("formPartPrice").value) || 0;
+      if (!name) { alert("Part ka naam likhein."); return; }
+
+      if (idVal) {
+        const item = catalogItems.find(i => i.id === Number(idVal));
+        if (item) {
+          item.category = category;
+          item.name = name;
+          item.spec = spec;
+          item.price = price;
         }
-      } else if (parsedQty > 0 && activeChatMatchedIds.length > 0) {
-        const prevItems = activeChatMatchedIds.map(id => appState.items.find(i => i.id === id)).filter(Boolean);
-        replyText = `${parsedQty} pcs quantity ke hisab se wholesale calculation:\n\n`;
-        prevItems.forEach(m => {
-          const calc = getWholesaleSlabRate(m.rate, parsedQty);
-          replyText += `• #${String(m.id).padStart(2, "0")} ${m.name} (${m.packing})\n  Base ₹${m.rate} → ₹${calc.unitRate}/pc × ${parsedQty} = ₹${calc.total} (${calc.slabLabel})\n`;
-          actions.push({ id: m.id, qty: parsedQty, label: `${m.name} (${parsedQty} pcs)` });
-        });
       } else {
-        replyText = `Kripya part ka naam ya bike model likhein — jaise:\n• "Chain kit super splendor"\n• "Clutch plate"\n• "Brake shoe"\n• "Air filter shine"\n• "Coupling rubber"\n\nQuantity slabs: 5+ pcs (3% extra off), 10+ pcs (5% extra off), 20+ pcs (8% extra off).`;
+        const nextId = catalogItems.length ? Math.max(...catalogItems.map(i => i.id)) + 1 : 1;
+        const code = "#" + String(nextId).padStart(2, "0");
+        catalogItems.push({ id: nextId, code, category, name, spec, price, visible: true, image: "" });
       }
-
-      appState.chatHistory.push({ role: "bot", text: replyText, actions });
-      persistState();
-      renderRateChatMessages();
-    }
-
-    // --- CART & VERIFIED ORDER FLOW ---
-    function addToCart(id) {
-      cart[id] = (cart[id] || 0) + 1;
-      persistState();
-      updateCartUI();
+      saveAdminDataLocal();
+      closePartModal();
+      renderCategories();
       renderCatalog();
-      showToast("Added to order list");
     }
 
-    function updateQty(id, delta) {
+    function deletePart(id) {
+      if (!confirm("Kya is part ko permanent delete karna hai?")) return;
+      catalogItems = catalogItems.filter(i => i.id !== id);
+      saveAdminDataLocal();
+      renderCategories();
+      renderCatalog();
+    }
+
+    function triggerPhotoPick(id) {
+      photoTargetId = id;
+      document.getElementById("partPhotoPicker").click();
+    }
+
+    function handlePartPhotoUpload(e) {
+      const file = e.target.files[0];
+      if (!file || !photoTargetId) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const item = catalogItems.find(i => i.id === photoTargetId);
+        if (item) {
+          item.image = reader.result;
+          saveAdminDataLocal();
+          renderCatalog();
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function copyLiveHtmlForGithub() {
+      const fullDoc = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+      const updatedBlock = `const DEFAULT_CATALOG = ${JSON.stringify(catalogItems, null, 2)};`;
+      const cleanHtml = fullDoc.replace(/const DEFAULT_CATALOG = \[[\s\S]*?\];/, updatedBlock);
+      try {
+        await navigator.clipboard.writeText(cleanHtml);
+        alert("Updated Live Code copy ho gaya! Ab GitHub me index.html kholkar paste aur Commit kar dein—sabhi customers ko aapke naye changes dikhenge.");
+      } catch (err) {
+        alert("Code copy nahi ho paya, browser permission check karein.");
+      }
+    }
+
+    // CUSTOMER CART & ORDER FUNCTIONS
+    function updateCart(id, delta) {
       const next = (cart[id] || 0) + delta;
       if (next <= 0) delete cart[id];
       else cart[id] = next;
-      persistState();
-      updateCartUI();
       renderCatalog();
-      if (!document.getElementById("orderDrawerModal").classList.contains("hidden")) {
-        renderOrderDrawerItems();
+      updateBottomCartBar();
+    }
+
+    function updateBottomCartBar() {
+      const entries = Object.entries(cart);
+      const bar = document.getElementById("bottomCartBar");
+      if (!entries.length) {
+        bar.classList.add("hidden");
+        return;
       }
-    }
-
-    function clearCart() {
-      cart = {};
-      persistState();
-      updateCartUI();
-      renderCatalog();
-      closeOrderDrawer();
-      showToast("Order list cleared");
-    }
-
-    function getCartTotals() {
       let totalQty = 0;
       let totalAmt = 0;
-      const lines = [];
-      Object.keys(cart).forEach(idStr => {
-        const id = Number(idStr);
-        const item = appState.items.find(i => i.id === id);
-        if (item && cart[id] > 0) {
-          const qty = cart[id];
-          const sub = item.rate * qty;
+      entries.forEach(([id, qty]) => {
+        const item = catalogItems.find(i => i.id === Number(id));
+        if (item) {
           totalQty += qty;
-          totalAmt += sub;
-          lines.push({ item, qty, sub });
+          totalAmt += item.price * qty;
         }
       });
-      return { totalQty, totalAmt, lines };
-    }
-
-    function updateCartUI() {
-      const { totalQty, totalAmt } = getCartTotals();
-      const bar = document.getElementById("bottomCartBar");
-      const chatBtn = document.getElementById("floatingRateChatBtn");
-      if (totalQty === 0) {
-        bar.classList.add("hidden");
-        chatBtn.classList.remove("bottom-24");
-        chatBtn.classList.add("bottom-5");
-      } else {
-        bar.classList.remove("hidden");
-        chatBtn.classList.remove("bottom-5");
-        chatBtn.classList.add("bottom-24");
-        document.getElementById("cartBadgeCount").textContent = totalQty;
-        document.getElementById("cartTotalSummary").textContent = `₹${totalAmt.toLocaleString('en-IN')} (${totalQty} pc${totalQty === 1 ? '' : 's'})`;
-      }
+      document.getElementById("cartBadgeCount").textContent = totalQty;
+      document.getElementById("cartTotalSummary").textContent = `₹${totalAmt} (${totalQty} pcs)`;
+      bar.classList.remove("hidden");
     }
 
     function openOrderDrawer() {
-      renderOrderDrawerItems();
-      validateCustomerForm();
+      const list = document.getElementById("cartItemsList");
+      let total = 0;
+      list.innerHTML = Object.entries(cart).map(([id, qty]) => {
+        const item = catalogItems.find(i => i.id === Number(id));
+        if (!item) return "";
+        const sub = item.price * qty;
+        total += sub;
+        return `<div class="flex items-center justify-between gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200 text-xs">
+          <div class="min-w-0">
+            <div class="font-bold text-gray-900 truncate">${item.name}</div>
+            <div class="text-[10px] text-gray-500">₹${item.price} × ${qty} pcs</div>
+          </div>
+          <div class="font-extrabold text-gray-900 shrink-0">₹${sub}</div>
+        </div>`;
+      }).join("");
+      document.getElementById("drawerTotalAmount").textContent = `₹${total}`;
       document.getElementById("orderDrawerModal").classList.remove("hidden");
     }
 
@@ -1227,569 +793,112 @@
       document.getElementById("orderDrawerModal").classList.add("hidden");
     }
 
-    function returnToCatalogToAddMore() {
-      closeOrderDrawer();
-      selectedCategory = "All Items";
-      renderCatalog();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      showToast("Select more items from All Categories");
-    }
-
-    function renderOrderDrawerItems() {
-      const { totalAmt, lines } = getCartTotals();
-      document.getElementById("drawerTotalAmount").textContent = `₹${totalAmt.toLocaleString('en-IN')}`;
-      const listEl = document.getElementById("orderItemsList");
-
-      if (lines.length === 0) {
-        listEl.innerHTML = `<div class="text-center py-6 text-xs text-gray-500">No items selected yet.</div>`;
+    function sendOrderOnWhatsApp() {
+      const name = document.getElementById("custName").value.trim();
+      const phone = document.getElementById("custPhone").value.trim();
+      const city = document.getElementById("custCity").value.trim();
+      if (!name || !phone) {
+        alert("Kripya apna Naam aur Mobile Number bharein.");
         return;
       }
-
-      listEl.innerHTML = lines.map(({ item, qty, sub }) => {
-        const serial = String(item.id).padStart(2, "0");
-        return `
-          <div class="bg-white border border-gray-200 rounded-2xl p-2.5 flex items-center gap-2.5">
-            <div class="w-12 h-12 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
-              ${item.image
-                ? `<img src="${item.image}" class="w-full h-full object-contain" />`
-                : getCategorySvg(item.category)
-              }
-            </div>
-            <div class="min-w-0 flex-1">
-              <div class="text-[10px] font-bold text-gray-500">#${serial} • ${item.packing}</div>
-              <div class="text-xs font-extrabold text-gray-900 truncate">${item.name}</div>
-              <div class="text-xs font-bold text-[#dc2626] mt-0.5">₹${item.rate} × ${qty} = ₹${sub}</div>
-            </div>
-            <div class="flex items-center bg-gray-100 border border-gray-200 rounded-xl shrink-0">
-              <button onclick="updateQty(${item.id}, -1)" class="px-2.5 py-1.5 text-xs font-extrabold text-gray-800">−</button>
-              <span class="px-2 text-xs font-extrabold text-gray-900">${qty}</span>
-              <button onclick="updateQty(${item.id}, 1)" class="px-2.5 py-1.5 text-xs font-extrabold text-gray-800">+</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function attachCustomerGps() {
-      const btn = document.getElementById("gpsPinBtn");
-      const msg = document.getElementById("gpsStatusMsg");
-      if (!navigator.geolocation) {
-        showToast("GPS not supported on this browser");
-        return;
-      }
-      btn.textContent = "Locating...";
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const lat = pos.coords.latitude.toFixed(6);
-          const lng = pos.coords.longitude.toFixed(6);
-          customerGpsLink = `https://maps.google.com/?q=${lat},${lng}`;
-          btn.textContent = "✅ GPS Pinned";
-          msg.textContent = `GPS Location Attached: ${lat}, ${lng}`;
-          msg.classList.remove("hidden");
-          saveCustomerProfileDraft();
-          validateCustomerForm();
-        },
-        () => {
-          btn.textContent = "📍 Pin GPS Location";
-          showToast("Please allow location permission or type your Sector/Area");
-        },
-        { enableHighAccuracy: true, timeout: 8000 }
-      );
-    }
-
-    function validateCustomerForm() {
-      const name = document.getElementById("custNameInput").value.trim();
-      const phone = sanitize10Digits(document.getElementById("custPhoneInput").value);
-      const addr = document.getElementById("custAddressInput").value.trim();
-      const { totalQty } = getCartTotals();
-
-      const isValid = name.length >= 2 && phone.length === 10 && addr.length >= 3 && totalQty > 0;
-      const pill = document.getElementById("verificationStatusPill");
-      const btn = document.getElementById("sendVerifiedOrderBtn");
-
-      if (isValid) {
-        pill.textContent = "✓ Verified Ready";
-        pill.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
-        btn.disabled = false;
-        btn.className = "w-full bg-[#16a34a] hover:bg-emerald-500 text-white cursor-pointer py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg transition-all";
-        btn.innerHTML = `<span>💬</span> Send Verified Order on WhatsApp`;
-      } else {
-        pill.textContent = "Fill Details";
-        pill.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700";
-        btn.disabled = true;
-        btn.className = "w-full bg-gray-300 text-gray-500 cursor-not-allowed py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2";
-        btn.innerHTML = `<span>🔒</span> Enter Name, 10-Digit Mobile &amp; Address to Send`;
-      }
-      return isValid;
-    }
-
-    function buildVerifiedOrderPayload() {
-      const name = document.getElementById("custNameInput").value.trim();
-      const phone = sanitize10Digits(document.getElementById("custPhoneInput").value);
-      const addr = document.getElementById("custAddressInput").value.trim();
-      const { totalQty, totalAmt, lines } = getCartTotals();
-
-      const now = new Date();
-      const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
-      const timeStr = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
-      const orderId = "GBS-" + Math.floor(1000 + Math.random() * 9000);
-
-      let text = `*NEW VERIFIED ORDER — GHUMO BIKE STORE*\n`;
-      text += `Order ID: *${orderId}*\n`;
-      text += `Date & Time: ${dateStr}, ${timeStr}\n`;
-      text += `----------------------------\n`;
-      text += `Customer: *${name}*\n`;
-      text += `Mobile: *+91 ${phone}*\n`;
-      text += `Location: ${addr}\n`;
-      if (customerGpsLink) text += `GPS Map: ${customerGpsLink}\n`;
-      text += `----------------------------\n`;
-      lines.forEach((l, idx) => {
-        text += `${idx + 1}. #${String(l.item.id).padStart(2, "0")} ${l.item.name} (${l.item.packing}) — ${l.qty} × ₹${l.item.rate} = *₹${l.sub}*\n`;
-      });
-      text += `----------------------------\n`;
-      text += `*Total Items:* ${totalQty} pcs\n`;
-      text += `*Estimated Total:* ₹${totalAmt.toLocaleString("en-IN")}`;
-
-      return { orderId, dateStr, timeStr, name, phone, addr, gps: customerGpsLink, totalQty, totalAmt, lines, text };
-    }
-
-    function copyFormattedOrder() {
-      const { totalQty } = getCartTotals();
-      if (totalQty === 0) return;
-      const payload = buildVerifiedOrderPayload();
-      lastPreparedMessage = payload.text;
-      navigator.clipboard?.writeText(payload.text);
-      showToast("Order details copied!");
-    }
-
-    function submitVerifiedOrder() {
-      if (!validateCustomerForm()) return;
-      saveCustomerProfileDraft();
-      const payload = buildVerifiedOrderPayload();
-      lastPreparedMessage = payload.text;
-
-      // Save in local Orders Log with status
-      if (!Array.isArray(appState.ordersLog)) appState.ordersLog = [];
-      appState.ordersLog.unshift({
-        orderId: payload.orderId,
-        timestamp: `${payload.dateStr} • ${payload.timeStr}`,
-        name: payload.name,
-        phone: payload.phone,
-        addr: payload.addr,
-        gps: payload.gps,
-        totalQty: payload.totalQty,
-        totalAmt: payload.totalAmt,
-        status: "Sent to WhatsApp",
-        summary: payload.lines.map(l => `${l.item.name} (${l.qty}pc)`).join(", "),
-        fullText: payload.text
-      });
-      persistState();
-      syncContactLinks();
-      hydrateReturningCustomer();
-
-      const wa = sanitize10Digits(appState.settings.waNumber) || "7531918790";
-      const waUrl = `https://wa.me/91${wa}?text=${encodeURIComponent(payload.text)}`;
-      handleDirectContact("wa", payload.text);
-      window.open(waUrl, "_blank", "noopener,noreferrer");
-      showToast(`Order ${payload.orderId} logged & opening WhatsApp`);
-    }
-
-    // --- ORDERS LOG & PENDING CART MODAL ---
-    function openOrdersLogModal() {
-      const list = appState.ordersLog || [];
-      const { totalQty, totalAmt, lines } = getCartTotals();
-      const container = document.getElementById("ordersLogContainer");
-      let html = "";
-
-      if (totalQty > 0) {
-        html += `
-          <div class="bg-amber-50 border border-amber-300 rounded-2xl p-3 space-y-1.5">
-            <div class="flex items-center justify-between">
-              <span class="bg-amber-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">IN-ORDER / PENDING CART</span>
-              <span class="text-[10px] font-bold text-amber-900">Not Sent Yet</span>
-            </div>
-            <div class="text-xs font-extrabold text-gray-900">${lines.map(l => `${l.item.name} (${l.qty}pc)`).join(", ")}</div>
-            <div class="flex items-center justify-between pt-1">
-              <span class="text-xs font-extrabold text-[#dc2626]">Estimate: ₹${totalAmt} (${totalQty} pcs)</span>
-              <button onclick="closeOrdersLogModal(); openOrderDrawer();" class="text-[11px] font-extrabold bg-[#dc2626] text-white px-3 py-1 rounded-lg">Complete Order →</button>
-            </div>
-          </div>
-        `;
-      }
-
-      if (list.length === 0 && totalQty === 0) {
-        html = `<div class="text-center py-8 text-xs text-gray-500">No orders or pending items recorded yet.</div>`;
-      } else {
-        html += list.map((o, idx) => `
-          <div class="bg-gray-50 border border-gray-200 rounded-2xl p-3 space-y-1.5">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-1.5">
-                <span class="bg-gray-900 text-white text-[10px] font-extrabold px-2 py-0.5 rounded">${o.orderId}</span>
-                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded">${o.status || "Sent to WhatsApp"}</span>
-              </div>
-              <span class="text-[10px] font-bold text-gray-500">${o.timestamp}</span>
-            </div>
-            <div class="text-xs font-extrabold text-gray-900">${o.name} • <span class="text-blue-700">+91 ${o.phone}</span></div>
-            <div class="text-[11px] text-gray-600">📍 ${o.addr}</div>
-            <div class="text-[11px] text-gray-800 bg-white p-2 rounded-xl border border-gray-200">${o.summary}</div>
-            <div class="flex items-center justify-between pt-1">
-              <span class="text-xs font-extrabold text-[#dc2626]">Total: ₹${o.totalAmt} (${o.totalQty} pcs)</span>
-              <button onclick="copyLoggedOrder(${idx})" class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Copy Receipt</button>
-            </div>
-          </div>
-        `).join("");
-      }
-
-      container.innerHTML = html;
-      document.getElementById("ordersLogModal").classList.remove("hidden");
-    }
-
-    function closeOrdersLogModal() {
-      document.getElementById("ordersLogModal").classList.add("hidden");
-    }
-
-    function copyLoggedOrder(idx) {
-      const o = appState.ordersLog[idx];
-      if (o && o.fullText) {
-        navigator.clipboard?.writeText(o.fullText);
-        showToast("Receipt copied!");
-      }
-    }
-
-    function clearOrdersLog() {
-      appState.ordersLog = [];
-      persistState();
-      syncContactLinks();
-      openOrdersLogModal();
-    }
-
-    // --- IMAGE UPLOAD & LIGHTBOX ---
-    function compressImageFile(file) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = new Image();
-          img.onload = () => {
-            const maxDim = 900;
-            let w = img.width;
-            let h = img.height;
-            if (w > maxDim || h > maxDim) {
-              if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
-              else { w = Math.round((w * maxDim) / h); h = maxDim; }
-            }
-            const canvas = document.createElement("canvas");
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL("image/jpeg", 0.82));
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    function triggerItemPhotoUpload(id) {
-      activeUploadItemId = id;
-      const inp = document.getElementById("itemPhotoInput");
-      inp.value = "";
-      inp.click();
-    }
-
-    async function handleItemPhotoSelected(e) {
-      const file = e.target.files && e.target.files[0];
-      if (!file || !activeUploadItemId) return;
-      showToast("Optimizing photo...");
-      const dataUrl = await compressImageFile(file);
-      const item = appState.items.find(i => i.id === activeUploadItemId);
-      if (item) {
-        item.image = dataUrl;
-        item.fitMode = "contain";
-        await persistState();
-        renderCatalog();
-        showToast("Photo saved!");
-      }
-    }
-
-    function toggleItemFitMode(id) {
-      const item = appState.items.find(i => i.id === id);
-      if (item) {
-        item.fitMode = item.fitMode === "cover" ? "contain" : "cover";
-        persistState();
-        renderCatalog();
-      }
-    }
-
-    function removeItemPhoto(id) {
-      const item = appState.items.find(i => i.id === id);
-      if (item) {
-        item.image = "";
-        persistState();
-        renderCatalog();
-        showToast("Photo removed");
-      }
-    }
-
-    function openLightbox(id) {
-      const item = appState.items.find(i => i.id === id);
-      if (!item || !item.image) return;
-      document.getElementById("lightboxTitle").textContent = `#${String(item.id).padStart(2, "0")} ${item.name}`;
-      document.getElementById("lightboxMeta").textContent = `Rate: ₹${item.rate} • ${item.packing} • ${item.category}`;
-      document.getElementById("lightboxImg").src = item.image;
-      document.getElementById("lightboxModal").classList.remove("hidden");
-    }
-
-    function closeLightbox(e, force) {
-      if (force || e.target.id === "lightboxModal") {
-        document.getElementById("lightboxModal").classList.add("hidden");
-      }
-    }
-
-    // --- ADD / EDIT ITEM & CATEGORY ---
-    function populateCategoryDropdown(selectedCat) {
-      const sel = document.getElementById("newPartCategorySelect");
-      const cats = getOrderedCategories();
-      sel.innerHTML = cats.map(c => `<option value="${c}" ${c === selectedCat ? "selected" : ""}>${c}</option>`).join("") +
-        `<option value="__NEW__">+ Create New Category...</option>`;
-      toggleNewCategoryField(sel.value);
-    }
-
-    function toggleNewCategoryField(val) {
-      document.getElementById("newCategoryNameWrap").classList.toggle("hidden", val !== "__NEW__");
-    }
-
-    function openAddItemModal() {
-      document.getElementById("addItemModalTitle").textContent = "+ Add New Spare Part / Category";
-      document.getElementById("editItemIdInput").value = "";
-      document.getElementById("newPartNameInput").value = "";
-      document.getElementById("newPartRateInput").value = "";
-      document.getElementById("newPartPackingInput").value = "";
-      document.getElementById("newCategoryNameInput").value = "";
-      pendingNewPartPhoto = "";
-      document.getElementById("newPartPhotoStatus").textContent = "No photo selected";
-      document.getElementById("newPartPhotoPreview").classList.add("hidden");
-      populateCategoryDropdown(getOrderedCategories()[0]);
-      document.getElementById("addItemModal").classList.remove("hidden");
-    }
-
-    function openEditItemModal(id) {
-      const item = appState.items.find(i => i.id === id);
-      if (!item) return;
-      document.getElementById("addItemModalTitle").textContent = `Edit Part #${String(item.id).padStart(2, "0")}`;
-      document.getElementById("editItemIdInput").value = String(item.id);
-      document.getElementById("newPartNameInput").value = item.name;
-      document.getElementById("newPartRateInput").value = item.rate;
-      document.getElementById("newPartPackingInput").value = item.packing;
-      pendingNewPartPhoto = item.image || "";
-      if (item.image) {
-        document.getElementById("newPartPhotoStatus").textContent = "Photo attached";
-        const prev = document.getElementById("newPartPhotoPreview");
-        prev.src = item.image;
-        prev.classList.remove("hidden");
-      } else {
-        document.getElementById("newPartPhotoStatus").textContent = "No photo selected";
-        document.getElementById("newPartPhotoPreview").classList.add("hidden");
-      }
-      populateCategoryDropdown(item.category);
-      document.getElementById("addItemModal").classList.remove("hidden");
-    }
-
-    function closeAddItemModal() {
-      document.getElementById("addItemModal").classList.add("hidden");
-    }
-
-    async function handleNewPartPhotoSelected(e) {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
-      pendingNewPartPhoto = await compressImageFile(file);
-      document.getElementById("newPartPhotoStatus").textContent = "Photo ready!";
-      const prev = document.getElementById("newPartPhotoPreview");
-      prev.src = pendingNewPartPhoto;
-      prev.classList.remove("hidden");
-    }
-
-    async function saveNewOrEditedPart() {
-      const editId = document.getElementById("editItemIdInput").value;
-      let cat = document.getElementById("newPartCategorySelect").value;
-      if (cat === "__NEW__") {
-        cat = document.getElementById("newCategoryNameInput").value.trim();
-        if (!cat) { showToast("Enter new category name"); return; }
-      }
-      const name = document.getElementById("newPartNameInput").value.trim();
-      const rate = Number(document.getElementById("newPartRateInput").value);
-      const packing = document.getElementById("newPartPackingInput").value.trim() || "Standard Packing";
-
-      if (!name || !rate || rate <= 0) {
-        showToast("Enter valid part name and rate");
-        return;
-      }
-
-      if (editId) {
-        const item = appState.items.find(i => i.id === Number(editId));
+      let lines = [`*NEW ORDER — GHUMO BIKE STORE*`, `Customer: ${name}`, `Phone: ${phone}`];
+      if (city) lines.push(`Area/City: ${city}`);
+      lines.push(`\n*Items:*`);
+      let total = 0;
+      Object.entries(cart).forEach(([id, qty], idx) => {
+        const item = catalogItems.find(i => i.id === Number(id));
         if (item) {
-          item.category = cat;
-          item.name = name;
-          item.rate = rate;
-          item.packing = packing;
-          item.image = pendingNewPartPhoto;
+          const sub = item.price * qty;
+          total += sub;
+          lines.push(`${idx + 1}. ${item.name} (${item.spec}) - ${qty} pcs × ₹${item.price} = ₹${sub}`);
         }
+      });
+      lines.push(`\n*Estimated Total: ₹${total}*`);
+
+      const savedOrders = JSON.parse(localStorage.getItem("gbs_cust_orders") || "[]");
+      savedOrders.unshift({ date: new Date().toLocaleString(), total, summary: lines.slice(4, -1).join(", ") });
+      localStorage.setItem("gbs_cust_orders", JSON.stringify(savedOrders));
+      updateMyOrdersBadge();
+
+      window.open(`https://wa.me/91${STORE_WHATSAPP}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank");
+    }
+
+    function updateMyOrdersBadge() {
+      const savedOrders = JSON.parse(localStorage.getItem("gbs_cust_orders") || "[]");
+      document.getElementById("myOrdersBadge").textContent = savedOrders.length;
+    }
+
+    function openMyOrdersModal() {
+      const savedOrders = JSON.parse(localStorage.getItem("gbs_cust_orders") || "[]");
+      const list = document.getElementById("myOrdersList");
+      list.innerHTML = savedOrders.length
+        ? savedOrders.map(o => `<div class="bg-gray-50 p-3 rounded-xl border border-gray-200 text-xs">
+            <div class="flex justify-between font-bold text-gray-800"><span>${o.date}</span><span class="text-[#dc2626]">₹${o.total}</span></div>
+            <div class="text-[11px] text-gray-600 mt-1">${o.summary}</div>
+          </div>`).join("")
+        : `<p class="text-xs text-gray-500 text-center py-6">Abhi tak koi order nahi bheja gaya hai.</p>`;
+      document.getElementById("myOrdersModal").classList.remove("hidden");
+    }
+
+    function openRateChatModal() {
+      renderChatMessages();
+      document.getElementById("rateChatModal").classList.remove("hidden");
+    }
+    function closeRateChatModal() {
+      document.getElementById("rateChatModal").classList.add("hidden");
+    }
+    function sendQuickChatPrompt(txt) {
+      document.getElementById("rateChatInput").value = txt;
+      handleRateChatSubmit(new Event("submit"));
+    }
+    function handleRateChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById("rateChatInput");
+      const text = input.value.trim();
+      if (!text) return;
+      chatMessages.push({ sender: "user", text });
+      input.value = "";
+
+      const qtyMatch = text.match(/(\d+)\s*(pcs|pc|set|sets|piece|pieces)?/i);
+      const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
+      const cleanQuery = text.replace(/(\d+)\s*(pcs|pc|set|sets|piece|pieces)?/gi, "").trim().toLowerCase();
+
+      let matched = null;
+      if (cleanQuery.length >= 2) {
+        matched = getDisplayItems().find(i => i.name.toLowerCase().includes(cleanQuery) || i.category.toLowerCase().includes(cleanQuery));
+        if (matched) lastChatPart = matched;
+      } else if (lastChatPart) {
+        matched = lastChatPart;
+      }
+
+      if (matched) {
+        const discount = qty >= 20 ? 0.92 : qty >= 10 ? 0.95 : 1;
+        const unitRate = Math.round(matched.price * discount);
+        const total = unitRate * qty;
+        chatMessages.push({
+          sender: "bot",
+          text: `${matched.name} (${matched.spec})\n• Rate (${qty} pcs): ₹${unitRate}/pc\n• Total Estimate: ₹${total}\nOrder ke liye WhatsApp (+91 ${STORE_WHATSAPP}) par message karein.`
+        });
       } else {
-        const nextId = appState.items.reduce((m, i) => Math.max(m, i.id), 0) + 1;
-        appState.items.push({
-          id: nextId,
-          category: cat,
-          name,
-          rate,
-          packing,
-          image: pendingNewPartPhoto,
-          fitMode: "contain"
+        chatMessages.push({
+          sender: "bot",
+          text: `Is part ka exact rate confirm karne ke liye seedhe WhatsApp (+91 ${STORE_WHATSAPP}) par message karein ya part ka naam likhein.`
         });
       }
-
-      await persistState();
-      closeAddItemModal();
-      renderCatalog();
-      showToast(editId ? "Part updated!" : "New part added!");
+      renderChatMessages();
+    }
+    function renderChatMessages() {
+      const box = document.getElementById("rateChatMessages");
+      box.innerHTML = chatMessages.map(m => `<div class="flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}">
+        <div class="max-w-[82%] rounded-2xl px-3.5 py-2.5 text-xs whitespace-pre-line ${m.sender === 'user' ? 'bg-[#dc2626] text-white font-semibold' : 'bg-white border border-gray-200 text-gray-800'}">${m.text}</div>
+      </div>`).join("");
+      box.scrollTop = box.scrollHeight;
     }
 
-    // --- SETTINGS ---
-    function openSettingsModal() {
-      document.getElementById("settingsWaInput").value = appState.settings.waNumber;
-      document.getElementById("settingsCallInput").value = appState.settings.callNumber;
-      document.getElementById("settingsAddressInput").value = appState.settings.address;
-      document.getElementById("settingsModal").classList.remove("hidden");
-    }
-
-    function closeSettingsModal() {
-      document.getElementById("settingsModal").classList.add("hidden");
-    }
-
-    function copyWaToCallSetting() {
-      document.getElementById("settingsCallInput").value = document.getElementById("settingsWaInput").value;
-    }
-
-    async function saveStoreSettings() {
-      const wa = sanitize10Digits(document.getElementById("settingsWaInput").value);
-      const call = sanitize10Digits(document.getElementById("settingsCallInput").value);
-      const addr = document.getElementById("settingsAddressInput").value.trim();
-      if (wa.length !== 10 || call.length !== 10) {
-        showToast("Please enter 10-digit mobile numbers");
-        return;
-      }
-      appState.settings.waNumber = wa;
-      appState.settings.callNumber = call;
-      if (addr) appState.settings.address = addr;
-      await persistState();
-      syncContactLinks();
-      closeSettingsModal();
-      showToast("Store settings saved!");
-    }
-
-    // --- BACKUP & STANDALONE LIVE HTML EXPORT ---
-    function exportBackupJson() {
-      const jsonStr = JSON.stringify(appState, null, 2);
-      const blob = new Blob([jsonStr], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "ghumo-bike-store-backup.json";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      showToast("Backup JSON triggered");
-    }
-
-    function triggerLoadBackup() {
-      const inp = document.getElementById("backupFileInput");
-      inp.value = "";
-      inp.click();
-    }
-
-    function handleBackupFileLoaded(e) {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async (ev) => {
-        try {
-          const parsed = JSON.parse(ev.target.result);
-          if (parsed && Array.isArray(parsed.items)) {
-            appState = { ...appState, ...parsed };
-            await persistState();
-            syncContactLinks();
-            renderCatalog();
-            showToast("Backup restored successfully!");
-          }
-        } catch (err) {
-          showToast("Invalid backup file");
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function buildStandaloneHtmlString() {
-      const clone = document.documentElement.cloneNode(true);
-      ["orderDrawerModal", "ordersLogModal", "addItemModal", "settingsModal", "exportHtmlModal", "lightboxModal", "toastMsg", "sandboxContactBar", "bottomCartBar", "rateChatModal", "returningCustomerBanner"].forEach(id => {
-        const el = clone.querySelector("#" + id);
-        if (el) el.classList.add("hidden");
-      });
-      const exportState = {
-        items: appState.items,
-        settings: appState.settings,
-        ordersLog: [],
-        customerProfile: { name: "", phone: "", address: "", gps: "" },
-        pendingCart: {},
-        chatHistory: []
-      };
-      let html = "<!DOCTYPE html>\n" + clone.outerHTML;
-      html = html.replace(
-        /const EMBEDDED_STATE = null;/,
-        `const EMBEDDED_STATE = ${JSON.stringify(exportState)};`
-      );
-      return html;
-    }
-
-    function openExportHtmlModal() {
-      const html = buildStandaloneHtmlString();
-      document.getElementById("exportHtmlTextarea").value = html;
-      document.getElementById("exportHtmlModal").classList.remove("hidden");
-    }
-
-    function closeExportHtmlModal() {
-      document.getElementById("exportHtmlModal").classList.add("hidden");
-    }
-
-    function triggerDirectHtmlDownload() {
-      const html = buildStandaloneHtmlString();
-      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "index.html";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1500);
-      showToast("Downloading index.html...");
-    }
-
-    function copyFullHtmlCode() {
-      const ta = document.getElementById("exportHtmlTextarea");
-      ta.select();
-      ta.setSelectionRange(0, ta.value.length);
-      navigator.clipboard?.writeText(ta.value);
-      showToast("Full index.html code copied! Paste & save as index.html");
-    }
-
-    // --- INIT ---
-    (async function init() {
-      await loadPersistedState();
-      hydrateReturningCustomer();
-      syncContactLinks();
-      updateCartUI();
-      renderCatalog();
-    })();
+    syncAdminUI();
+    renderCategories();
+    renderCatalog();
+    updateMyOrdersBadge();
   </script>
 </body>
 </html>
