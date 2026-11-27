@@ -1,0 +1,11 @@
+{
+  "name": "ghumo-bike-store",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs",
+    "build": "node -e \"const fs=require('fs');fs.mkdirSync('dist',{recursive:true});fs.copyFileSync('index.html','dist/index.html');\"",
+    "lint": "node -e \"const fs=require('fs');const html=fs.readFileSync('index.html','utf8');const m=html.match(/<script>([\\s\\S]*?)<\\/script>/);if(!m)process.exit(1);new Function(m[1]);\""
+  }
+}
