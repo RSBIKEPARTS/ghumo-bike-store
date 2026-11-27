@@ -76,6 +76,7 @@
         <div class="flex items-center gap-1.5 flex-wrap">
           <button id="adminTabProductsBtn" type="button" onclick="setAdminTab('products')" class="bg-white/20 text-white text-[11px] font-bold px-2 py-1 rounded-lg">Products</button>
           <button id="adminTabOrdersBtn" type="button" onclick="setAdminTab('customers')" class="bg-white/10 text-gray-200 text-[11px] font-bold px-2 py-1 rounded-lg">Customers &amp; Orders</button>
+          <button id="syncAllCloudBtn" type="button" onclick="syncAllProductsToCloud()" class="bg-emerald-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">Sync All 38 to Cloud</button>
           <button onclick="openPartForm()" class="bg-red-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">+ Add Part</button>
           <button onclick="lockAdmin()" class="bg-yellow-400 text-gray-900 text-[11px] font-extrabold px-2.5 py-1 rounded-lg">← Customer Panel</button>
         </div>
@@ -294,6 +295,28 @@
     </div>
   </div>
 
+  <!-- SUPABASE RLS FIX MODAL (ADMIN ONLY, SHOWN ONLY ON 42501 RLS ERROR) -->
+  <div id="rlsHelpModal" onclick="if(event.target===this) closeRlsHelpModal()" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
+    <div class="bg-[#181b20] text-white w-full max-w-md rounded-2xl p-4 space-y-3 border border-white/10">
+      <div class="flex justify-between items-center">
+        <h2 class="text-sm font-extrabold text-amber-400">Enable Supabase Write Policy</h2>
+        <button type="button" onclick="closeRlsHelpModal()" class="text-gray-400 font-bold">✕</button>
+      </div>
+      <p class="text-xs text-gray-300 leading-relaxed">
+        Your change is saved locally, but Supabase Row-Level Security (RLS) blocked writing to the <code class="text-amber-300">product</code> table. Run this SQL once in your Supabase <b>SQL Editor</b>, then tap <b>Sync All 38 to Cloud</b>:
+      </p>
+      <pre id="rlsSqlText" class="bg-black border border-gray-700 rounded-xl p-3 text-[11px] text-emerald-300 overflow-x-auto whitespace-pre-wrap select-all">ALTER TABLE public.product ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow all on product" ON public.product;
+CREATE POLICY "Allow all on product" ON public.product
+  FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="copyRlsSql()" class="flex-1 bg-emerald-600 text-white text-xs font-extrabold py-2.5 rounded-xl">Copy SQL</button>
+        <button type="button" onclick="closeRlsHelpModal()" class="px-4 bg-white/10 text-white text-xs font-bold py-2.5 rounded-xl">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-lg whitespace-nowrap pointer-events-none">
     ✅ Photo Saved!
@@ -442,7 +465,7 @@
             .order("serial_code", { ascending: true });
 
           if (error) {
-            console.error("Supabase product load error:", error);
+            console.warn("Supabase product load warning:", error.message || error);
             return;
           }
 
@@ -450,6 +473,7 @@
             if (!hasSeededDefaults) {
               hasSeededDefaults = true;
               const seedRows = DEFAULT_ITEMS.map((d, idx) => ({
+                id: toCloudProductId(d.id ?? (idx + 1)),
                 serial_code: d.code || ("#" + String(idx + 1).padStart(2, "0")),
                 sort_order: idx + 1,
                 category: d.category,
@@ -461,7 +485,7 @@
               }));
               const { data: seeded, error: seedErr } = await sb
                 .from("product")
-                .insert(seedRows)
+                .upsert(seedRows, { onConflict: "id" })
                 .select("*");
               if (!seedErr && Array.isArray(seeded) && seeded.length) {
                 items = sortItemsList(seeded.map((r, idx) => normalizeProduct(r, idx)));
@@ -471,8 +495,12 @@
                 return;
               }
               if (seedErr) {
-                hasSeededDefaults = false;
-                console.error("Supabase auto-seed error:", seedErr);
+                if (isRlsError(seedErr)) {
+                  console.warn("Supabase product table RLS blocks initial auto-seed; using local catalog until RLS policy is enabled.");
+                } else {
+                  hasSeededDefaults = false;
+                  console.warn("Supabase auto-seed warning:", seedErr.message || seedErr);
+                }
               }
             }
             return;
@@ -486,7 +514,7 @@
             renderAll();
           }
         } catch (err) {
-          console.error("Supabase fetch exception:", err);
+          console.warn("Supabase fetch exception:", err);
         } finally {
           productsLoadingPromise = null;
         }
@@ -1272,6 +1300,108 @@
       return `${data.publicUrl}?t=${Date.now()}`;
     }
 
+    function toCloudProductId(rawId) {
+      const str = String(rawId ?? "").trim();
+      if (!str) return rawId;
+      const num = Number(str);
+      return Number.isInteger(num) && String(num) === str ? num : str;
+    }
+
+    function buildProductPayload(item, overrides = {}) {
+      const merged = { ...item, ...overrides };
+      const sort_order = Number.isFinite(Number(merged.sort_order)) ? Number(merged.sort_order) : 1;
+      const serial_code = merged.serial_code || merged.code || ("#" + String(sort_order).padStart(2, "0"));
+      const rate = Number(merged.rate ?? merged.price) || 0;
+      const image_url = merged.image_url !== undefined ? (merged.image_url || "") : (merged.image || "");
+      const visible = merged.visible !== false;
+      return {
+        id: toCloudProductId(merged.id),
+        serial_code,
+        sort_order,
+        category: merged.category || "General",
+        name: merged.name || "",
+        spec: merged.spec || "Standard",
+        rate,
+        image_url,
+        visible
+      };
+    }
+
+    function isRlsError(err) {
+      return Boolean(err && (err.code === "42501" || /row-level security|permission denied/i.test(String(err.message || ""))));
+    }
+
+    function showRlsHelpModal() {
+      const modal = document.getElementById("rlsHelpModal");
+      if (modal) modal.classList.remove("hidden");
+    }
+
+    function closeRlsHelpModal() {
+      const modal = document.getElementById("rlsHelpModal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    async function copyRlsSql() {
+      const el = document.getElementById("rlsSqlText");
+      const sql = el ? el.textContent : "";
+      if (!sql) return;
+      try {
+        await navigator.clipboard.writeText(sql);
+        showToast("SQL Copied ✓");
+      } catch (err) {
+        const ta = document.createElement("textarea");
+        ta.value = sql;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        showToast("SQL Copied ✓");
+      }
+    }
+
+    async function syncAllProductsToCloud() {
+      if (!sb) {
+        showToast("Supabase not connected", 2500, true);
+        return;
+      }
+      const btn = document.getElementById("syncAllCloudBtn");
+      const originalLabel = btn ? btn.textContent : "Sync All 38 to Cloud";
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Syncing...";
+      }
+      try {
+        const rows = items.map(i => buildProductPayload(i));
+        const { data, error } = await sb
+          .from("product")
+          .upsert(rows, { onConflict: "id" })
+          .select("*");
+        if (error) throw error;
+        if (Array.isArray(data) && data.length) {
+          items = sortItemsList(data.map((r, idx) => normalizeProduct(r, idx)));
+          productsLoadedFromCloud = true;
+          hasSeededDefaults = true;
+          saveCache();
+          renderAll();
+        }
+        showToast(`Saved to Cloud ✓ (${rows.length} parts)`);
+      } catch (err) {
+        if (isRlsError(err)) {
+          console.warn("Supabase RLS blocked syncAllProductsToCloud:", err.message);
+          showRlsHelpModal();
+          showToast("Enable Supabase RLS policy to sync", 3200, true);
+        } else {
+          console.warn("Sync all products error:", err);
+          showToast("Cloud sync error: " + (err.message || "Failed to sync"), 3500, true);
+        }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = originalLabel;
+        }
+      }
+    }
+
     // ADMIN ACTIONS SYNCED TO SUPABASE
     async function toggleVis(id) {
       const x = items.find(i => String(i.id) === String(id));
@@ -1281,20 +1411,31 @@
       x.visible = nextVis;
       renderAll();
       if (sb) {
+        const payload = buildProductPayload(x, { visible: nextVis });
         const { data, error } = await sb
           .from("product")
-          .update({ visible: nextVis })
-          .eq("id", x.id)
-          .select("id");
-        if (error || !data || data.length === 0) {
+          .upsert(payload, { onConflict: "id" })
+          .select("*");
+        if (error) {
+          if (isRlsError(error)) {
+            console.warn("Supabase RLS blocked visibility sync:", error.message);
+            saveCache();
+            showRlsHelpModal();
+            showToast("Saved locally — enable RLS to sync", 3200, true);
+            return;
+          }
           x.visible = prevVis;
           renderAll();
-          console.error("Supabase visibility error:", error || "No matching row updated");
-          showToast("Cloud sync error: " + (error ? error.message : "Could not update row"), 3200, true);
+          console.warn("Supabase visibility error:", error);
+          showToast("Cloud sync error: " + error.message, 3200, true);
           return;
+        }
+        if (Array.isArray(data) && data[0]) {
+          Object.assign(x, normalizeProduct(data[0]));
         }
       }
       saveCache();
+      renderAll();
       showToast("Saved to Cloud ✓");
     }
 
@@ -1319,12 +1460,18 @@
       const btn = document.getElementById("confirmDeleteBtn");
       if (btn) { btn.disabled = true; btn.textContent = "Deleting..."; }
       try {
+        let rlsBlocked = false;
         if (sb) {
-          const { data, error } = await sb.from("product").delete().eq("id", targetId).select("id");
-          if (error || !data || data.length === 0) {
-            console.error("Supabase delete error:", error || "No matching row deleted");
-            showToast("Cloud delete error: " + (error ? error.message : "Could not delete row"), 3200, true);
-            return;
+          const { error } = await sb.from("product").delete().eq("id", toCloudProductId(targetId));
+          if (error) {
+            if (isRlsError(error)) {
+              console.warn("Supabase RLS blocked delete:", error.message);
+              rlsBlocked = true;
+            } else {
+              console.warn("Supabase delete error:", error);
+              showToast("Cloud delete error: " + error.message, 3200, true);
+              return;
+            }
           }
           try {
             const safeKey = `part-${String(targetId).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
@@ -1337,7 +1484,12 @@
         closeDeleteModal();
         renderAll();
         updateCartBar();
-        showToast("Saved to Cloud ✓");
+        if (rlsBlocked) {
+          showRlsHelpModal();
+          showToast("Deleted locally — enable RLS to sync", 3200, true);
+        } else {
+          showToast("Saved to Cloud ✓");
+        }
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = "Delete"; }
       }
@@ -1359,51 +1511,97 @@
       try {
         const { blob, dataUrl } = await cropImageToSquareJpeg(f, 320, 0.75);
         let finalUrl = dataUrl;
+        let rlsBlocked = false;
         if (sb) {
           finalUrl = await uploadBlobToPartPhotos(x.id, blob);
+          const payload = buildProductPayload(x, { image_url: finalUrl });
           const { data, error } = await sb
             .from("product")
-            .update({ image_url: finalUrl })
-            .eq("id", x.id)
-            .select("id");
-          if (error) throw error;
-          if (!data || data.length === 0) throw new Error("Product row not found in Supabase");
+            .upsert(payload, { onConflict: "id" })
+            .select("*");
+          if (error) {
+            if (isRlsError(error)) {
+              console.warn("Photo uploaded to Storage, but Supabase product RLS blocked table save:", error.message);
+              rlsBlocked = true;
+              x.image_url = finalUrl;
+              x.image = finalUrl;
+            } else {
+              throw error;
+            }
+          } else if (Array.isArray(data) && data[0]) {
+            Object.assign(x, normalizeProduct(data[0]));
+          } else {
+            x.image_url = finalUrl;
+            x.image = finalUrl;
+          }
+        } else {
+          x.image_url = finalUrl;
+          x.image = finalUrl;
         }
-        x.image_url = finalUrl;
-        x.image = finalUrl;
         saveCache();
         renderAll();
-        showToast("Saved to Cloud ✓");
+        if (rlsBlocked) {
+          showRlsHelpModal();
+          showToast("Photo uploaded — enable RLS then Sync All", 3500, true);
+        } else {
+          showToast("Saved to Cloud ✓");
+        }
       } catch (err) {
-        console.error("Photo upload error:", err);
-        showToast("Photo upload failed: " + (err.message || "Check Storage policy"), 3500, true);
+        console.warn("Photo upload error:", err);
+        if (isRlsError(err)) {
+          showRlsHelpModal();
+          showToast("Enable Supabase RLS policy to save photo", 3500, true);
+        } else {
+          showToast("Photo upload failed: " + (err.message || "Check Storage policy"), 3500, true);
+        }
       }
     }
 
     async function removePartPhoto(id) {
       const x = items.find(i => String(i.id) === String(id));
       if (!x) return;
+      let rlsBlocked = false;
       if (sb) {
+        const payload = buildProductPayload(x, { image_url: "" });
         const { data, error } = await sb
           .from("product")
-          .update({ image_url: "" })
-          .eq("id", x.id)
-          .select("id");
-        if (error || !data || data.length === 0) {
-          console.error("Photo remove error:", error || "No matching row updated");
-          showToast("Cloud sync error: " + (error ? error.message : "Could not update row"), 3200, true);
-          return;
+          .upsert(payload, { onConflict: "id" })
+          .select("*");
+        if (error) {
+          if (isRlsError(error)) {
+            console.warn("Supabase RLS blocked photo remove:", error.message);
+            rlsBlocked = true;
+            x.image_url = "";
+            x.image = "";
+          } else {
+            console.warn("Photo remove error:", error);
+            showToast("Cloud sync error: " + error.message, 3200, true);
+            return;
+          }
+        } else {
+          try {
+            const safeKey = `part-${String(x.id).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
+            await sb.storage.from(PHOTO_BUCKET).remove([safeKey]);
+          } catch (err) {}
+          if (Array.isArray(data) && data[0]) {
+            Object.assign(x, normalizeProduct(data[0]));
+          } else {
+            x.image_url = "";
+            x.image = "";
+          }
         }
-        try {
-          const safeKey = `part-${String(x.id).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
-          await sb.storage.from(PHOTO_BUCKET).remove([safeKey]);
-        } catch (err) {}
+      } else {
+        x.image_url = "";
+        x.image = "";
       }
-      x.image_url = "";
-      x.image = "";
       saveCache();
       renderAll();
-      showToast("Saved to Cloud ✓");
+      if (rlsBlocked) {
+        showRlsHelpModal();
+        showToast("Removed locally — enable RLS to sync", 3200, true);
+      } else {
+        showToast("Saved to Cloud ✓");
+      }
     }
 
     function closePartForm() {
@@ -1487,6 +1685,7 @@
       const saveBtn = document.getElementById("savePartBtn");
       if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Saving to Cloud..."; }
 
+      let rlsBlocked = false;
       try {
         if (editId) {
           const x = items.find(i => String(i.id) === String(editId));
@@ -1504,63 +1703,101 @@
             } catch (err) {}
           }
 
+          const payload = buildProductPayload(x, {
+            serial_code,
+            sort_order,
+            category,
+            name,
+            spec,
+            rate,
+            image_url,
+            visible: x.visible !== false
+          });
+
           if (sb) {
             const { data, error } = await sb
               .from("product")
-              .update({ serial_code, sort_order, category, name, spec, rate, image_url })
-              .eq("id", x.id)
+              .upsert(payload, { onConflict: "id" })
               .select("*");
-            if (error) throw error;
-            if (!data || data.length === 0) throw new Error("Product row not found in Supabase");
-            Object.assign(x, normalizeProduct(data[0]));
+            if (error) {
+              if (isRlsError(error)) {
+                console.warn("Supabase RLS blocked part edit:", error.message);
+                rlsBlocked = true;
+                Object.assign(x, normalizeProduct(payload));
+              } else {
+                throw error;
+              }
+            } else if (Array.isArray(data) && data[0]) {
+              Object.assign(x, normalizeProduct(data[0]));
+            } else {
+              Object.assign(x, normalizeProduct(payload));
+            }
           } else {
-            Object.assign(x, { serial_code, code: serial_code, sort_order, category, name, spec, rate, price: rate, image_url, image: image_url });
+            Object.assign(x, normalizeProduct(payload));
           }
         } else {
           const maxOrder = items.length ? Math.max(...items.map(i => Number(i.sort_order) || 0)) : 0;
+          const maxId = items.reduce((m, i) => {
+            const n = Number(i.id);
+            return Number.isInteger(n) && n > m ? n : m;
+          }, 0);
+          const nextId = maxId + 1;
           const sort_order = Number.isFinite(rawOrder) && rawOrder >= 0 ? rawOrder : (maxOrder + 1);
           const serial_code = rawCode || ("#" + String(sort_order).padStart(2, "0"));
-          let insertedItem = null;
+          let image_url = "";
 
+          if (pendingFormPhotoBlob && sb) {
+            image_url = await uploadBlobToPartPhotos(nextId, pendingFormPhotoBlob);
+          }
+
+          const payload = {
+            id: nextId,
+            serial_code,
+            sort_order,
+            category,
+            name,
+            spec,
+            rate,
+            image_url,
+            visible: true
+          };
+
+          let insertedItem = null;
           if (sb) {
             const { data, error } = await sb
               .from("product")
-              .insert({ serial_code, sort_order, category, name, spec, rate, visible: true, image_url: "" })
+              .upsert(payload, { onConflict: "id" })
               .select("*")
               .single();
-            if (error) throw error;
-            insertedItem = normalizeProduct(data, items.length);
-            items.push(insertedItem);
-            sortItemsList(items);
-            saveCache();
-            renderAll();
-
-            if (pendingFormPhotoBlob) {
-              const uploadedUrl = await uploadBlobToPartPhotos(insertedItem.id, pendingFormPhotoBlob);
-              const { error: photoUpdErr } = await sb
-                .from("product")
-                .update({ image_url: uploadedUrl })
-                .eq("id", insertedItem.id);
-              if (photoUpdErr) throw photoUpdErr;
-              insertedItem.image_url = uploadedUrl;
-              insertedItem.image = uploadedUrl;
+            if (error) {
+              if (isRlsError(error)) {
+                console.warn("Supabase RLS blocked new part save:", error.message);
+                rlsBlocked = true;
+                insertedItem = normalizeProduct(payload, items.length);
+              } else {
+                throw error;
+              }
+            } else {
+              insertedItem = normalizeProduct(data || payload, items.length);
             }
           } else {
-            insertedItem = normalizeProduct({
-              id: String(Date.now()),
-              serial_code, sort_order, category, name, spec, rate, visible: true, image_url: ""
-            });
-            items.push(insertedItem);
+            insertedItem = normalizeProduct(payload, items.length);
           }
+          items.push(insertedItem);
         }
 
         sortItemsList(items);
         saveCache();
         closePartForm();
         renderAll();
-        showToast("Saved to Cloud ✓");
+        if (rlsBlocked) {
+          showRlsHelpModal();
+          showToast("Saved locally — enable RLS then Sync All", 3500, true);
+        } else {
+          showToast("Saved to Cloud ✓");
+        }
       } catch (err) {
-        console.error("Save part error:", err);
+        console.warn("Save part error:", err);
         errEl.textContent = "Cloud save error: " + (err.message || "Failed to save");
         errEl.classList.remove("hidden");
       } finally {
