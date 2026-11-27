@@ -283,4 +283,173 @@
     }
 
     function getList() {
-      return isAdmin ? it
+      return isAdmin ? items : items.filter(i => i.visible !== false);
+    }
+
+    function renderAll() {
+      document.getElementById("adminBar").classList.toggle("hidden", !isAdmin);
+      const list = getList();
+      const cats = ["All Items", ...new Set(list.map(i => i.category))];
+      if (!cats.includes(activeCat)) activeCat = "All Items";
+      document.getElementById("categoryBar").innerHTML = cats.map(c => `
+        <button onclick="activeCat='${c.replace(/'/g,"\\'")}';renderAll()" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${activeCat===c?'bg-red-600 text-white':'bg-gray-100 text-gray-700'}">${c}</button>
+      `).join("");
+      renderCatalog();
+    }
+
+    function renderCatalog() {
+      let list = getList();
+      if (activeCat !== "All Items") list = list.filter(i => i.category === activeCat);
+      if (query) list = list.filter(i => i.name.toLowerCase().includes(query) || i.spec.toLowerCase().includes(query) || i.category.toLowerCase().includes(query));
+
+      document.getElementById("countBadge").textContent = `${list.length} Items`;
+      const box = document.getElementById("catalogBox");
+
+      // CUSTOM FRIENDLY "PRODUCT NOT FOUND / ON-DEMAND" CARD
+      if (!list.length) {
+        const askText = encodeURIComponent(`Hello GHUMO BIKE STORE, mujhe "${query}" chahiye. Kya ye stock me available hai?`);
+        box.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center border-2 border-dashed border-amber-400 space-y-2.5">
+          <div class="text-3xl">🛠️</div>
+          <h3 class="text-sm font-extrabold text-gray-900">"${query}" Abhi Online List Me Nahi Hai</h3>
+          <p class="text-xs text-gray-600">Chinta na karein! Hamare paas sabhi bikes ke parts order par bhi milte hain. Niche click karke sidha WhatsApp par mangwayein:</p>
+          <a href="https://wa.me/91${WA_NUM}?text=${askText}" target="_blank" class="inline-block bg-green-600 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow">💬 WhatsApp Par Part Mangwayein</a>
+          <div><button onclick="clearSearch()" class="text-xs text-gray-500 font-bold underline mt-1">Sabhi Parts Dekhein</button></div>
+        </div>`;
+        return;
+      }
+
+      if (view === "list") {
+        box.innerHTML = `<div class="bg-white rounded-xl border overflow-hidden">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-gray-100 text-[10px] uppercase text-gray-600">
+              <tr><th class="p-2.5">Part Name</th><th class="p-2.5 text-right">Rate</th><th class="p-2.5 text-right">Action</th></tr>
+            </thead>
+            <tbody class="divide-y">
+              ${list.map(i => `<tr>
+                <td class="p-2.5"><div class="font-bold">${i.name}</div><div class="text-[10px] text-gray-500">${i.code} • ${i.spec}</div></td>
+                <td class="p-2.5 text-right font-extrabold text-red-600">₹${i.price}</td>
+                <td class="p-2.5 text-right">
+                  ${isAdmin
+                    ? `<button onclick="toggleVis(${i.id})" class="text-[10px] font-bold px-2 py-1 rounded ${i.visible!==false?'bg-emerald-100 text-emerald-800':'bg-red-100 text-red-700'}">${i.visible!==false?'SHOW':'HIDE'}</button>`
+                    : `<button onclick="addCart(${i.id},1)" class="bg-gray-900 text-white text-[10px] font-bold px-2.5 py-1 rounded">+ Add (${cart[i.id]||0})</button>`}
+                </td>
+              </tr>`).join("")}
+            </tbody>
+          </table>
+        </div>`;
+        return;
+      }
+
+      box.innerHTML = list.map(i => {
+        const qty = cart[i.id] || 0;
+        const vis = i.visible !== false;
+        const wa = `https://wa.me/91${WA_NUM}?text=${encodeURIComponent(`Hello GHUMO BIKE STORE, order: ${i.name} (${i.spec}) - ₹${i.price}`)}`;
+        return `<div class="bg-white rounded-2xl p-3 border ${!vis?'border-red-400 bg-red-50/40':'border-gray-200'}">
+          <div class="flex justify-between items-center mb-1.5">
+            <div class="flex items-center gap-1.5">
+              <span class="bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded">${i.code}</span>
+              ${isAdmin ? `
+                <button onclick="openPartForm(${i.id})" class="bg-gray-100 border text-[10px] font-bold px-2 py-0.5 rounded">Edit</button>
+                <button onclick="toggleVis(${i.id})" class="text-[10px] font-bold px-2 py-0.5 rounded ${vis?'bg-emerald-100 text-emerald-800':'bg-red-100 text-red-700'}">${vis?'SHOW':'HIDE'}</button>
+                <button onclick="pickPhoto(${i.id})" class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded">📷</button>
+              ` : ''}
+            </div>
+            <span class="text-[10px] text-gray-500 font-semibold">${i.category}</span>
+          </div>
+          ${i.image ? `<img src="${i.image}" class="w-full h-32 object-contain bg-gray-50 rounded-xl mb-2" />` : ''}
+          <div class="text-sm font-extrabold text-gray-900">${i.name}</div>
+          <div class="text-[10px] text-emerald-800 bg-emerald-50 inline-block px-2 py-0.5 rounded font-bold mt-1">• ${i.spec}</div>
+          <div class="mt-2.5 pt-2 border-t flex justify-between items-center">
+            <div class="text-base font-extrabold text-red-600">₹${i.price}</div>
+            <div class="flex items-center gap-1.5">
+              ${isAdmin ? `<button onclick="delPart(${i.id})" class="bg-red-50 text-red-600 text-xs px-2 py-1 rounded-lg">🗑️</button>` : ''}
+              <a href="${wa}" target="_blank" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-xl">WA</a>
+              ${qty > 0
+                ? `<div class="bg-gray-900 text-white rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center gap-2"><button onclick="addCart(${i.id},-1)">−</button><span>${qty}</span><button onclick="addCart(${i.id},1)">+</button></div>`
+                : `<button onclick="addCart(${i.id},1)" class="bg-gray-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl">+ Add</button>`}
+            </div>
+          </div>
+        </div>`;
+      }).join("");
+    }
+
+    // ADMIN ACTIONS
+    function toggleVis(id) { const x = items.find(i => i.id === id); if (x) { x.visible = x.visible === false; saveLocal(); } }
+    function delPart(id) { if (confirm("Delete item?")) { items = items.filter(i => i.id !== id); saveLocal(); } }
+    function pickPhoto(id) { photoId = id; document.getElementById("adminPhotoFile").click(); }
+    function handleAdminPhoto(e) {
+      const f = e.target.files[0]; if (!f || !photoId) return;
+      const r = new FileReader();
+      r.onload = () => { const x = items.find(i => i.id === photoId); if (x) { x.image = r.result; saveLocal(); } };
+      r.readAsDataURL(f);
+    }
+    function openPartForm(id) {
+      const x = id ? items.find(i => i.id === id) : null;
+      document.getElementById("editId").value = x ? x.id : "";
+      document.getElementById("fCat").value = x ? x.category : "";
+      document.getElementById("fName").value = x ? x.name : "";
+      document.getElementById("fSpec").value = x ? x.spec : "";
+      document.getElementById("fPrice").value = x ? x.price : "";
+      document.getElementById("partModal").classList.remove("hidden");
+    }
+    function savePart() {
+      const id = document.getElementById("editId").value;
+      const category = document.getElementById("fCat").value.trim() || "General";
+      const name = document.getElementById("fName").value.trim();
+      const spec = document.getElementById("fSpec").value.trim() || "Standard";
+      const price = Number(document.getElementById("fPrice").value) || 0;
+      if (!name) return alert("Part name likhein");
+      if (id) {
+        const x = items.find(i => i.id === Number(id));
+        if (x) Object.assign(x, { category, name, spec, price });
+      } else {
+        const nid = items.length ? Math.max(...items.map(i => i.id)) + 1 : 1;
+        items.push({ id: nid, code: "#" + String(nid).padStart(2, "0"), category, name, spec, price, visible: true, image: "" });
+      }
+      document.getElementById("partModal").classList.add("hidden");
+      saveLocal();
+    }
+    async function copyUpdatedHtml() {
+      const full = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+      const updated = full.replace(/const DEFAULT_ITEMS = \[[\s\S]*?\];/, `const DEFAULT_ITEMS = ${JSON.stringify(items, null, 2)};`);
+      await navigator.clipboard.writeText(updated);
+      alert("Code copy ho gaya! GitHub me index.html me paste karke Commit kar dein.");
+    }
+
+    // CART & CHECKOUT
+    function addCart(id, d) {
+      const n = (cart[id] || 0) + d;
+      if (n <= 0) delete cart[id]; else cart[id] = n;
+      renderCatalog();
+      const entries = Object.entries(cart);
+      const bar = document.getElementById("cartBar");
+      if (!entries.length) return bar.classList.add("hidden");
+      let q = 0, t = 0;
+      entries.forEach(([k, v]) => { const x = items.find(i => i.id === Number(k)); if (x) { q += v; t += x.price * v; } });
+      document.getElementById("cartSummary").textContent = `₹${t} (${q} pcs)`;
+      bar.classList.remove("hidden");
+    }
+    function openCheckout() {
+      document.getElementById("checkoutItems").innerHTML = Object.entries(cart).map(([k, v]) => {
+        const x = items.find(i => i.id === Number(k));
+        return x ? `<div class="flex justify-between bg-gray-50 p-2 rounded-lg"><span>${x.name} × ${v}</span><b>₹${x.price * v}</b></div>` : "";
+      }).join("");
+      document.getElementById("checkoutModal").classList.remove("hidden");
+    }
+    function sendWhatsAppOrder() {
+      const n = document.getElementById("cName").value.trim();
+      const p = document.getElementById("cPhone").value.trim();
+      if (!n || !p) return alert("Naam aur Mobile Number bharein");
+      let msg = `*ORDER — GHUMO BIKE STORE*\nName: ${n}\nPhone: ${p}\n\n`, tot = 0;
+      Object.entries(cart).forEach(([k, v], idx) => {
+        const x = items.find(i => i.id === Number(k));
+        if (x) { tot += x.price * v; msg += `${idx + 1}. ${x.name} (${v} pcs) = ₹${x.price * v}\n`; }
+      });
+      msg += `\n*Total: ₹${tot}*`;
+      window.open(`https://wa.me/91${WA_NUM}?text=${encodeURIComponent(msg)}`, "_blank");
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
