@@ -20,12 +20,7 @@
       background-size: 12px 12px;
     }
     .card-shadow { box-shadow: 0 2px 10px rgba(17, 24, 39, 0.05); }
-    .sheet-enter { animation: slideUp 0.22s ease-out; }
     .no-select { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-    @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
   </style>
 </head>
 <body class="pb-28">
@@ -59,7 +54,9 @@
         <!-- Customer Action Icons -->
         <div class="flex items-center gap-1.5 shrink-0">
           <button onclick="openMyOrdersModal()" title="My Orders" class="px-2.5 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center gap-1 text-white text-[11px] font-bold border border-white/10">
-            <span>📋</span>
+            <svg class="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
             <span id="myOrdersBadge" class="bg-amber-400 text-gray-950 text-[10px] font-extrabold px-1.5 rounded-full">0</span>
           </button>
           <a href="tel:+919625489457" title="Call Store" class="w-8 h-8 rounded-lg bg-[#2563eb] hover:bg-blue-500 flex items-center justify-center text-white shadow">
@@ -92,17 +89,36 @@
         </div>
       </div>
 
-      <!-- SMART SEARCH BAR (TEXT + VOICE MIC + IMAGE SEARCH) -->
-      <div class="mt-2.5 flex items-center bg-[#1f2127] border border-white/10 focus-within:border-red-500 rounded-xl px-2.5 py-1.5 gap-1.5">
+      <!-- GOOGLE-STYLE CLEAN SEARCH BAR (SVG MIC + GOOGLE LENS ICON) -->
+      <div class="mt-2.5 flex items-center bg-[#1f2127] border border-white/10 focus-within:border-red-500 rounded-xl px-3 py-1.5 gap-2">
         <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z"/>
         </svg>
         <input id="searchInput" type="text" oninput="handleSearch(this.value)" placeholder="Search parts, model (Splendor, Super, Shine...)" class="flex-1 bg-transparent text-white placeholder-gray-400 text-xs focus:outline-none min-w-0" />
         <button id="clearSearchBtn" onclick="clearSearch()" class="hidden text-gray-400 hover:text-white text-xs font-bold px-1">✕</button>
-        <button onclick="startVoiceSearch()" title="Bolkar Khojein (Voice Search)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-red-600 flex items-center justify-center text-xs shrink-0">🎤</button>
-        <button onclick="document.getElementById('visualPartInput').click()" title="Photo Se Khojein" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-emerald-600 flex items-center justify-center text-xs shrink-0">📷</button>
+
+        <!-- Clean Google-style Voice Mic SVG -->
+        <button onclick="startVoiceSearch()" title="Voice Search" class="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z" fill="#4285F4"/>
+            <path d="M17 11a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.93V21h2v-3.07A7 7 0 0 0 19 11h-2Z" fill="#34A853"/>
+            <path d="M7 11H5a7 7 0 0 0 2.05 4.95l1.41-1.41A5 5 0 0 1 7 11Z" fill="#FBBC05"/>
+            <path d="M12 18v3h1v-3.07c-.33.04-.66.07-1 .07Z" fill="#EA4335"/>
+          </svg>
+        </button>
+
+        <!-- Clean Google Lens Visual Search SVG -->
+        <button onclick="document.getElementById('visualPartInput').click()" title="Search by Part Photo" class="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <path d="M9 3h6l1.5 2H19a2 2 0 0 1 2 2v4h-2V7H5v4H3V7a2 2 0 0 1 2-2h2.5L9 3Z" fill="#EA4335"/>
+            <path d="M3 13h2v4h6v2H5a2 2 0 0 1-2-2v-4Z" fill="#34A853"/>
+            <path d="M21 13v4a2 2 0 0 1-2 2h-4v-2h4v-4h2Z" fill="#4285F4"/>
+            <circle cx="12" cy="12" r="3" fill="#4285F4"/>
+            <circle cx="17.5" cy="16.5" r="1.5" fill="#FBBC05"/>
+          </svg>
+        </button>
       </div>
-      <div id="voiceListeningBar" class="hidden text-[11px] text-amber-300 mt-1 text-center font-bold">🎙️ Boliye... part ka naam sun rahe hain...</div>
+      <div id="voiceListeningBar" class="hidden text-[11px] text-amber-300 mt-1 text-center font-bold">Boliye... part ka naam sun rahe hain...</div>
     </div>
 
     <!-- Category Horizontal Pills -->
@@ -143,10 +159,10 @@
       <p class="text-xs font-bold text-emerald-400 mt-1">Direct Call &amp; WhatsApp: +91 96254 89457</p>
       <div class="mt-3 grid grid-cols-2 gap-2">
         <a href="tel:+919625489457" class="bg-[#1e293b] hover:bg-slate-700 text-blue-300 border border-blue-500/30 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-          <span>📞</span> Call Store
+          Call Store
         </a>
         <a href="https://wa.me/919625489457?text=Hello%20GHUMO%20BIKE%20STORE%20(Faridabad)%2C%20I%20would%20like%20to%20inquire%20about%20spare%20parts." target="_blank" rel="noopener noreferrer" class="bg-[#064e3b] hover:bg-emerald-900 text-emerald-300 border border-emerald-500/30 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-          <span>💬</span> WhatsApp Store
+          WhatsApp Store
         </a>
       </div>
     </footer>
@@ -179,14 +195,11 @@
 
   <!-- SECRET ADMIN LOGIN MODAL -->
   <div id="adminLoginModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
-    <div class="bg-[#181b20] border border-gray-700 text-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4 sheet-enter">
+    <div class="bg-[#181b20] border border-gray-700 text-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="w-8 h-8 rounded-xl bg-[#dc2626] flex items-center justify-center text-sm">🔒</span>
-          <div>
-            <h2 class="text-sm font-extrabold">Admin Panel Login</h2>
-            <p class="text-[10px] text-gray-400">GHUMO BIKE STORE Owner Access</p>
-          </div>
+        <div>
+          <h2 class="text-sm font-extrabold">Admin Panel Login</h2>
+          <p class="text-[10px] text-gray-400">GHUMO BIKE STORE Owner Access</p>
         </div>
         <button onclick="closeAdminLoginModal()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
       </div>
@@ -207,7 +220,7 @@
 
   <!-- ADMIN ADD / EDIT PART MODAL -->
   <div id="adminPartModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
-    <div class="bg-[#181b20] border border-gray-700 text-white w-full max-w-md rounded-3xl p-5 space-y-3 sheet-enter">
+    <div class="bg-[#181b20] border border-gray-700 text-white w-full max-w-md rounded-3xl p-5 space-y-3">
       <div class="flex items-center justify-between">
         <h2 id="partModalHeading" class="text-sm font-extrabold">Edit Spare Part</h2>
         <button onclick="closePartModal()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
@@ -235,7 +248,7 @@
 
   <!-- AI RATE CHAT MODAL -->
   <div id="rateChatModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl h-[82vh] sm:h-[580px] flex flex-col overflow-hidden shadow-2xl sheet-enter">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl h-[82vh] sm:h-[580px] flex flex-col overflow-hidden shadow-2xl">
       <div class="carbon-bg text-white px-4 py-3 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2.5 min-w-0">
           <div class="w-8 h-8 rounded-full bg-[#dc2626] flex items-center justify-center font-extrabold text-xs shrink-0">AI</div>
@@ -256,19 +269,3 @@
       <form onsubmit="handleRateChatSubmit(event)" class="p-3 bg-white border-t border-gray-200 flex items-center gap-2 shrink-0">
         <input id="rateChatInput" type="text" placeholder="Type part name or quantity (e.g. 10 pcs)..." class="flex-1 bg-gray-100 border border-gray-300 rounded-xl px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:border-red-500" />
         <button type="submit" class="bg-[#dc2626] text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shrink-0">Send</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- CUSTOMER ORDER DRAWER -->
-  <div id="orderDrawerModal" class="hidden fixed inset-0 z-40 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl sheet-enter">
-      <div class="carbon-bg text-white px-4 py-3.5 flex items-center justify-between gap-2 shrink-0">
-        <div>
-          <h2 class="text-sm font-extrabold">Order Summary &amp; WhatsApp Send</h2>
-          <p class="text-[11px] text-gray-300">GHUMO BIKE STORE • +91 96254 89457</p>
-        </div>
-        <button onclick="closeOrderDrawer()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
-      </div>
-      <div class="p-4 overflow-y-auto space-y-3 flex-1">
-        <div class="bg-gray-50 borde
