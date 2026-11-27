@@ -38,7 +38,7 @@
 
     <div class="carbon-bg text-white px-3 pt-2.5 pb-2.5">
       <div class="flex items-center justify-between gap-2">
-        <!-- SECRET 3-SECOND LONG PRESS TRIGGER ON LOGO & STORE TITLE -->
+        <!-- SECRET 3-SECOND LONG PRESS TRIGGER -->
         <div id="secretAdminTrigger" class="flex items-center gap-2.5 min-w-0 no-select cursor-pointer">
           <div id="brandLogoBox" class="w-9 h-9 rounded-xl bg-[#dc2626] flex items-center justify-center shrink-0 shadow-md border border-red-400/30 transition-transform">
             <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -56,18 +56,18 @@
           </div>
         </div>
 
-        <!-- Customer Action Buttons -->
+        <!-- Customer Action Icons -->
         <div class="flex items-center gap-1.5 shrink-0">
           <button onclick="openMyOrdersModal()" title="My Orders" class="px-2.5 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center gap-1 text-white text-[11px] font-bold border border-white/10">
             <span>📋</span>
             <span id="myOrdersBadge" class="bg-amber-400 text-gray-950 text-[10px] font-extrabold px-1.5 rounded-full">0</span>
           </button>
-          <a id="headerCallBtn" href="tel:+919625489457" title="Call Store" class="w-8 h-8 rounded-lg bg-[#2563eb] hover:bg-blue-500 flex items-center justify-center text-white shadow">
+          <a href="tel:+919625489457" title="Call Store" class="w-8 h-8 rounded-lg bg-[#2563eb] hover:bg-blue-500 flex items-center justify-center text-white shadow">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.07 21 3 13.93 3 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/>
             </svg>
           </a>
-          <a id="headerWaBtn" href="https://wa.me/919625489457?text=Hello%20GHUMO%20BIKE%20STORE%20(Faridabad)%2C%20I%20am%20checking%20your%20Spare%20Parts%20Rate%20List." target="_blank" rel="noopener noreferrer" title="WhatsApp Store" class="w-8 h-8 rounded-lg bg-[#16a34a] hover:bg-emerald-500 flex items-center justify-center text-white shadow">
+          <a href="https://wa.me/919625489457?text=Hello%20GHUMO%20BIKE%20STORE%20(Faridabad)%2C%20I%20am%20checking%20your%20Spare%20Parts%20Rate%20List." target="_blank" rel="noopener noreferrer" title="WhatsApp Store" class="w-8 h-8 rounded-lg bg-[#16a34a] hover:bg-emerald-500 flex items-center justify-center text-white shadow">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.82 14.01c-.24.68-1.41 1.3-1.95 1.38-.5.07-1.13.1-1.82-.12-.42-.13-.96-.31-1.65-.61-2.91-1.26-4.81-4.19-4.96-4.39-.14-.2-1.18-1.57-1.18-3 0-1.43.75-2.13 1.01-2.42.27-.29.58-.36.77-.36.19 0 .39 0 .56.01.18.01.42-.07.66.5.24.58.82 2.01.89 2.15.07.15.12.32.02.51-.1.2-.15.32-.29.49-.15.17-.31.38-.44.51-.15.15-.3.31-.13.61.17.29.76 1.25 1.63 2.03 1.12 1 2.06 1.31 2.36 1.46.29.15.46.12.63-.07.17-.2.73-.85.92-1.14.2-.29.39-.24.66-.15.27.1 1.7.8 1.99.95.29.15.49.22.56.34.07.12.07.7-.17 1.38z"/>
             </svg>
@@ -75,45 +75,50 @@
         </div>
       </div>
 
-      <!-- ADMIN ONLY CONTROL BAR (HIDDEN FROM CUSTOMERS) -->
+      <!-- ADMIN CONTROL BAR WITH BACK TO CUSTOMER PANEL BUTTON -->
       <div id="adminControlBar" class="hidden mt-2.5 pt-2.5 border-t border-white/15 space-y-2">
-        <div class="flex items-center justify-between gap-2">
-          <span class="text-[11px] font-extrabold text-amber-400">🔓 ADMIN MODE ACTIVE</span>
+        <div class="flex items-center justify-between gap-1.5">
+          <button onclick="exitAdminMode()" class="bg-amber-400 hover:bg-amber-300 text-gray-950 text-[11px] font-extrabold px-2.5 py-1 rounded-lg shadow flex items-center gap-1">
+            <span>←</span> Customer Panel
+          </button>
           <div class="flex items-center gap-1.5">
             <button onclick="openAddPartModal()" class="bg-[#dc2626] hover:bg-red-500 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-lg shadow">+ Add Part</button>
             <button onclick="copyLiveHtmlForGithub()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-lg shadow">Copy Live Code</button>
-            <button onclick="exitAdminMode()" class="bg-white/15 hover:bg-white/25 text-white text-[11px] font-bold px-2 py-1 rounded-lg">Lock</button>
           </div>
         </div>
         <div class="text-[10px] text-gray-300 flex items-center justify-between bg-black/40 px-2.5 py-1 rounded-lg">
-          <span id="adminStatsLine">Total: 38 | Visible: 38 | Hidden: 0</span>
+          <span id="adminStatsLine">Total: 38 | Show: 38 | Hidden: 0</span>
           <span class="text-emerald-400">Tap SHOW/HIDE on any part</span>
         </div>
       </div>
 
-      <!-- Search Input -->
-      <div class="mt-2.5 relative">
-        <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <!-- SMART SEARCH BAR (TEXT + VOICE MIC + IMAGE SEARCH) -->
+      <div class="mt-2.5 flex items-center bg-[#1f2127] border border-white/10 focus-within:border-red-500 rounded-xl px-2.5 py-1.5 gap-1.5">
+        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z"/>
         </svg>
-        <input id="searchInput" type="text" oninput="handleSearch(this.value)" placeholder="Search parts, model (Splendor, Super, Shine, RTR...)" class="w-full bg-[#1f2127] text-white placeholder-gray-400 text-xs rounded-xl pl-9 pr-8 py-2.5 border border-white/10 focus:outline-none focus:border-red-500" />
-        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs font-bold px-1.5 py-0.5">✕</button>
+        <input id="searchInput" type="text" oninput="handleSearch(this.value)" placeholder="Search parts, model (Splendor, Super, Shine...)" class="flex-1 bg-transparent text-white placeholder-gray-400 text-xs focus:outline-none min-w-0" />
+        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden text-gray-400 hover:text-white text-xs font-bold px-1">✕</button>
+        <button onclick="startVoiceSearch()" title="Bolkar Khojein (Voice Search)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-red-600 flex items-center justify-center text-xs shrink-0">🎤</button>
+        <button onclick="document.getElementById('visualPartInput').click()" title="Photo Se Khojein" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-emerald-600 flex items-center justify-center text-xs shrink-0">📷</button>
       </div>
+      <div id="voiceListeningBar" class="hidden text-[11px] text-amber-300 mt-1 text-center font-bold">🎙️ Boliye... part ka naam sun rahe hain...</div>
     </div>
 
     <!-- Category Horizontal Pills -->
     <div id="categoryBar" class="bg-white px-3 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-gray-100"></div>
   </header>
 
-  <!-- Hidden Photo Input for Admin -->
+  <!-- Hidden Inputs -->
   <input type="file" id="partPhotoPicker" accept="image/*" class="hidden" onchange="handlePartPhotoUpload(event)" />
+  <input type="file" id="visualPartInput" accept="image/*" class="hidden" onchange="handleVisualPartSearch(event)" />
 
   <!-- MAIN CONTENT -->
   <main class="max-w-xl mx-auto px-3 pt-3">
     <!-- Filter Count & View Switcher Bar -->
     <div class="bg-white rounded-xl p-2.5 mb-3 border border-gray-200/80 card-shadow flex items-center justify-between gap-2">
       <div class="flex items-center gap-2 min-w-0">
-        <span id="visibleCountBadge" class="bg-red-50 text-[#b91c1c] text-xs font-extrabold px-2.5 py-1 rounded-lg border border-red-100 shrink-0">0 Items</span>
+        <span id="visibleCountBadge" class="bg-red-50 text-[#b91c1c] text-xs font-extrabold px-2.5 py-1 rounded-lg border border-red-100 shrink-0">38 Items</span>
         <span id="activeCategoryLabel" class="text-xs font-semibold text-gray-600 truncate">All Items</span>
       </div>
       <div class="flex items-center bg-gray-100 p-0.5 rounded-lg shrink-0">
@@ -129,7 +134,7 @@
     <!-- Catalog Container -->
     <div id="catalogContainer" class="space-y-4"></div>
 
-    <!-- Store Footer Card (Also supports 3-second long press on store name) -->
+    <!-- Store Footer Card -->
     <footer class="mt-6 bg-[#141518] text-white rounded-2xl p-4 text-center border border-gray-800 shadow-md">
       <div id="footerSecretTrigger" class="inline-flex items-center gap-1.5 text-xs font-extrabold tracking-wide text-white no-select cursor-pointer py-1 px-2">
         <span class="w-2 h-2 rounded-full bg-red-500"></span> GHUMO BIKE STORE
@@ -172,7 +177,7 @@
     </div>
   </div>
 
-  <!-- SECRET ADMIN LOGIN MODAL (OPENS ON 3-SECOND LONG PRESS) -->
+  <!-- SECRET ADMIN LOGIN MODAL -->
   <div id="adminLoginModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
     <div class="bg-[#181b20] border border-gray-700 text-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4 sheet-enter">
       <div class="flex items-center justify-between">
@@ -266,639 +271,4 @@
         <button onclick="closeOrderDrawer()" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
       </div>
       <div class="p-4 overflow-y-auto space-y-3 flex-1">
-        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-3 space-y-2">
-          <div class="text-[11px] font-extrabold text-gray-700 uppercase">Customer Details</div>
-          <input id="custName" type="text" placeholder="Your Name / Shop Name *" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-medium" />
-          <input id="custPhone" type="tel" placeholder="Mobile Number *" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-medium" />
-          <input id="custCity" type="text" placeholder="Area / City (e.g. Faridabad Sector 23)" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-medium" />
-        </div>
-        <div id="cartItemsList" class="space-y-2"></div>
-      </div>
-      <div class="p-4 bg-white border-t border-gray-200 shrink-0 space-y-2">
-        <div class="flex items-center justify-between text-xs font-extrabold">
-          <span>Estimated Total:</span>
-          <span id="drawerTotalAmount" class="text-base text-[#dc2626]">₹0</span>
-        </div>
-        <button onclick="sendOrderOnWhatsApp()" class="w-full bg-[#16a34a] hover:bg-emerald-600 text-white font-extrabold text-xs py-3 rounded-xl shadow flex items-center justify-center gap-2">
-          <span>💬</span> Send Order on WhatsApp (+91 96254 89457)
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MY ORDERS MODAL -->
-  <div id="myOrdersModal" class="hidden fixed inset-0 z-40 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[80vh] flex flex-col overflow-hidden shadow-2xl sheet-enter">
-      <div class="carbon-bg text-white px-4 py-3 flex items-center justify-between shrink-0">
-        <h2 class="text-sm font-extrabold">My Sent Orders</h2>
-        <button onclick="document.getElementById('myOrdersModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-white/10 text-white font-bold">✕</button>
-      </div>
-      <div id="myOrdersList" class="p-4 overflow-y-auto space-y-2 flex-1"></div>
-    </div>
-  </div>
-
-  <script>
-    const ADMIN_ID = "Ghumostore";
-    const ADMIN_PASS = "sonuRs879012";
-    const STORE_WHATSAPP = "9625489457";
-
-    // DEFAULT CATALOG ITEMS (Customers only see items with visible: true)
-    const DEFAULT_CATALOG = [
-      { id: 1, code: "#01", category: "Chain Kit", name: "Chain kit set super spl", spec: "hero orginal", price: 580, visible: true, image: "" },
-      { id: 2, code: "#02", category: "Chain Kit", name: "Chain kit set super spl", spec: "D hero genuine", price: 420, visible: true, image: "" },
-      { id: 3, code: "#03", category: "Chain Kit", name: "Chain kit set splendor plus", spec: "hero orginal", price: 540, visible: true, image: "" },
-      { id: 4, code: "#04", category: "Clutch Assembly & Plate", name: "Clutch plate splendor / passion", spec: "4 plate set • high grip", price: 145, visible: true, image: "" },
-      { id: 5, code: "#05", category: "Clutch Assembly & Plate", name: "Clutch assembly complete spl", spec: "heavy duty OE type", price: 490, visible: true, image: "" },
-      { id: 6, code: "#06", category: "Clutch Assembly & Plate", name: "Clutch center & hub set spl", spec: "precision alloy", price: 260, visible: true, image: "" },
-      { id: 7, code: "#07", category: "Brake Shoe & Pad", name: "Brake shoe splendor / deluxe", spec: "asbestos free • with spring", price: 85, visible: true, image: "" },
-      { id: 8, code: "#08", category: "Brake Shoe & Pad", name: "Disc brake pad front shine / unicorn", spec: "ceramic long life", price: 95, visible: true, image: "" },
-      { id: 9, code: "#09", category: "Cables", name: "Brake cable Bs6 spl", spec: "1 year Granty", price: 65, visible: true, image: "" },
-      { id: 10, code: "#10", category: "Cables", name: "Brake cable super", spec: "1 year Granty", price: 48, visible: true, image: "" },
-      { id: 11, code: "#11", category: "Cables", name: "Clutch cable splendor plus", spec: "1 year Granty • smooth inner", price: 45, visible: true, image: "" },
-      { id: 12, code: "#12", category: "Cables", name: "Clutch cable super splendor", spec: "1 year Granty", price: 52, visible: true, image: "" },
-      { id: 13, code: "#13", category: "Cables", name: "Accelerator cable spl / passion", spec: "1 year Granty", price: 38, visible: true, image: "" },
-      { id: 14, code: "#14", category: "Cables", name: "Meter cable splendor / deluxe", spec: "1 year Granty", price: 42, visible: true, image: "" },
-      { id: 15, code: "#15", category: "Cables", name: "Choke cable splendor BS4/BS6", spec: "1 year Granty", price: 35, visible: true, image: "" },
-      { id: 16, code: "#16", category: "Cables", name: "Seat lock cable splendor", spec: "heavy wire", price: 32, visible: true, image: "" },
-      { id: 17, code: "#17", category: "Filters", name: "Air filter splendor plus / pro", spec: "high dust holding paper", price: 55, visible: true, image: "" },
-      { id: 18, code: "#18", category: "Filters", name: "Air filter super splendor / glamour", spec: "OE fitment", price: 68, visible: true, image: "" },
-      { id: 19, code: "#19", category: "Filters", name: "Oil filter paper type pulsar / apache", spec: "micro filtration", price: 38, visible: true, image: "" },
-      { id: 20, code: "#20", category: "Rubber & Grips", name: "Coupling rubber super splendor (Set of 4)", spec: "heavy EPDM rubber", price: 35, visible: true, image: "" },
-      { id: 21, code: "#21", category: "Rubber & Grips", name: "Coupling rubber splendor plus (Set of 4)", spec: "shock absorbent", price: 28, visible: true, image: "" },
-      { id: 22, code: "#22", category: "Rubber & Grips", name: "Handle grip black universal pair", spec: "soft anti-slip grip", price: 25, visible: true, image: "" },
-      { id: 23, code: "#23", category: "Rubber & Grips", name: "Footrest rubber front pair spl", spec: "heavy core", price: 30, visible: true, image: "" },
-      { id: 24, code: "#24", category: "Electrical & Ignition", name: "Spark plug cap red silicone", spec: "brass connector • waterproof", price: 22, visible: true, image: "" },
-      { id: 25, code: "#25", category: "Electrical & Ignition", name: "Spark plug 4-stroke short thread", spec: "splendor / platina / ct100", price: 65, visible: true, image: "" },
-      { id: 26, code: "#26", category: "Electrical & Ignition", name: "Headlight bulb 12V 35/35W halogen", spec: "high brightness", price: 45, visible: true, image: "" },
-      { id: 27, code: "#27", category: "Electrical & Ignition", name: "Indicator bulb 12V 10W amber (Box of 10)", spec: "long life filament", price: 60, visible: true, image: "" },
-      { id: 28, code: "#28", category: "Electrical & Ignition", name: "Horn 12V loud waterproof single", spec: "clear sharp tone", price: 95, visible: true, image: "" },
-      { id: 29, code: "#29", category: "Bearings & Seals", name: "Wheel bearing 6301 2RS", spec: "double rubber seal", price: 45, visible: true, image: "" },
-      { id: 30, code: "#30", category: "Bearings & Seals", name: "Wheel bearing 6202 2RS", spec: "high speed steel", price: 48, visible: true, image: "" },
-      { id: 31, code: "#31", category: "Bearings & Seals", name: "Fork oil seal pair 30x42x10.5", spec: "double lip leak-proof", price: 42, visible: true, image: "" },
-      { id: 32, code: "#32", category: "Bearings & Seals", name: "Cone set / steering ball racer spl", spec: "hardened steel", price: 85, visible: true, image: "" },
-      { id: 33, code: "#33", category: "Body & Accessories", name: "Side mirror pair splendor / shine", spec: "clear wide glass", price: 110, visible: true, image: "" },
-      { id: 34, code: "#34", category: "Body & Accessories", name: "Brake lever & clutch lever set spl", spec: "aluminium alloy finish", price: 65, visible: true, image: "" },
-      { id: 35, code: "#35", category: "Body & Accessories", name: "Kick lever complete splendor", spec: "chrome plated heavy", price: 140, visible: true, image: "" },
-      { id: 36, code: "#36", category: "Body & Accessories", name: "Gear lever splendor plus", spec: "heavy steel with rubber", price: 75, visible: true, image: "" },
-      { id: 37, code: "#37", category: "Body & Accessories", name: "Indicator assembly set of 4 spl", spec: "flexible stem • amber lens", price: 160, visible: true, image: "" },
-      { id: 38, code: "#38", category: "Body & Accessories", name: "Petrol tank cap with 2 keys spl", spec: "rust-free lock", price: 115, visible: true, image: "" }
-    ];
-
-    let catalogItems = DEFAULT_CATALOG;
-    let isAdmin = sessionStorage.getItem("gbs_admin_unlocked") === "1";
-    if (isAdmin) {
-      const localSaved = localStorage.getItem("gbs_admin_saved_catalog");
-      if (localSaved) {
-        try { catalogItems = JSON.parse(localSaved); } catch (e) {}
-      }
-    }
-
-    let activeCategory = "All Items";
-    let searchQuery = "";
-    let viewMode = "cards";
-    let cart = {};
-    let photoTargetId = null;
-    let lastChatPart = null;
-    let chatMessages = [
-      { sender: "bot", text: "Namaste! GHUMO BIKE STORE (Faridabad) me swagat hai. Kisi bhi part ka naam ya quantity (jaise 'Chain kit 5 pcs') likhein." }
-    ];
-
-    // 3-SECOND LONG PRESS SETUP (WORKS ON BOTH MOBILE TOUCH & DESKTOP MOUSE)
-    function attachThreeSecondHold(el) {
-      if (!el) return;
-      let timer = null;
-      const startHold = () => {
-        const logo = document.getElementById("brandLogoBox");
-        if (logo) logo.classList.add("scale-90", "ring-2", "ring-amber-400");
-        timer = setTimeout(() => {
-          if (logo) logo.classList.remove("scale-90", "ring-2", "ring-amber-400");
-          if (navigator.vibrate) navigator.vibrate(60);
-          openAdminLoginModal();
-        }, 3000);
-      };
-      const cancelHold = () => {
-        const logo = document.getElementById("brandLogoBox");
-        if (logo) logo.classList.remove("scale-90", "ring-2", "ring-amber-400");
-        if (timer) { clearTimeout(timer); timer = null; }
-      };
-      el.addEventListener("touchstart", startHold, { passive: true });
-      el.addEventListener("touchend", cancelHold);
-      el.addEventListener("touchmove", cancelHold);
-      el.addEventListener("touchcancel", cancelHold);
-      el.addEventListener("mousedown", startHold);
-      el.addEventListener("mouseup", cancelHold);
-      el.addEventListener("mouseleave", cancelHold);
-    }
-
-    attachThreeSecondHold(document.getElementById("secretAdminTrigger"));
-    attachThreeSecondHold(document.getElementById("footerSecretTrigger"));
-
-    function openAdminLoginModal() {
-      if (isAdmin) {
-        syncAdminUI();
-        return;
-      }
-      document.getElementById("loginErrText").classList.add("hidden");
-      document.getElementById("loginIdInput").value = "";
-      document.getElementById("loginPassInput").value = "";
-      document.getElementById("adminLoginModal").classList.remove("hidden");
-    }
-
-    function closeAdminLoginModal() {
-      document.getElementById("adminLoginModal").classList.add("hidden");
-    }
-
-    function submitAdminLogin(e) {
-      e.preventDefault();
-      const uid = document.getElementById("loginIdInput").value.trim();
-      const pwd = document.getElementById("loginPassInput").value.trim();
-      if (uid === ADMIN_ID && pwd === ADMIN_PASS) {
-        isAdmin = true;
-        sessionStorage.setItem("gbs_admin_unlocked", "1");
-        const localSaved = localStorage.getItem("gbs_admin_saved_catalog");
-        if (localSaved) {
-          try { catalogItems = JSON.parse(localSaved); } catch (err) {}
-        }
-        closeAdminLoginModal();
-        syncAdminUI();
-        renderCategories();
-        renderCatalog();
-      } else {
-        document.getElementById("loginErrText").classList.remove("hidden");
-      }
-    }
-
-    function exitAdminMode() {
-      isAdmin = false;
-      sessionStorage.removeItem("gbs_admin_unlocked");
-      syncAdminUI();
-      renderCategories();
-      renderCatalog();
-    }
-
-    function syncAdminUI() {
-      const bar = document.getElementById("adminControlBar");
-      if (isAdmin) {
-        bar.classList.remove("hidden");
-        const visCount = catalogItems.filter(i => i.visible !== false).length;
-        const hidCount = catalogItems.filter(i => i.visible === false).length;
-        document.getElementById("adminStatsLine").textContent = `Total: ${catalogItems.length} | Show: ${visCount} | Hidden: ${hidCount}`;
-      } else {
-        bar.classList.add("hidden");
-      }
-    }
-
-    function saveAdminDataLocal() {
-      localStorage.setItem("gbs_admin_saved_catalog", JSON.stringify(catalogItems));
-      syncAdminUI();
-    }
-
-    function getDisplayItems() {
-      return isAdmin ? catalogItems : catalogItems.filter(i => i.visible !== false);
-    }
-
-    function renderCategories() {
-      const items = getDisplayItems();
-      const cats = ["All Items", ...new Set(items.map(i => i.category))];
-      if (!cats.includes(activeCategory)) activeCategory = "All Items";
-      const bar = document.getElementById("categoryBar");
-      bar.innerHTML = cats.map(cat => {
-        const count = cat === "All Items" ? items.length : items.filter(i => i.category === cat).length;
-        const active = activeCategory === cat;
-        return `<button onclick="selectCategory('${cat.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition ${active ? 'bg-[#dc2626] text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}">
-          <span>${cat}</span>
-          <span class="text-[10px] px-1.5 py-0.2 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-white text-gray-600'}">${count}</span>
-        </button>`;
-      }).join("");
-    }
-
-    function selectCategory(cat) {
-      activeCategory = cat;
-      renderCategories();
-      renderCatalog();
-    }
-
-    function handleSearch(val) {
-      searchQuery = val.trim().toLowerCase();
-      document.getElementById("clearSearchBtn").classList.toggle("hidden", !searchQuery);
-      renderCatalog();
-    }
-
-    function clearSearch() {
-      document.getElementById("searchInput").value = "";
-      handleSearch("");
-    }
-
-    function setViewMode(mode) {
-      viewMode = mode;
-      document.getElementById("viewCardsBtn").className = mode === "cards"
-        ? "px-2.5 py-1 rounded-md text-xs font-bold bg-white text-gray-900 shadow-sm flex items-center gap-1"
-        : "px-2.5 py-1 rounded-md text-xs font-semibold text-gray-600 flex items-center gap-1";
-      document.getElementById("viewTableBtn").className = mode === "table"
-        ? "px-2.5 py-1 rounded-md text-xs font-bold bg-white text-gray-900 shadow-sm flex items-center gap-1"
-        : "px-2.5 py-1 rounded-md text-xs font-semibold text-gray-600 flex items-center gap-1";
-      renderCatalog();
-    }
-
-    function renderCatalog() {
-      let items = getDisplayItems();
-      if (activeCategory !== "All Items") {
-        items = items.filter(i => i.category === activeCategory);
-      }
-      if (searchQuery) {
-        items = items.filter(i =>
-          i.name.toLowerCase().includes(searchQuery) ||
-          i.spec.toLowerCase().includes(searchQuery) ||
-          i.category.toLowerCase().includes(searchQuery) ||
-          i.code.toLowerCase().includes(searchQuery)
-        );
-      }
-
-      document.getElementById("visibleCountBadge").textContent = `${items.length} Items`;
-      document.getElementById("activeCategoryLabel").textContent = searchQuery ? `Search: "${searchQuery}"` : activeCategory;
-
-      const container = document.getElementById("catalogContainer");
-      if (!items.length) {
-        container.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center border border-gray-200">
-          <div class="text-sm font-bold text-gray-700">No matching parts found</div>
-          <p class="text-xs text-gray-500 mt-1">Try another bike model or ask directly on WhatsApp.</p>
-        </div>`;
-        return;
-      }
-
-      if (viewMode === "table") {
-        container.innerHTML = `<div class="bg-white rounded-2xl border border-gray-200 overflow-hidden card-shadow">
-          <table class="w-full text-left border-collapse">
-            <thead class="bg-gray-100 text-[10px] font-extrabold uppercase text-gray-600">
-              <tr>
-                <th class="py-2.5 px-3">Part Details</th>
-                <th class="py-2.5 px-2 text-right">Rate</th>
-                <th class="py-2.5 px-3 text-right">${isAdmin ? 'Admin' : 'Order'}</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100 text-xs">
-              ${items.map(item => {
-                const qty = cart[item.id] || 0;
-                const isVis = item.visible !== false;
-                return `<tr class="${!isVis ? 'bg-red-50/60' : ''}">
-                  <td class="py-2.5 px-3">
-                    <div class="font-bold text-gray-900">${item.name}</div>
-                    <div class="text-[10px] text-gray-500">${item.code} • ${item.spec}</div>
-                  </td>
-                  <td class="py-2.5 px-2 text-right font-extrabold text-[#dc2626] whitespace-nowrap">₹${item.price}</td>
-                  <td class="py-2.5 px-3 text-right whitespace-nowrap">
-                    ${isAdmin
-                      ? `<button onclick="togglePartShowHide(${item.id})" class="text-[10px] font-extrabold px-2 py-1 rounded ${isVis ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700'}">${isVis ? 'SHOW' : 'HIDDEN'}</button>`
-                      : (qty > 0
-                        ? `<div class="inline-flex items-center gap-1.5 bg-gray-900 text-white rounded-lg px-2 py-1 text-[11px] font-bold">
-                            <button onclick="updateCart(${item.id}, -1)">−</button>
-                            <span>${qty}</span>
-                            <button onclick="updateCart(${item.id}, 1)">+</button>
-                          </div>`
-                        : `<button onclick="updateCart(${item.id}, 1)" class="bg-gray-900 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">+ Add</button>`)
-                    }
-                  </td>
-                </tr>`;
-              }).join("")}
-            </tbody>
-          </table>
-        </div>`;
-        return;
-      }
-
-      const grouped = {};
-      items.forEach(item => {
-        if (!grouped[item.category]) grouped[item.category] = [];
-        grouped[item.category].push(item);
-      });
-
-      container.innerHTML = Object.entries(grouped).map(([cat, catItems]) => `
-        <section class="space-y-2.5">
-          <div class="flex items-center justify-between px-1">
-            <div class="flex items-center gap-2">
-              <span class="w-1 h-4 bg-[#dc2626] rounded-full"></span>
-              <h2 class="text-xs font-extrabold uppercase tracking-wider text-gray-800">${cat}</h2>
-            </div>
-            <span class="bg-white border border-gray-200 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-full">${catItems.length} parts</span>
-          </div>
-          <div class="space-y-2.5">
-            ${catItems.map(item => {
-              const qty = cart[item.id] || 0;
-              const isVis = item.visible !== false;
-              const waMsg = encodeURIComponent(`Hello GHUMO BIKE STORE, I want to order:\n• ${item.name} (${item.spec}) - Rate: ₹${item.price}`);
-              return `<div class="bg-white rounded-2xl p-3 border ${!isVis ? 'border-red-300 bg-red-50/30' : 'border-gray-200/90'} card-shadow">
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <div class="flex items-center gap-1.5">
-                    <span class="bg-[#141518] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md">${item.code}</span>
-                    ${isAdmin ? `
-                      <button onclick="openEditPartModal(${item.id})" class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-md border border-gray-300">Edit</button>
-                      <button onclick="togglePartShowHide(${item.id})" class="text-[10px] font-extrabold px-2 py-0.5 rounded-md ${isVis ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-red-100 text-red-700 border border-red-300'}">${isVis ? '👁️ SHOW' : '🚫 HIDDEN'}</button>
-                    ` : ''}
-                  </div>
-                  <span class="bg-gray-100 text-gray-600 text-[10px] font-semibold px-2 py-0.5 rounded-md">${item.category}</span>
-                </div>
-
-                ${item.image
-                  ? `<div class="mb-2.5 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 h-36 flex items-center justify-center relative">
-                      <img src="${item.image}" alt="${item.name}" class="max-h-full max-w-full object-contain" />
-                      ${isAdmin ? `<button onclick="triggerPhotoPick(${item.id})" class="absolute bottom-2 right-2 bg-black/75 text-white text-[10px] font-bold px-2 py-1 rounded-lg">Change Photo</button>` : ''}
-                    </div>`
-                  : (isAdmin ? `<div class="mb-2.5 flex justify-end"><button onclick="triggerPhotoPick(${item.id})" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 text-[10px] font-bold px-2.5 py-1 rounded-lg">+ Photo</button></div>` : '')
-                }
-
-                <h3 class="text-sm font-extrabold text-gray-900 leading-snug">${item.name}</h3>
-                <div class="mt-1 inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[10px] font-bold px-2 py-0.5 rounded-md">
-                  <span>•</span> ${item.spec}
-                </div>
-                <div class="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between gap-2">
-                  <div>
-                    <div class="text-[9px] font-extrabold uppercase tracking-wider text-gray-400">WHOLESALE RATE</div>
-                    <div class="text-base font-extrabold text-[#dc2626]">₹${item.price}</div>
-                  </div>
-                  <div class="flex items-center gap-1.5">
-                    ${isAdmin ? `<button onclick="deletePart(${item.id})" class="bg-red-50 text-red-600 border border-red-200 text-xs font-bold px-2.5 py-1.5 rounded-xl">🗑️</button>` : ''}
-                    <a href="https://wa.me/91${STORE_WHATSAPP}?text=${waMsg}" target="_blank" rel="noopener noreferrer" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-extrabold px-3 py-1.5 rounded-xl">WA</a>
-                    ${qty > 0
-                      ? `<div class="inline-flex items-center gap-2 bg-[#141518] text-white rounded-xl px-3 py-1.5 text-xs font-extrabold">
-                          <button onclick="updateCart(${item.id}, -1)" class="px-1">−</button>
-                          <span>${qty}</span>
-                          <button onclick="updateCart(${item.id}, 1)" class="px-1">+</button>
-                        </div>`
-                      : `<button onclick="updateCart(${item.id}, 1)" class="bg-[#141518] hover:bg-gray-800 text-white text-xs font-extrabold px-3.5 py-1.5 rounded-xl">+ Add</button>`
-                    }
-                  </div>
-                </div>
-              </div>`;
-            }).join("")}
-          </div>
-        </section>
-      `).join("");
-    }
-
-    // ADMIN FUNCTIONS
-    function togglePartShowHide(id) {
-      const item = catalogItems.find(i => i.id === id);
-      if (item) {
-        item.visible = item.visible === false ? true : false;
-        saveAdminDataLocal();
-        renderCategories();
-        renderCatalog();
-      }
-    }
-
-    function openAddPartModal() {
-      document.getElementById("partModalHeading").textContent = "Add New Spare Part";
-      document.getElementById("formPartId").value = "";
-      document.getElementById("formPartCategory").value = "";
-      document.getElementById("formPartName").value = "";
-      document.getElementById("formPartSpec").value = "";
-      document.getElementById("formPartPrice").value = "";
-      document.getElementById("adminPartModal").classList.remove("hidden");
-    }
-
-    function openEditPartModal(id) {
-      const item = catalogItems.find(i => i.id === id);
-      if (!item) return;
-      document.getElementById("partModalHeading").textContent = `Edit ${item.code}`;
-      document.getElementById("formPartId").value = item.id;
-      document.getElementById("formPartCategory").value = item.category;
-      document.getElementById("formPartName").value = item.name;
-      document.getElementById("formPartSpec").value = item.spec;
-      document.getElementById("formPartPrice").value = item.price;
-      document.getElementById("adminPartModal").classList.remove("hidden");
-    }
-
-    function closePartModal() {
-      document.getElementById("adminPartModal").classList.add("hidden");
-    }
-
-    function savePartChanges() {
-      const idVal = document.getElementById("formPartId").value;
-      const category = document.getElementById("formPartCategory").value.trim() || "General Parts";
-      const name = document.getElementById("formPartName").value.trim();
-      const spec = document.getElementById("formPartSpec").value.trim() || "Standard OE";
-      const price = Number(document.getElementById("formPartPrice").value) || 0;
-      if (!name) { alert("Part ka naam likhein."); return; }
-
-      if (idVal) {
-        const item = catalogItems.find(i => i.id === Number(idVal));
-        if (item) {
-          item.category = category;
-          item.name = name;
-          item.spec = spec;
-          item.price = price;
-        }
-      } else {
-        const nextId = catalogItems.length ? Math.max(...catalogItems.map(i => i.id)) + 1 : 1;
-        const code = "#" + String(nextId).padStart(2, "0");
-        catalogItems.push({ id: nextId, code, category, name, spec, price, visible: true, image: "" });
-      }
-      saveAdminDataLocal();
-      closePartModal();
-      renderCategories();
-      renderCatalog();
-    }
-
-    function deletePart(id) {
-      if (!confirm("Kya is part ko permanent delete karna hai?")) return;
-      catalogItems = catalogItems.filter(i => i.id !== id);
-      saveAdminDataLocal();
-      renderCategories();
-      renderCatalog();
-    }
-
-    function triggerPhotoPick(id) {
-      photoTargetId = id;
-      document.getElementById("partPhotoPicker").click();
-    }
-
-    function handlePartPhotoUpload(e) {
-      const file = e.target.files[0];
-      if (!file || !photoTargetId) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const item = catalogItems.find(i => i.id === photoTargetId);
-        if (item) {
-          item.image = reader.result;
-          saveAdminDataLocal();
-          renderCatalog();
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function copyLiveHtmlForGithub() {
-      const fullDoc = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-      const updatedBlock = `const DEFAULT_CATALOG = ${JSON.stringify(catalogItems, null, 2)};`;
-      const cleanHtml = fullDoc.replace(/const DEFAULT_CATALOG = \[[\s\S]*?\];/, updatedBlock);
-      try {
-        await navigator.clipboard.writeText(cleanHtml);
-        alert("Updated Live Code copy ho gaya! Ab GitHub me index.html kholkar paste aur Commit kar dein—sabhi customers ko aapke naye changes dikhenge.");
-      } catch (err) {
-        alert("Code copy nahi ho paya, browser permission check karein.");
-      }
-    }
-
-    // CUSTOMER CART & ORDER FUNCTIONS
-    function updateCart(id, delta) {
-      const next = (cart[id] || 0) + delta;
-      if (next <= 0) delete cart[id];
-      else cart[id] = next;
-      renderCatalog();
-      updateBottomCartBar();
-    }
-
-    function updateBottomCartBar() {
-      const entries = Object.entries(cart);
-      const bar = document.getElementById("bottomCartBar");
-      if (!entries.length) {
-        bar.classList.add("hidden");
-        return;
-      }
-      let totalQty = 0;
-      let totalAmt = 0;
-      entries.forEach(([id, qty]) => {
-        const item = catalogItems.find(i => i.id === Number(id));
-        if (item) {
-          totalQty += qty;
-          totalAmt += item.price * qty;
-        }
-      });
-      document.getElementById("cartBadgeCount").textContent = totalQty;
-      document.getElementById("cartTotalSummary").textContent = `₹${totalAmt} (${totalQty} pcs)`;
-      bar.classList.remove("hidden");
-    }
-
-    function openOrderDrawer() {
-      const list = document.getElementById("cartItemsList");
-      let total = 0;
-      list.innerHTML = Object.entries(cart).map(([id, qty]) => {
-        const item = catalogItems.find(i => i.id === Number(id));
-        if (!item) return "";
-        const sub = item.price * qty;
-        total += sub;
-        return `<div class="flex items-center justify-between gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200 text-xs">
-          <div class="min-w-0">
-            <div class="font-bold text-gray-900 truncate">${item.name}</div>
-            <div class="text-[10px] text-gray-500">₹${item.price} × ${qty} pcs</div>
-          </div>
-          <div class="font-extrabold text-gray-900 shrink-0">₹${sub}</div>
-        </div>`;
-      }).join("");
-      document.getElementById("drawerTotalAmount").textContent = `₹${total}`;
-      document.getElementById("orderDrawerModal").classList.remove("hidden");
-    }
-
-    function closeOrderDrawer() {
-      document.getElementById("orderDrawerModal").classList.add("hidden");
-    }
-
-    function sendOrderOnWhatsApp() {
-      const name = document.getElementById("custName").value.trim();
-      const phone = document.getElementById("custPhone").value.trim();
-      const city = document.getElementById("custCity").value.trim();
-      if (!name || !phone) {
-        alert("Kripya apna Naam aur Mobile Number bharein.");
-        return;
-      }
-      let lines = [`*NEW ORDER — GHUMO BIKE STORE*`, `Customer: ${name}`, `Phone: ${phone}`];
-      if (city) lines.push(`Area/City: ${city}`);
-      lines.push(`\n*Items:*`);
-      let total = 0;
-      Object.entries(cart).forEach(([id, qty], idx) => {
-        const item = catalogItems.find(i => i.id === Number(id));
-        if (item) {
-          const sub = item.price * qty;
-          total += sub;
-          lines.push(`${idx + 1}. ${item.name} (${item.spec}) - ${qty} pcs × ₹${item.price} = ₹${sub}`);
-        }
-      });
-      lines.push(`\n*Estimated Total: ₹${total}*`);
-
-      const savedOrders = JSON.parse(localStorage.getItem("gbs_cust_orders") || "[]");
-      savedOrders.unshift({ date: new Date().toLocaleString(), total, summary: lines.slice(4, -1).join(", ") });
-      localStorage.setItem("gbs_cust_orders", JSON.stringify(savedOrders));
-      updateMyOrdersBadge();
-
-      window.open(`https://wa.me/91${STORE_WHATSAPP}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank");
-    }
-
-    function updateMyOrdersBadge() {
-      const savedOrders = JSON.parse(localStorage.getItem("gbs_cust_orders") || "[]");
-      document.getElementById("myOrdersBadge").textContent = savedOrders.length;
-    }
-
-    function openMyOrdersModal() {
-      const savedOrders = JSON.parse(localStorage.getItem("gbs_cust_orders") || "[]");
-      const list = document.getElementById("myOrdersList");
-      list.innerHTML = savedOrders.length
-        ? savedOrders.map(o => `<div class="bg-gray-50 p-3 rounded-xl border border-gray-200 text-xs">
-            <div class="flex justify-between font-bold text-gray-800"><span>${o.date}</span><span class="text-[#dc2626]">₹${o.total}</span></div>
-            <div class="text-[11px] text-gray-600 mt-1">${o.summary}</div>
-          </div>`).join("")
-        : `<p class="text-xs text-gray-500 text-center py-6">Abhi tak koi order nahi bheja gaya hai.</p>`;
-      document.getElementById("myOrdersModal").classList.remove("hidden");
-    }
-
-    function openRateChatModal() {
-      renderChatMessages();
-      document.getElementById("rateChatModal").classList.remove("hidden");
-    }
-    function closeRateChatModal() {
-      document.getElementById("rateChatModal").classList.add("hidden");
-    }
-    function sendQuickChatPrompt(txt) {
-      document.getElementById("rateChatInput").value = txt;
-      handleRateChatSubmit(new Event("submit"));
-    }
-    function handleRateChatSubmit(e) {
-      e.preventDefault();
-      const input = document.getElementById("rateChatInput");
-      const text = input.value.trim();
-      if (!text) return;
-      chatMessages.push({ sender: "user", text });
-      input.value = "";
-
-      const qtyMatch = text.match(/(\d+)\s*(pcs|pc|set|sets|piece|pieces)?/i);
-      const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
-      const cleanQuery = text.replace(/(\d+)\s*(pcs|pc|set|sets|piece|pieces)?/gi, "").trim().toLowerCase();
-
-      let matched = null;
-      if (cleanQuery.length >= 2) {
-        matched = getDisplayItems().find(i => i.name.toLowerCase().includes(cleanQuery) || i.category.toLowerCase().includes(cleanQuery));
-        if (matched) lastChatPart = matched;
-      } else if (lastChatPart) {
-        matched = lastChatPart;
-      }
-
-      if (matched) {
-        const discount = qty >= 20 ? 0.92 : qty >= 10 ? 0.95 : 1;
-        const unitRate = Math.round(matched.price * discount);
-        const total = unitRate * qty;
-        chatMessages.push({
-          sender: "bot",
-          text: `${matched.name} (${matched.spec})\n• Rate (${qty} pcs): ₹${unitRate}/pc\n• Total Estimate: ₹${total}\nOrder ke liye WhatsApp (+91 ${STORE_WHATSAPP}) par message karein.`
-        });
-      } else {
-        chatMessages.push({
-          sender: "bot",
-          text: `Is part ka exact rate confirm karne ke liye seedhe WhatsApp (+91 ${STORE_WHATSAPP}) par message karein ya part ka naam likhein.`
-        });
-      }
-      renderChatMessages();
-    }
-    function renderChatMessages() {
-      const box = document.getElementById("rateChatMessages");
-      box.innerHTML = chatMessages.map(m => `<div class="flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}">
-        <div class="max-w-[82%] rounded-2xl px-3.5 py-2.5 text-xs whitespace-pre-line ${m.sender === 'user' ? 'bg-[#dc2626] text-white font-semibold' : 'bg-white border border-gray-200 text-gray-800'}">${m.text}</div>
-      </div>`).join("");
-      box.scrollTop = box.scrollHeight;
-    }
-
-    syncAdminUI();
-    renderCategories();
-    renderCatalog();
-    updateMyOrdersBadge();
-  </script>
-</body>
-</html>
+        <div class="bg-gray-50 borde
