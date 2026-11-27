@@ -6,6 +6,7 @@
   <title>GHUMO BIKE STORE — Wholesale & Retail Bike Spare Parts | Faridabad</title>
   <meta name="description" content="GHUMO BIKE STORE Faridabad — Wholesale & Retail Two-Wheeler Spare Parts Rate List for Splendor, Super Splendor, Passion, Shine. Direct WhatsApp Order." />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -73,6 +74,8 @@
       <div id="adminBar" class="hidden mt-2.5 pt-2 border-t border-white/15 flex flex-wrap items-center justify-between gap-1.5">
         <span class="text-[11px] font-extrabold text-amber-400">🔓 ADMIN</span>
         <div class="flex items-center gap-1.5 flex-wrap">
+          <button id="adminTabProductsBtn" type="button" onclick="setAdminTab('products')" class="bg-white/20 text-white text-[11px] font-bold px-2 py-1 rounded-lg">Products</button>
+          <button id="adminTabOrdersBtn" type="button" onclick="setAdminTab('customers')" class="bg-white/10 text-gray-200 text-[11px] font-bold px-2 py-1 rounded-lg">Customers &amp; Orders</button>
           <button onclick="openPartForm()" class="bg-red-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">+ Add Part</button>
           <button onclick="lockAdmin()" class="bg-yellow-400 text-gray-900 text-[11px] font-extrabold px-2.5 py-1 rounded-lg">← Customer Panel</button>
         </div>
@@ -119,7 +122,7 @@
 
   <!-- MAIN CATALOG -->
   <main class="max-w-xl mx-auto px-3 pt-3">
-    <div class="bg-white rounded-xl p-2.5 mb-3 border flex items-center justify-between">
+    <div id="catalogToolbar" class="bg-white rounded-xl p-2.5 mb-3 border flex items-center justify-between">
       <span id="countBadge" class="bg-red-50 text-red-700 text-xs font-extrabold px-2.5 py-1 rounded-lg">38 Items</span>
       <div class="flex bg-gray-100 p-0.5 rounded-lg text-xs">
         <button id="btnCards" onclick="setView('cards')" class="px-2.5 py-1 rounded-md font-bold bg-white shadow-sm">Cards</button>
@@ -128,6 +131,18 @@
     </div>
 
     <div id="catalogBox" class="space-y-3"></div>
+
+    <!-- ADMIN CUSTOMERS & ORDERS PANEL -->
+    <section id="adminCrmBox" class="hidden space-y-3">
+      <div class="bg-white rounded-xl p-2.5 border flex items-center justify-between gap-2">
+        <div class="flex bg-gray-100 p-0.5 rounded-lg text-xs">
+          <button id="crmTabOrders" type="button" onclick="setCrmSubTab('orders')" class="px-3 py-1 rounded-md font-bold bg-white shadow-sm">Orders</button>
+          <button id="crmTabCustomers" type="button" onclick="setCrmSubTab('customers')" class="px-3 py-1 rounded-md font-semibold text-gray-600">Customers</button>
+        </div>
+        <button type="button" onclick="loadAdminCrmData(true)" class="bg-gray-900 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">↻ Refresh</button>
+      </div>
+      <div id="crmContent" class="space-y-3"></div>
+    </section>
 
     <!-- FOOTER -->
     <footer class="mt-6 bg-[#141518] text-white rounded-2xl p-4 text-center">
@@ -178,32 +193,74 @@
 
   <!-- ADD / EDIT PART MODAL -->
   <div id="partModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
-    <div class="bg-[#181b20] text-white w-full max-w-sm rounded-2xl p-4 space-y-2.5">
+    <div class="bg-[#181b20] text-white w-full max-w-sm rounded-2xl p-4 space-y-2.5 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center">
         <h2 id="formHeading" class="text-sm font-extrabold">Add / Edit Part</h2>
-        <button onclick="document.getElementById('partModal').classList.add('hidden')" class="text-gray-400 font-bold">✕</button>
+        <button type="button" onclick="closePartForm()" class="text-gray-400 font-bold">✕</button>
       </div>
       <input type="hidden" id="editId" />
-      <input id="fCode" type="text" placeholder="Serial Code (e.g. #39)" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
+      <div class="grid grid-cols-2 gap-2">
+        <input id="fCode" type="text" placeholder="Serial Code (e.g. #39)" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
+        <input id="fOrder" type="number" placeholder="Sort Order (e.g. 39)" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
+      </div>
       <input id="fCat" type="text" placeholder="Category (e.g. Chain Kit, Cables)" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
       <input id="fName" type="text" placeholder="Part Name *" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
       <input id="fSpec" type="text" placeholder="Brand / Spec (e.g. Hero Original)" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
       <input id="fPrice" type="number" placeholder="Wholesale Rate ₹ *" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
-      <button onclick="savePart()" class="w-full bg-red-600 text-white font-extrabold text-xs py-2.5 rounded-xl">Save Part</button>
+      <div class="bg-black/50 border border-gray-700 rounded-xl p-2.5 space-y-2">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-[11px] font-bold text-gray-300">Part Photo (1:1 Optional)</span>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="document.getElementById('formPhotoFile').click()" class="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">📷 Choose Photo</button>
+            <button id="fRemovePhotoBtn" type="button" onclick="clearFormPhoto()" class="hidden bg-red-600/20 text-red-300 border border-red-500/40 text-[10px] font-bold px-2 py-1 rounded-lg">Remove</button>
+          </div>
+        </div>
+        <input type="file" id="formPhotoFile" accept="image/*" class="hidden" onchange="handleFormPhotoSelect(event)" />
+        <div id="fPhotoPreviewWrap" class="hidden w-24 h-24 mx-auto aspect-square rounded-xl overflow-hidden border border-white/15 bg-black">
+          <img id="fPhotoPreview" src="" alt="Part preview" class="w-full h-full object-cover" />
+        </div>
+      </div>
+      <p id="partFormErr" class="hidden text-xs text-red-400 font-bold"></p>
+      <button id="savePartBtn" type="button" onclick="savePart()" class="w-full bg-red-600 text-white font-extrabold text-xs py-2.5 rounded-xl">Save Part</button>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRM MODAL -->
+  <div id="deleteModal" onclick="if(event.target===this) closeDeleteModal()" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
+    <div class="bg-[#181b20] text-white w-full max-w-xs rounded-2xl p-5 space-y-3 border border-white/10">
+      <h2 class="text-sm font-extrabold">Delete Part?</h2>
+      <p id="deletePartLabel" class="text-xs text-gray-300">This part will be permanently deleted from the store.</p>
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="closeDeleteModal()" class="flex-1 bg-white/10 text-white text-xs font-bold py-2.5 rounded-xl">Cancel</button>
+        <button id="confirmDeleteBtn" type="button" onclick="confirmDeletePart()" class="flex-1 bg-red-600 text-white text-xs font-extrabold py-2.5 rounded-xl">Delete</button>
+      </div>
     </div>
   </div>
 
   <!-- CHECKOUT MODAL -->
-  <div id="checkoutModal" class="hidden fixed inset-0 z-40 bg-black/60 flex items-end sm:items-center justify-center">
-    <div class="bg-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl p-4 space-y-3 max-h-[85vh] overflow-y-auto">
+  <div id="checkoutModal" onclick="if(event.target===this) closeCheckout()" class="hidden fixed inset-0 z-40 bg-black/60 flex items-end sm:items-center justify-center">
+    <div class="bg-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl p-4 space-y-2.5 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
-        <h2 class="text-sm font-extrabold">WhatsApp Order Summary</h2>
-        <button onclick="document.getElementById('checkoutModal').classList.add('hidden')" class="font-bold text-gray-500">✕</button>
+        <h2 class="text-sm font-extrabold">WhatsApp Order Details</h2>
+        <button type="button" onclick="closeCheckout()" class="font-bold text-gray-500">✕</button>
       </div>
-      <input id="cName" type="text" placeholder="Your Name / Shop Name *" class="w-full border rounded-xl px-3 py-2 text-xs" />
-      <input id="cPhone" type="tel" placeholder="Mobile Number *" class="w-full border rounded-xl px-3 py-2 text-xs" />
-      <div id="checkoutItems" class="space-y-1.5 text-xs"></div>
-      <button onclick="sendWhatsAppOrder()" class="w-full bg-green-600 text-white font-extrabold text-xs py-3 rounded-xl">💬 Send Order on WhatsApp</button>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <input id="cName" type="text" required placeholder="Customer Name *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
+        <input id="cPhone" type="tel" required placeholder="Mobile Number *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
+      </div>
+      <input id="cShop" type="text" required placeholder="Shop Name / Number *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
+      <textarea id="cAddress" rows="2" required placeholder="Full Address *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs resize-none"></textarea>
+      <div class="grid grid-cols-2 gap-2">
+        <input id="cArea" type="text" required placeholder="Area / Locality *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
+        <input id="cPin" type="text" inputmode="numeric" maxlength="6" required placeholder="Pin Code *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
+      </div>
+      <p id="checkoutErr" class="hidden text-xs text-red-600 font-bold"></p>
+      <div id="checkoutItems" class="space-y-1.5 text-xs border-t pt-2"></div>
+      <div id="checkoutTotalRow" class="flex justify-between items-center text-sm font-extrabold text-gray-900 bg-red-50 px-3 py-2 rounded-xl">
+        <span>Order Total</span>
+        <span id="checkoutTotalAmt" class="text-red-600">₹0</span>
+      </div>
+      <button id="sendOrderBtn" type="button" onclick="sendWhatsAppOrder()" class="w-full bg-green-600 text-white font-extrabold text-xs py-3 rounded-xl">💬 Save &amp; Send Order on WhatsApp</button>
     </div>
   </div>
 
@@ -243,6 +300,11 @@
   </div>
 
   <script>
+    const SUPABASE_URL = "https://nqrhowozsbsrgagaimdh.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_Jbufem4GtNHrwvjnrAV7YA_AP9RXOG-";
+    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+    const PHOTO_BUCKET = "part-photos";
+
     const ADMIN_ID = "Ghumostore";
     const ADMIN_PASS = "sonuRs879012";
     const WA_NUM = "9625489457";
@@ -288,138 +350,148 @@
       { id: 38, code: "#38", category: "Body Parts", name: "Petrol tank cap with 2 keys spl", spec: "rust-free", price: 115, visible: true, image: "" }
     ];
 
+    function normalizeProduct(row, idx = 0) {
+      const sortOrder = Number.isFinite(Number(row.sort_order))
+        ? Number(row.sort_order)
+        : (Number.isFinite(Number(row.id)) ? Number(row.id) : idx + 1);
+      const code = row.serial_code || row.code || ("#" + String(sortOrder).padStart(2, "0"));
+      const rate = Number(row.rate !== undefined ? row.rate : row.price) || 0;
+      const imageUrl = row.image_url !== undefined ? (row.image_url || "") : (row.image || "");
+      return {
+        id: String(row.id),
+        serial_code: code,
+        code: code,
+        sort_order: sortOrder,
+        category: row.category || "General",
+        name: row.name || "",
+        spec: row.spec || "",
+        rate: rate,
+        price: rate,
+        visible: row.visible === true,
+        image_url: imageUrl,
+        image: imageUrl
+      };
+    }
+
+    function sortItemsList(list) {
+      return list.sort((a, b) => {
+        const ao = Number(a.sort_order) || 0;
+        const bo = Number(b.sort_order) || 0;
+        if (ao !== bo) return ao - bo;
+        return String(a.serial_code || "").localeCompare(String(b.serial_code || ""), undefined, { numeric: true });
+      });
+    }
+
     let isAdmin = sessionStorage.getItem("gbs_admin") === "1";
+    let adminTab = "products";
+    let crmSubTab = "orders";
     let adminHistoryPushed = false;
-    const defaultPhotoMap = {};
-    DEFAULT_ITEMS.forEach(i => { if (i.image) defaultPhotoMap[String(i.id)] = i.image; });
-
-    function loadInitialItems() {
-      try {
-        const raw = localStorage.getItem("gbs_items");
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length) return parsed;
-        }
-      } catch (err) {}
-      return DEFAULT_ITEMS.map(i => ({ ...i }));
-    }
-
-    let items = loadInitialItems();
-    const photoMap = { ...defaultPhotoMap };
-    items.forEach(i => {
-      if (i.image) photoMap[String(i.id)] = i.image;
-      else if (photoMap[String(i.id)]) i.image = photoMap[String(i.id)];
-    });
+    let items = sortItemsList(DEFAULT_ITEMS.map((i, idx) => normalizeProduct(i, idx)));
+    let productsLoadingPromise = null;
+    let hasSeededDefaults = false;
+    let productsLoadedFromCloud = false;
+    let crmOrders = [];
+    let crmCustomers = [];
+    let crmLoaded = false;
     let activeCat = "All Items", query = "", view = "cards", cart = {}, photoId = null;
-
-    // INDEXEDDB PHOTO STORAGE (PERMANENT, NO 5MB LOCALSTORAGE QUOTA LIMIT)
-    const PHOTO_DB_NAME = "gbs_photos_db";
-    const PHOTO_STORE = "photos";
-    let photoDbPromise = null;
-
-    function openPhotoDB() {
-      if (photoDbPromise) return photoDbPromise;
-      photoDbPromise = new Promise((resolve, reject) => {
-        if (!window.indexedDB) return reject(new Error("IndexedDB unavailable"));
-        const req = indexedDB.open(PHOTO_DB_NAME, 1);
-        req.onupgradeneeded = (ev) => {
-          const db = ev.target.result;
-          if (!db.objectStoreNames.contains(PHOTO_STORE)) {
-            db.createObjectStore(PHOTO_STORE);
-          }
-        };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-      });
-      return photoDbPromise;
-    }
-
-    async function idbPutPhoto(id, dataUrl) {
-      const db = await openPhotoDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(PHOTO_STORE, "readwrite");
-        tx.objectStore(PHOTO_STORE).put(dataUrl, String(id));
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error);
-      });
-    }
-
-    async function idbDeletePhoto(id) {
-      try {
-        const db = await openPhotoDB();
-        await new Promise((resolve, reject) => {
-          const tx = db.transaction(PHOTO_STORE, "readwrite");
-          tx.objectStore(PHOTO_STORE).delete(String(id));
-          tx.oncomplete = () => resolve();
-          tx.onerror = () => reject(tx.error);
-        });
-      } catch (err) {}
-    }
-
-    async function idbGetAllPhotos() {
-      try {
-        const db = await openPhotoDB();
-        return await new Promise((resolve, reject) => {
-          const tx = db.transaction(PHOTO_STORE, "readonly");
-          const store = tx.objectStore(PHOTO_STORE);
-          const result = {};
-          const req = store.openCursor();
-          req.onsuccess = (ev) => {
-            const cursor = ev.target.result;
-            if (cursor) {
-              result[String(cursor.key)] = cursor.value;
-              cursor.continue();
-            } else {
-              resolve(result);
-            }
-          };
-          req.onerror = () => reject(req.error);
-        });
-      } catch (err) {
-        return {};
-      }
-    }
+    let pendingDeleteId = null;
+    let singleCheckoutItemId = null;
+    let pendingFormPhotoBlob = null;
+    let pendingFormPhotoRemoved = false;
 
     let toastTimer = null;
-    function showToast(msg, duration = 2200) {
+    function showToast(msg, duration = 2200, isError = false) {
       const el = document.getElementById("toast");
       if (!el) return;
       el.textContent = msg;
-      el.classList.remove("hidden");
+      el.className = `fixed bottom-20 left-1/2 -translate-x-1/2 z-50 ${isError ? "bg-red-600" : "bg-emerald-600"} text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-lg whitespace-nowrap pointer-events-none`;
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => el.classList.add("hidden"), duration);
     }
 
-    async function hydratePhotosFromDB() {
+    function saveCache() {
       try {
-        const dbPhotos = await idbGetAllPhotos();
-        let migrated = false;
-        for (const item of items) {
-          const key = String(item.id);
-          if (dbPhotos[key]) {
-            photoMap[key] = dbPhotos[key];
-            item.image = dbPhotos[key];
-          } else if (item.image && item.image !== defaultPhotoMap[key]) {
-            photoMap[key] = item.image;
-            try {
-              await idbPutPhoto(item.id, item.image);
-              migrated = true;
-            } catch (err) {}
-          } else if (defaultPhotoMap[key]) {
-            photoMap[key] = defaultPhotoMap[key];
-            item.image = defaultPhotoMap[key];
-          }
-        }
-        if (migrated) persistMetadataOnly();
-        renderAll();
+        localStorage.setItem("gbs_items_cloud_cache", JSON.stringify(items));
       } catch (err) {}
     }
 
-    function persistMetadataOnly() {
+    function loadCacheIfAny() {
       try {
-        const slim = items.map(({ image, ...rest }) => ({ ...rest, image: "" }));
-        localStorage.setItem("gbs_items", JSON.stringify(slim));
+        const raw = localStorage.getItem("gbs_items_cloud_cache");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length) {
+            items = sortItemsList(parsed.map((r, idx) => normalizeProduct(r, idx)));
+          }
+        }
       } catch (err) {}
+    }
+
+    loadCacheIfAny();
+
+    // SUPABASE PRODUCTS FETCH & INITIAL 38-ITEM AUTO-SEED
+    async function loadProductsFromSupabase() {
+      if (!sb) return;
+      if (productsLoadingPromise) return productsLoadingPromise;
+      productsLoadingPromise = (async () => {
+        try {
+          const { data, error } = await sb
+            .from("product")
+            .select("*")
+            .order("sort_order", { ascending: true })
+            .order("serial_code", { ascending: true });
+
+          if (error) {
+            console.error("Supabase product load error:", error);
+            return;
+          }
+
+          if (Array.isArray(data) && data.length === 0) {
+            if (!hasSeededDefaults) {
+              hasSeededDefaults = true;
+              const seedRows = DEFAULT_ITEMS.map((d, idx) => ({
+                serial_code: d.code || ("#" + String(idx + 1).padStart(2, "0")),
+                sort_order: idx + 1,
+                category: d.category,
+                name: d.name,
+                spec: d.spec,
+                rate: Number(d.price) || 0,
+                visible: true,
+                image_url: d.image || ""
+              }));
+              const { data: seeded, error: seedErr } = await sb
+                .from("product")
+                .insert(seedRows)
+                .select("*");
+              if (!seedErr && Array.isArray(seeded) && seeded.length) {
+                items = sortItemsList(seeded.map((r, idx) => normalizeProduct(r, idx)));
+                productsLoadedFromCloud = true;
+                saveCache();
+                renderAll();
+                return;
+              }
+              if (seedErr) {
+                hasSeededDefaults = false;
+                console.error("Supabase auto-seed error:", seedErr);
+              }
+            }
+            return;
+          }
+
+          if (Array.isArray(data) && data.length > 0) {
+            hasSeededDefaults = true;
+            productsLoadedFromCloud = true;
+            items = sortItemsList(data.map((r, idx) => normalizeProduct(r, idx)));
+            saveCache();
+            renderAll();
+          }
+        } catch (err) {
+          console.error("Supabase fetch exception:", err);
+        } finally {
+          productsLoadingPromise = null;
+        }
+      })();
+      return productsLoadingPromise;
     }
 
     function pushAdminHistory() {
@@ -437,8 +509,10 @@
       if (isAdmin) {
         adminHistoryPushed = false;
         isAdmin = false;
+        adminTab = "products";
         sessionStorage.removeItem("gbs_admin");
-        document.getElementById("partModal").classList.add("hidden");
+        closePartForm();
+        closeDeleteModal();
         renderAll();
       }
     });
@@ -479,6 +553,8 @@
       e.preventDefault();
       if (document.getElementById("uid").value.trim() === ADMIN_ID && document.getElementById("pwd").value.trim() === ADMIN_PASS) {
         isAdmin = true;
+        adminTab = "products";
+        crmLoaded = false;
         sessionStorage.setItem("gbs_admin", "1");
         document.getElementById("loginErr").classList.add("hidden");
         document.getElementById("loginModal").classList.add("hidden");
@@ -486,6 +562,7 @@
         if (pwdEl && pwdEl.type !== "password") togglePasswordVisibility();
         pushAdminHistory();
         renderAll();
+        loadProductsFromSupabase();
       } else {
         document.getElementById("loginErr").classList.remove("hidden");
       }
@@ -493,8 +570,10 @@
 
     function lockAdmin() {
       isAdmin = false;
+      adminTab = "products";
       sessionStorage.removeItem("gbs_admin");
-      document.getElementById("partModal").classList.add("hidden");
+      closePartForm();
+      closeDeleteModal();
       renderAll();
       if (adminHistoryPushed) {
         adminHistoryPushed = false;
@@ -502,9 +581,15 @@
       }
     }
 
-    function saveLocal() {
-      persistMetadataOnly();
+    function setAdminTab(tab) {
+      adminTab = tab;
       renderAll();
+      if (tab === "customers") loadAdminCrmData(!crmLoaded);
+    }
+
+    function setCrmSubTab(sub) {
+      crmSubTab = sub;
+      renderCrmView();
     }
 
     // VOICE SEARCH (EN-IN & HI-IN WITH PULSING WAVE MODAL, 5S SILENCE TIMEOUT & INLINE PREVIEW FALLBACK)
@@ -996,6 +1081,11 @@
     function runSearch(val, skipSuggestions = false) {
       query = val.trim().toLowerCase();
       document.getElementById("clearBtn").classList.toggle("hidden", !query);
+      if (isAdmin && adminTab === "customers") {
+        hideSuggestions();
+        renderCrmView();
+        return;
+      }
       if (skipSuggestions || !query) hideSuggestions();
       else renderSuggestions(val);
       renderCatalog();
@@ -1015,16 +1105,38 @@
     }
 
     function getList() {
-      return isAdmin ? items : items.filter(i => i.visible !== false);
+      return isAdmin ? items : items.filter(i => i.visible === true);
     }
 
     function renderAll() {
       document.getElementById("adminBar").classList.toggle("hidden", !isAdmin);
+      const showCrm = isAdmin && adminTab === "customers";
+      const prodBtn = document.getElementById("adminTabProductsBtn");
+      const ordBtn = document.getElementById("adminTabOrdersBtn");
+      if (prodBtn && ordBtn) {
+        prodBtn.className = !showCrm
+          ? "bg-white text-gray-900 text-[11px] font-extrabold px-2.5 py-1 rounded-lg"
+          : "bg-white/10 text-gray-200 text-[11px] font-bold px-2.5 py-1 rounded-lg";
+        ordBtn.className = showCrm
+          ? "bg-white text-gray-900 text-[11px] font-extrabold px-2.5 py-1 rounded-lg"
+          : "bg-white/10 text-gray-200 text-[11px] font-bold px-2.5 py-1 rounded-lg";
+      }
+
+      document.getElementById("categoryBar").classList.toggle("hidden", showCrm);
+      document.getElementById("catalogToolbar").classList.toggle("hidden", showCrm);
+      document.getElementById("catalogBox").classList.toggle("hidden", showCrm);
+      document.getElementById("adminCrmBox").classList.toggle("hidden", !showCrm);
+
+      if (showCrm) {
+        renderCrmView();
+        return;
+      }
+
       const list = getList();
       const cats = ["All Items", ...new Set(list.map(i => i.category))];
       if (!cats.includes(activeCat)) activeCat = "All Items";
       document.getElementById("categoryBar").innerHTML = cats.map(c => `
-        <button onclick="activeCat='${c.replace(/'/g,"\\'")}';renderAll()" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${activeCat===c?'bg-red-600 text-white':'bg-gray-100 text-gray-700'}">${c}</button>
+        <button onclick="activeCat='${c.replace(/'/g,"\\'")}';renderAll()" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${activeCat===c?'bg-red-600 text-white':'bg-gray-100 text-gray-700'}">${escapeHtml(c)}</button>
       `).join("");
       renderCatalog();
     }
@@ -1048,7 +1160,7 @@
         const askText = encodeURIComponent(`Hello GHUMO BIKE STORE, mujhe "${query}" chahiye. Kya ye stock me available hai?`);
         box.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center border-2 border-dashed border-amber-400 space-y-2.5">
           <div class="text-3xl">🛠️</div>
-          <h3 class="text-sm font-extrabold text-gray-900">"${query}" Abhi Online List Me Nahi Hai</h3>
+          <h3 class="text-sm font-extrabold text-gray-900">"${escapeHtml(query)}" Abhi Online List Me Nahi Hai</h3>
           <p class="text-xs text-gray-600">Chinta na karein! Hamare paas sabhi bikes ke parts order par bhi milte hain. Niche click karke sidha WhatsApp par mangwayein:</p>
           <a href="https://wa.me/91${WA_NUM}?text=${askText}" target="_blank" class="inline-block bg-green-600 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow">💬 WhatsApp Par Part Mangwayein</a>
           <div><button onclick="clearSearch()" class="text-xs text-gray-500 font-bold underline mt-1">Sabhi Parts Dekhein</button></div>
@@ -1063,15 +1175,19 @@
               <tr><th class="p-2.5">Part Name</th><th class="p-2.5 text-right">Rate</th><th class="p-2.5 text-right">Action</th></tr>
             </thead>
             <tbody class="divide-y">
-              ${list.map(i => `<tr>
-                <td class="p-2.5"><div class="font-bold">${i.name}</div><div class="text-[10px] text-gray-500">${i.code} • ${i.spec}</div></td>
-                <td class="p-2.5 text-right font-extrabold text-red-600">₹${i.price}</td>
-                <td class="p-2.5 text-right">
-                  ${isAdmin
-                    ? `<button onclick="toggleVis(${i.id})" class="text-[10px] font-bold px-2 py-1 rounded ${i.visible!==false?'bg-emerald-100 text-emerald-800':'bg-red-100 text-red-700'}">${i.visible!==false?'SHOW':'HIDE'}</button>`
-                    : `<button onclick="addCart(${i.id},1)" class="bg-gray-900 text-white text-[10px] font-bold px-2.5 py-1 rounded">+ Add (${cart[i.id]||0})</button>`}
-                </td>
-              </tr>`).join("")}
+              ${list.map(i => {
+                const sid = escapeHtml(String(i.id));
+                const rate = Number(i.rate ?? i.price) || 0;
+                return `<tr>
+                  <td class="p-2.5"><div class="font-bold">${escapeHtml(i.name)}</div><div class="text-[10px] text-gray-500">${escapeHtml(i.serial_code || i.code)} • ${escapeHtml(i.spec)}</div></td>
+                  <td class="p-2.5 text-right font-extrabold text-red-600">₹${rate}</td>
+                  <td class="p-2.5 text-right whitespace-nowrap">
+                    ${isAdmin
+                      ? `<button onclick="openPartForm('${sid}')" class="bg-gray-100 border text-[10px] font-bold px-2 py-1 rounded mr-1">Edit</button><button onclick="toggleVis('${sid}')" class="text-[10px] font-bold px-2 py-1 rounded ${i.visible!==false?'bg-emerald-100 text-emerald-800':'bg-red-100 text-red-700'}">${i.visible!==false?'SHOW':'HIDE'}</button>`
+                      : `<button onclick="addCart('${sid}',1)" class="bg-gray-900 text-white text-[10px] font-bold px-2.5 py-1 rounded">+ Add (${cart[i.id]||0})</button>`}
+                  </td>
+                </tr>`;
+              }).join("")}
             </tbody>
           </table>
         </div>`;
@@ -1079,197 +1195,757 @@
       }
 
       box.innerHTML = list.map(i => {
+        const sid = escapeHtml(String(i.id));
         const qty = cart[i.id] || 0;
         const vis = i.visible !== false;
-        const wa = `https://wa.me/91${WA_NUM}?text=${encodeURIComponent(`Hello GHUMO BIKE STORE, order: ${i.name} (${i.spec}) - ₹${i.price}`)}`;
+        const rate = Number(i.rate ?? i.price) || 0;
+        const imgUrl = i.image_url || i.image || "";
         return `<div class="bg-white rounded-2xl p-3 border ${!vis?'border-red-400 bg-red-50/40':'border-gray-200'}">
-          <div class="flex justify-between items-center mb-1.5">
-            <div class="flex items-center gap-1.5">
-              <span class="bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded">${i.code}</span>
+          <div class="flex justify-between items-center gap-1.5 mb-1.5">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded">${escapeHtml(i.serial_code || i.code)}</span>
               ${isAdmin ? `
-                <button onclick="openPartForm(${i.id})" class="bg-gray-100 border text-[10px] font-bold px-2 py-0.5 rounded">Edit</button>
-                <button onclick="toggleVis(${i.id})" class="text-[10px] font-bold px-2 py-0.5 rounded ${vis?'bg-emerald-100 text-emerald-800':'bg-red-100 text-red-700'}">${vis?'SHOW':'HIDE'}</button>
-                <button onclick="pickPhoto(${i.id})" class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded">📷</button>
+                <button onclick="openPartForm('${sid}')" class="bg-gray-100 border text-[10px] font-bold px-2 py-0.5 rounded">Edit</button>
+                <button onclick="toggleVis('${sid}')" class="text-[10px] font-bold px-2 py-0.5 rounded ${vis?'bg-emerald-100 text-emerald-800':'bg-red-100 text-red-700'}">${vis?'SHOW':'HIDE'}</button>
+                <button onclick="pickPhoto('${sid}')" class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded" title="Upload or replace photo">📷</button>
+                ${imgUrl ? `<button onclick="removePartPhoto('${sid}')" class="bg-red-50 text-red-700 border border-red-200 text-[10px] font-bold px-2 py-0.5 rounded" title="Remove photo">✕ Photo</button>` : ''}
               ` : ''}
             </div>
-            <span class="text-[10px] text-gray-500 font-semibold">${i.category}</span>
+            <span class="text-[10px] text-gray-500 font-semibold shrink-0">${escapeHtml(i.category)}</span>
           </div>
-          ${i.image ? `<div class="w-full max-w-[400px] mx-auto aspect-square bg-gray-50 rounded-xl overflow-hidden mb-2.5 border border-gray-100"><img src="${i.image}" alt="${i.name.replace(/"/g, '&quot;')}" class="w-full h-full object-cover" /></div>` : ''}
-          <div class="text-sm font-extrabold text-gray-900">${i.name}</div>
-          <div class="text-[10px] text-emerald-800 bg-emerald-50 inline-block px-2 py-0.5 rounded font-bold mt-1">• ${i.spec}</div>
+          ${imgUrl ? `<div class="w-full max-w-[400px] mx-auto aspect-square bg-gray-50 rounded-xl overflow-hidden mb-2.5 border border-gray-100"><img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(i.name)}" class="w-full h-full object-cover" /></div>` : ''}
+          <div class="text-sm font-extrabold text-gray-900">${escapeHtml(i.name)}</div>
+          <div class="text-[10px] text-emerald-800 bg-emerald-50 inline-block px-2 py-0.5 rounded font-bold mt-1">• ${escapeHtml(i.spec)}</div>
           <div class="mt-2.5 pt-2 border-t flex justify-between items-center">
-            <div class="text-base font-extrabold text-red-600">₹${i.price}</div>
+            <div class="text-base font-extrabold text-red-600">₹${rate}</div>
             <div class="flex items-center gap-1.5">
-              ${isAdmin ? `<button onclick="delPart(${i.id})" class="bg-red-50 text-red-600 text-xs px-2 py-1 rounded-lg">🗑️</button>` : ''}
-              <a href="${wa}" target="_blank" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-xl">WA</a>
+              ${isAdmin ? `<button onclick="askDeletePart('${sid}')" class="bg-red-50 text-red-600 text-xs px-2 py-1 rounded-lg">🗑️</button>` : ''}
+              <button type="button" onclick="openSingleOrderCheckout('${sid}')" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-xl">WA</button>
               ${qty > 0
-                ? `<div class="bg-gray-900 text-white rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center gap-2"><button onclick="addCart(${i.id},-1)">−</button><span>${qty}</span><button onclick="addCart(${i.id},1)">+</button></div>`
-                : `<button onclick="addCart(${i.id},1)" class="bg-gray-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl">+ Add</button>`}
+                ? `<div class="bg-gray-900 text-white rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center gap-2"><button onclick="addCart('${sid}',-1)">−</button><span>${qty}</span><button onclick="addCart('${sid}',1)">+</button></div>`
+                : `<button onclick="addCart('${sid}',1)" class="bg-gray-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl">+ Add</button>`}
             </div>
           </div>
         </div>`;
       }).join("");
     }
 
-    // ADMIN ACTIONS
-    function toggleVis(id) { const x = items.find(i => i.id === id); if (x) { x.visible = x.visible === false; saveLocal(); } }
-    function delPart(id) {
-      if (confirm("Delete item?")) {
-        items = items.filter(i => i.id !== id);
-        delete photoMap[String(id)];
-        idbDeletePhoto(id);
-        saveLocal();
+    // 1:1 SQUARE JPEG COMPRESSOR (RETURNS BLOB + PREVIEW DATAURL)
+    function cropImageToSquareJpeg(file, size = 320, quality = 0.75) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("File read failed"));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error("Image decode failed"));
+          img.onload = () => {
+            const side = Math.min(img.width, img.height);
+            const sx = (img.width - side) / 2;
+            const sy = (img.height - side) / 2;
+            const canvas = document.createElement("canvas");
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext("2d");
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, size, size);
+            ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
+            const dataUrl = canvas.toDataURL("image/jpeg", quality);
+            canvas.toBlob((blob) => {
+              if (!blob) return reject(new Error("Blob creation failed"));
+              resolve({ blob, dataUrl });
+            }, "image/jpeg", quality);
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadBlobToPartPhotos(productId, blob) {
+      if (!sb) throw new Error("Supabase not initialized");
+      const safeKey = `part-${String(productId).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
+      const { error } = await sb.storage
+        .from(PHOTO_BUCKET)
+        .upload(safeKey, blob, { contentType: "image/jpeg", upsert: true });
+      if (error) throw error;
+      const { data } = sb.storage.from(PHOTO_BUCKET).getPublicUrl(safeKey);
+      return `${data.publicUrl}?t=${Date.now()}`;
+    }
+
+    // ADMIN ACTIONS SYNCED TO SUPABASE
+    async function toggleVis(id) {
+      const x = items.find(i => String(i.id) === String(id));
+      if (!x) return;
+      const prevVis = x.visible === true;
+      const nextVis = !prevVis;
+      x.visible = nextVis;
+      renderAll();
+      if (sb) {
+        const { data, error } = await sb
+          .from("product")
+          .update({ visible: nextVis })
+          .eq("id", x.id)
+          .select("id");
+        if (error || !data || data.length === 0) {
+          x.visible = prevVis;
+          renderAll();
+          console.error("Supabase visibility error:", error || "No matching row updated");
+          showToast("Cloud sync error: " + (error ? error.message : "Could not update row"), 3200, true);
+          return;
+        }
+      }
+      saveCache();
+      showToast("Saved to Cloud ✓");
+    }
+
+    function askDeletePart(id) {
+      const x = items.find(i => String(i.id) === String(id));
+      if (!x) return;
+      pendingDeleteId = String(x.id);
+      const lbl = document.getElementById("deletePartLabel");
+      if (lbl) lbl.textContent = `Delete "${x.name}" (${x.serial_code || x.code}) permanently from the cloud?`;
+      document.getElementById("deleteModal").classList.remove("hidden");
+    }
+
+    function closeDeleteModal() {
+      pendingDeleteId = null;
+      const el = document.getElementById("deleteModal");
+      if (el) el.classList.add("hidden");
+    }
+
+    async function confirmDeletePart() {
+      if (!pendingDeleteId) return;
+      const targetId = pendingDeleteId;
+      const btn = document.getElementById("confirmDeleteBtn");
+      if (btn) { btn.disabled = true; btn.textContent = "Deleting..."; }
+      try {
+        if (sb) {
+          const { data, error } = await sb.from("product").delete().eq("id", targetId).select("id");
+          if (error || !data || data.length === 0) {
+            console.error("Supabase delete error:", error || "No matching row deleted");
+            showToast("Cloud delete error: " + (error ? error.message : "Could not delete row"), 3200, true);
+            return;
+          }
+          try {
+            const safeKey = `part-${String(targetId).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
+            await sb.storage.from(PHOTO_BUCKET).remove([safeKey]);
+          } catch (err) {}
+        }
+        items = items.filter(i => String(i.id) !== String(targetId));
+        delete cart[targetId];
+        saveCache();
+        closeDeleteModal();
+        renderAll();
+        updateCartBar();
+        showToast("Saved to Cloud ✓");
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = "Delete"; }
       }
     }
-    function pickPhoto(id) { photoId = id; document.getElementById("adminPhotoFile").click(); }
-    function handleAdminPhoto(e) {
+
+    function pickPhoto(id) {
+      photoId = String(id);
+      document.getElementById("adminPhotoFile").click();
+    }
+
+    async function handleAdminPhoto(e) {
       const f = e.target.files[0];
       e.target.value = "";
       if (!f || !photoId) return;
       const targetId = photoId;
-      const r = new FileReader();
-      r.onload = () => {
-        const img = new Image();
-        img.onload = async () => {
-          const side = Math.min(img.width, img.height);
-          const sx = (img.width - side) / 2;
-          const sy = (img.height - side) / 2;
-          const size = 320;
-          const canvas = document.createElement("canvas");
-          canvas.width = size;
-          canvas.height = size;
-          const ctx = canvas.getContext("2d");
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, size, size);
-          ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
-          const cropped = canvas.toDataURL("image/jpeg", 0.7);
-          const x = items.find(i => i.id === targetId);
-          if (x) {
-            photoMap[String(targetId)] = cropped;
-            x.image = cropped;
-            try { await idbPutPhoto(targetId, cropped); } catch (err) {}
-            saveLocal();
-            showToast("✅ Photo Saved!");
-          }
-        };
-        img.onerror = async () => {
-          const x = items.find(i => i.id === targetId);
-          if (x) {
-            photoMap[String(targetId)] = r.result;
-            x.image = r.result;
-            try { await idbPutPhoto(targetId, r.result); } catch (err) {}
-            saveLocal();
-            showToast("✅ Photo Saved!");
-          }
-        };
-        img.src = r.result;
-      };
-      r.readAsDataURL(f);
-    }
-    function openPartForm(id) {
-      const x = id ? items.find(i => i.id === id) : null;
-      const nextId = items.length ? Math.max(...items.map(i => i.id)) + 1 : 1;
-      document.getElementById("formHeading").textContent = x ? "Edit Part" : "Add New Part";
-      document.getElementById("editId").value = x ? x.id : "";
-      document.getElementById("fCode").value = x ? (x.code || "") : "#" + String(nextId).padStart(2, "0");
-      document.getElementById("fCat").value = x ? x.category : "";
-      document.getElementById("fName").value = x ? x.name : "";
-      document.getElementById("fSpec").value = x ? x.spec : "";
-      document.getElementById("fPrice").value = x ? x.price : "";
-      document.getElementById("partModal").classList.remove("hidden");
-    }
-    function savePart() {
-      const id = document.getElementById("editId").value;
-      const rawCode = document.getElementById("fCode").value.trim();
-      const category = document.getElementById("fCat").value.trim() || "General";
-      const name = document.getElementById("fName").value.trim();
-      const spec = document.getElementById("fSpec").value.trim() || "Standard";
-      const price = Number(document.getElementById("fPrice").value) || 0;
-      if (!name) return alert("Part name likhein");
-      if (id) {
-        const x = items.find(i => i.id === Number(id));
-        if (x) {
-          const code = rawCode || x.code || ("#" + String(x.id).padStart(2, "0"));
-          Object.assign(x, { code, category, name, spec, price });
-        }
-      } else {
-        const nid = items.length ? Math.max(...items.map(i => i.id)) + 1 : 1;
-        const code = rawCode || ("#" + String(nid).padStart(2, "0"));
-        items.push({ id: nid, code, category, name, spec, price, visible: true, image: "" });
-      }
-      document.getElementById("partModal").classList.add("hidden");
-      saveLocal();
-    }
-    async function copyUpdatedHtml() {
-      const dbPhotos = await idbGetAllPhotos();
-      const exportItems = items.map(i => {
-        const key = String(i.id);
-        return { ...i, image: dbPhotos[key] || photoMap[key] || i.image || "" };
-      });
-      const clone = document.documentElement.cloneNode(true);
-      ["adminBar", "cartBar", "loginModal", "partModal", "checkoutModal", "voiceModal", "voiceStatus", "searchSuggestions", "clearBtn", "toast"].forEach(id => {
-        const el = clone.querySelector("#" + id);
-        if (el) el.classList.add("hidden");
-      });
-      const catBar = clone.querySelector("#categoryBar");
-      if (catBar) catBar.innerHTML = "";
-      const catBox = clone.querySelector("#catalogBox");
-      if (catBox) catBox.innerHTML = "";
-      const searchEl = clone.querySelector("#searchInput");
-      if (searchEl) searchEl.setAttribute("value", "");
-      const full = "<!DOCTYPE html>\n" + clone.outerHTML;
-      const updated = full.replace(/const DEFAULT_ITEMS = \[[\s\S]*?\];/, () => `const DEFAULT_ITEMS = ${JSON.stringify(exportItems, null, 2)};`);
+      const x = items.find(i => String(i.id) === String(targetId));
+      if (!x) return;
+      showToast("Uploading photo...", 4000);
       try {
-        await navigator.clipboard.writeText(updated);
-        showToast("✅ Code Copied with All Photos!");
+        const { blob, dataUrl } = await cropImageToSquareJpeg(f, 320, 0.75);
+        let finalUrl = dataUrl;
+        if (sb) {
+          finalUrl = await uploadBlobToPartPhotos(x.id, blob);
+          const { data, error } = await sb
+            .from("product")
+            .update({ image_url: finalUrl })
+            .eq("id", x.id)
+            .select("id");
+          if (error) throw error;
+          if (!data || data.length === 0) throw new Error("Product row not found in Supabase");
+        }
+        x.image_url = finalUrl;
+        x.image = finalUrl;
+        saveCache();
+        renderAll();
+        showToast("Saved to Cloud ✓");
       } catch (err) {
-        const ta = document.createElement("textarea");
-        ta.value = updated;
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
-        showToast("✅ Code Copied with All Photos!");
+        console.error("Photo upload error:", err);
+        showToast("Photo upload failed: " + (err.message || "Check Storage policy"), 3500, true);
       }
     }
 
-    // CART & CHECKOUT
-    function addCart(id, d) {
-      const n = (cart[id] || 0) + d;
-      if (n <= 0) delete cart[id]; else cart[id] = n;
-      renderCatalog();
+    async function removePartPhoto(id) {
+      const x = items.find(i => String(i.id) === String(id));
+      if (!x) return;
+      if (sb) {
+        const { data, error } = await sb
+          .from("product")
+          .update({ image_url: "" })
+          .eq("id", x.id)
+          .select("id");
+        if (error || !data || data.length === 0) {
+          console.error("Photo remove error:", error || "No matching row updated");
+          showToast("Cloud sync error: " + (error ? error.message : "Could not update row"), 3200, true);
+          return;
+        }
+        try {
+          const safeKey = `part-${String(x.id).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
+          await sb.storage.from(PHOTO_BUCKET).remove([safeKey]);
+        } catch (err) {}
+      }
+      x.image_url = "";
+      x.image = "";
+      saveCache();
+      renderAll();
+      showToast("Saved to Cloud ✓");
+    }
+
+    function closePartForm() {
+      pendingFormPhotoBlob = null;
+      pendingFormPhotoRemoved = false;
+      const modal = document.getElementById("partModal");
+      if (modal) modal.classList.add("hidden");
+      const errEl = document.getElementById("partFormErr");
+      if (errEl) errEl.classList.add("hidden");
+    }
+
+    function clearFormPhoto() {
+      pendingFormPhotoBlob = null;
+      pendingFormPhotoRemoved = true;
+      document.getElementById("fPhotoPreview").src = "";
+      document.getElementById("fPhotoPreviewWrap").classList.add("hidden");
+      document.getElementById("fRemovePhotoBtn").classList.add("hidden");
+    }
+
+    async function handleFormPhotoSelect(e) {
+      const f = e.target.files[0];
+      e.target.value = "";
+      if (!f) return;
+      try {
+        const { blob, dataUrl } = await cropImageToSquareJpeg(f, 320, 0.75);
+        pendingFormPhotoBlob = blob;
+        pendingFormPhotoRemoved = false;
+        document.getElementById("fPhotoPreview").src = dataUrl;
+        document.getElementById("fPhotoPreviewWrap").classList.remove("hidden");
+        document.getElementById("fRemovePhotoBtn").classList.remove("hidden");
+      } catch (err) {
+        showToast("Could not read image", 2500, true);
+      }
+    }
+
+    function openPartForm(id) {
+      const x = id ? items.find(i => String(i.id) === String(id)) : null;
+      const maxOrder = items.length ? Math.max(...items.map(i => Number(i.sort_order) || 0)) : 0;
+      const nextOrder = maxOrder + 1;
+      pendingFormPhotoBlob = null;
+      pendingFormPhotoRemoved = false;
+      document.getElementById("formHeading").textContent = x ? "Edit Part" : "Add New Part";
+      document.getElementById("editId").value = x ? String(x.id) : "";
+      document.getElementById("fCode").value = x ? (x.serial_code || x.code || "") : "#" + String(nextOrder).padStart(2, "0");
+      document.getElementById("fOrder").value = x ? (x.sort_order ?? nextOrder) : nextOrder;
+      document.getElementById("fCat").value = x ? x.category : "";
+      document.getElementById("fName").value = x ? x.name : "";
+      document.getElementById("fSpec").value = x ? x.spec : "";
+      document.getElementById("fPrice").value = x ? (x.rate ?? x.price) : "";
+      const existingUrl = x ? (x.image_url || x.image || "") : "";
+      if (existingUrl) {
+        document.getElementById("fPhotoPreview").src = existingUrl;
+        document.getElementById("fPhotoPreviewWrap").classList.remove("hidden");
+        document.getElementById("fRemovePhotoBtn").classList.remove("hidden");
+      } else {
+        document.getElementById("fPhotoPreview").src = "";
+        document.getElementById("fPhotoPreviewWrap").classList.add("hidden");
+        document.getElementById("fRemovePhotoBtn").classList.add("hidden");
+      }
+      document.getElementById("partFormErr").classList.add("hidden");
+      document.getElementById("partModal").classList.remove("hidden");
+    }
+
+    async function savePart() {
+      const editId = document.getElementById("editId").value.trim();
+      const rawCode = document.getElementById("fCode").value.trim();
+      const rawOrderStr = document.getElementById("fOrder").value.trim();
+      const rawOrder = rawOrderStr === "" ? NaN : Number(rawOrderStr);
+      const category = document.getElementById("fCat").value.trim() || "General";
+      const name = document.getElementById("fName").value.trim();
+      const spec = document.getElementById("fSpec").value.trim() || "Standard";
+      const rate = Number(document.getElementById("fPrice").value) || 0;
+      const errEl = document.getElementById("partFormErr");
+      if (!name) {
+        errEl.textContent = "Please enter the Part Name.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+      errEl.classList.add("hidden");
+
+      const saveBtn = document.getElementById("savePartBtn");
+      if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Saving to Cloud..."; }
+
+      try {
+        if (editId) {
+          const x = items.find(i => String(i.id) === String(editId));
+          if (!x) return;
+          const sort_order = Number.isFinite(rawOrder) && rawOrder >= 0 ? rawOrder : (x.sort_order || 1);
+          const serial_code = rawCode || x.serial_code || ("#" + String(sort_order).padStart(2, "0"));
+          let image_url = pendingFormPhotoRemoved ? "" : (x.image_url || x.image || "");
+
+          if (pendingFormPhotoBlob && sb) {
+            image_url = await uploadBlobToPartPhotos(x.id, pendingFormPhotoBlob);
+          } else if (pendingFormPhotoRemoved && sb) {
+            try {
+              const safeKey = `part-${String(x.id).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
+              await sb.storage.from(PHOTO_BUCKET).remove([safeKey]);
+            } catch (err) {}
+          }
+
+          if (sb) {
+            const { data, error } = await sb
+              .from("product")
+              .update({ serial_code, sort_order, category, name, spec, rate, image_url })
+              .eq("id", x.id)
+              .select("*");
+            if (error) throw error;
+            if (!data || data.length === 0) throw new Error("Product row not found in Supabase");
+            Object.assign(x, normalizeProduct(data[0]));
+          } else {
+            Object.assign(x, { serial_code, code: serial_code, sort_order, category, name, spec, rate, price: rate, image_url, image: image_url });
+          }
+        } else {
+          const maxOrder = items.length ? Math.max(...items.map(i => Number(i.sort_order) || 0)) : 0;
+          const sort_order = Number.isFinite(rawOrder) && rawOrder >= 0 ? rawOrder : (maxOrder + 1);
+          const serial_code = rawCode || ("#" + String(sort_order).padStart(2, "0"));
+          let insertedItem = null;
+
+          if (sb) {
+            const { data, error } = await sb
+              .from("product")
+              .insert({ serial_code, sort_order, category, name, spec, rate, visible: true, image_url: "" })
+              .select("*")
+              .single();
+            if (error) throw error;
+            insertedItem = normalizeProduct(data, items.length);
+            items.push(insertedItem);
+            sortItemsList(items);
+            saveCache();
+            renderAll();
+
+            if (pendingFormPhotoBlob) {
+              const uploadedUrl = await uploadBlobToPartPhotos(insertedItem.id, pendingFormPhotoBlob);
+              const { error: photoUpdErr } = await sb
+                .from("product")
+                .update({ image_url: uploadedUrl })
+                .eq("id", insertedItem.id);
+              if (photoUpdErr) throw photoUpdErr;
+              insertedItem.image_url = uploadedUrl;
+              insertedItem.image = uploadedUrl;
+            }
+          } else {
+            insertedItem = normalizeProduct({
+              id: String(Date.now()),
+              serial_code, sort_order, category, name, spec, rate, visible: true, image_url: ""
+            });
+            items.push(insertedItem);
+          }
+        }
+
+        sortItemsList(items);
+        saveCache();
+        closePartForm();
+        renderAll();
+        showToast("Saved to Cloud ✓");
+      } catch (err) {
+        console.error("Save part error:", err);
+        errEl.textContent = "Cloud save error: " + (err.message || "Failed to save");
+        errEl.classList.remove("hidden");
+      } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "Save Part"; }
+      }
+    }
+
+    // ADMIN CUSTOMERS & ORDERS TAB (SUPABASE LIVE DATA)
+    async function loadAdminCrmData(showLoading = false) {
+      const box = document.getElementById("crmContent");
+      if (showLoading && box) {
+        box.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center text-xs text-gray-500 border">Loading from Supabase...</div>`;
+      }
+      if (!sb) return;
+      try {
+        const [custRes, ordRes] = await Promise.all([
+          sb.from("customers").select("*").order("last_order_at", { ascending: false, nullsFirst: false }),
+          sb.from("customer_orders").select("*").order("created_at", { ascending: false })
+        ]);
+        if (custRes.error) console.error("Customers load error:", custRes.error);
+        if (ordRes.error) console.error("Orders load error:", ordRes.error);
+        if (Array.isArray(custRes.data)) crmCustomers = custRes.data;
+        if (Array.isArray(ordRes.data)) crmOrders = ordRes.data;
+        crmLoaded = true;
+        renderCrmView(custRes.error || ordRes.error);
+      } catch (err) {
+        console.error("CRM load exception:", err);
+        renderCrmView(err);
+      }
+    }
+
+    function formatCloudDate(iso) {
+      if (!iso) return "";
+      try {
+        return new Date(iso).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+      } catch (err) {
+        return String(iso);
+      }
+    }
+
+    function renderCrmView(loadErr = null) {
+      const q = (query || "").trim().toLowerCase();
+      const filteredCustomers = q
+        ? crmCustomers.filter(c => [c.customer_name, c.mobile_number, c.shop_name_or_number, c.full_address, c.area_locality, c.pin_code].join(" ").toLowerCase().includes(q))
+        : crmCustomers;
+      const filteredOrders = q
+        ? crmOrders.filter(o => {
+            const parsedItems = Array.isArray(o.items) ? o.items : (typeof o.items === "string" ? (() => { try { return JSON.parse(o.items); } catch { return []; } })() : []);
+            const itemText = parsedItems.map(it => `${it.serial_code || ""} ${it.name || ""}`).join(" ");
+            return [o.customer_name, o.mobile_number, o.shop_name_or_number, o.full_address, o.area_locality, o.pin_code, itemText].join(" ").toLowerCase().includes(q);
+          })
+        : crmOrders;
+
+      const ordBtn = document.getElementById("crmTabOrders");
+      const custBtn = document.getElementById("crmTabCustomers");
+      if (ordBtn && custBtn) {
+        ordBtn.className = crmSubTab === "orders" ? "px-3 py-1 rounded-md font-bold bg-white shadow-sm" : "px-3 py-1 rounded-md font-semibold text-gray-600";
+        custBtn.className = crmSubTab === "customers" ? "px-3 py-1 rounded-md font-bold bg-white shadow-sm" : "px-3 py-1 rounded-md font-semibold text-gray-600";
+        ordBtn.textContent = `Orders (${filteredOrders.length})`;
+        custBtn.textContent = `Customers (${filteredCustomers.length})`;
+      }
+
+      const box = document.getElementById("crmContent");
+      if (!box) return;
+
+      if (loadErr) {
+        box.innerHTML = `<div class="bg-white rounded-2xl p-5 text-center border border-red-200 space-y-1.5">
+          <div class="text-xs font-extrabold text-red-600">Unable to load cloud records</div>
+          <p class="text-[11px] text-gray-600">${escapeHtml(loadErr.message || "Check Supabase permissions for customers & customer_orders tables.")}</p>
+        </div>`;
+        return;
+      }
+
+      if (crmSubTab === "customers") {
+        if (!filteredCustomers.length) {
+          box.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center border text-xs text-gray-500">${q ? "No matching customers found." : "No saved customers yet. Customer details will appear here automatically when orders are placed."}</div>`;
+          return;
+        }
+        box.innerHTML = filteredCustomers.map(c => {
+          const phone = String(c.mobile_number || "").replace(/\D/g, "");
+          const dialPhone = phone.length === 12 && phone.startsWith("91") ? phone.slice(2) : phone;
+          return `<div class="bg-white rounded-2xl p-3.5 border border-gray-200 space-y-1.5">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="text-sm font-extrabold text-gray-900 truncate">${escapeHtml(c.customer_name || "Customer")}</div>
+                <div class="text-xs font-bold text-red-600">${escapeHtml(c.mobile_number || "")}</div>
+              </div>
+              <span class="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-lg shrink-0">${Number(c.total_orders) || 1} Orders</span>
+            </div>
+            <div class="text-xs text-gray-700"><b>Shop:</b> ${escapeHtml(c.shop_name_or_number || "-")}</div>
+            <div class="text-xs text-gray-700"><b>Address:</b> ${escapeHtml(c.full_address || "-")}</div>
+            <div class="text-[11px] text-gray-500">${escapeHtml(c.area_locality || "")}${c.pin_code ? ` • PIN ${escapeHtml(c.pin_code)}` : ""}</div>
+            <div class="pt-2 border-t flex items-center justify-between gap-2">
+              <span class="text-[10px] text-gray-400">${c.last_order_at ? "Last order: " + escapeHtml(formatCloudDate(c.last_order_at)) : ""}</span>
+              <div class="flex items-center gap-1.5">
+                ${dialPhone ? `<a href="tel:+91${dialPhone}" class="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">Call</a>` : ""}
+                ${dialPhone ? `<a href="https://wa.me/91${dialPhone}" target="_blank" class="bg-green-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">WhatsApp</a>` : ""}
+              </div>
+            </div>
+          </div>`;
+        }).join("");
+        return;
+      }
+
+      if (!filteredOrders.length) {
+        box.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center border text-xs text-gray-500">${q ? "No matching orders found." : "No orders recorded yet. Submitted WhatsApp orders will appear here automatically."}</div>`;
+        return;
+      }
+
+      box.innerHTML = filteredOrders.map(o => {
+        const orderItems = Array.isArray(o.items) ? o.items : (typeof o.items === "string" ? (() => { try { return JSON.parse(o.items); } catch { return []; } })() : []);
+        const phone = String(o.mobile_number || "").replace(/\D/g, "");
+        const dialPhone = phone.length === 12 && phone.startsWith("91") ? phone.slice(2) : phone;
+        return `<div class="bg-white rounded-2xl p-3.5 border border-gray-200 space-y-2">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="text-sm font-extrabold text-gray-900 truncate">${escapeHtml(o.customer_name || "Customer")}</div>
+              <div class="text-[11px] text-gray-600 font-semibold">${escapeHtml(o.mobile_number || "")} • ${escapeHtml(o.shop_name_or_number || "")}</div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="text-sm font-extrabold text-red-600">₹${Number(o.total_amount) || 0}</div>
+              <div class="text-[10px] text-gray-400">${escapeHtml(formatCloudDate(o.created_at))}</div>
+            </div>
+          </div>
+          <div class="text-[11px] text-gray-600 bg-gray-50 rounded-xl p-2">
+            ${escapeHtml(o.full_address || "")}${o.area_locality ? `, ${escapeHtml(o.area_locality)}` : ""}${o.pin_code ? ` - ${escapeHtml(o.pin_code)}` : ""}
+          </div>
+          <div class="space-y-1 text-xs">
+            ${orderItems.map(it => `<div class="flex justify-between gap-2 text-[11px]">
+              <span class="text-gray-800">${escapeHtml(it.serial_code || "")} ${escapeHtml(it.name || "")} × ${Number(it.qty) || 1}</span>
+              <span class="font-bold text-gray-900 shrink-0">₹${Number(it.subtotal || ((Number(it.rate) || 0) * (Number(it.qty) || 1)))}</span>
+            </div>`).join("")}
+          </div>
+          ${dialPhone ? `<div class="pt-1.5 border-t flex justify-end gap-1.5">
+            <a href="tel:+91${dialPhone}" class="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">Call</a>
+            <a href="https://wa.me/91${dialPhone}" target="_blank" class="bg-green-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">WhatsApp</a>
+          </div>` : ""}
+        </div>`;
+      }).join("");
+    }
+
+    // CART & CHECKOUT (SAVES TO SUPABASE customers + customer_orders BEFORE OPENING WHATSAPP)
+    function updateCartBar() {
       const entries = Object.entries(cart);
       const bar = document.getElementById("cartBar");
       if (!entries.length) return bar.classList.add("hidden");
       let q = 0, t = 0;
-      entries.forEach(([k, v]) => { const x = items.find(i => i.id === Number(k)); if (x) { q += v; t += x.price * v; } });
+      entries.forEach(([k, v]) => {
+        const x = items.find(i => String(i.id) === String(k));
+        if (x) { q += v; t += (Number(x.rate ?? x.price) || 0) * v; }
+      });
+      if (!q) return bar.classList.add("hidden");
       document.getElementById("cartSummary").textContent = `₹${t} (${q} pcs)`;
       bar.classList.remove("hidden");
     }
-    function openCheckout() {
-      document.getElementById("checkoutItems").innerHTML = Object.entries(cart).map(([k, v]) => {
-        const x = items.find(i => i.id === Number(k));
-        return x ? `<div class="flex justify-between bg-gray-50 p-2 rounded-lg"><span>${x.name} × ${v}</span><b>₹${x.price * v}</b></div>` : "";
+
+    function addCart(id, d) {
+      const key = String(id);
+      const n = (cart[key] || 0) + d;
+      if (n <= 0) delete cart[key]; else cart[key] = n;
+      renderCatalog();
+      updateCartBar();
+    }
+
+    function getActiveCheckoutEntries() {
+      if (singleCheckoutItemId !== null) {
+        const key = String(singleCheckoutItemId);
+        const qty = Math.max(1, Number(cart[key]) || 0);
+        return [[key, qty]];
+      }
+      return Object.entries(cart);
+    }
+
+    function closeCheckout() {
+      singleCheckoutItemId = null;
+      document.getElementById("checkoutModal").classList.add("hidden");
+    }
+
+    function openSingleOrderCheckout(id) {
+      singleCheckoutItemId = String(id);
+      openCheckout(true);
+    }
+
+    function openCheckout(isSingle = false) {
+      if (!isSingle) singleCheckoutItemId = null;
+      let tot = 0;
+      const entries = getActiveCheckoutEntries();
+      document.getElementById("checkoutItems").innerHTML = entries.map(([k, v]) => {
+        const x = items.find(i => String(i.id) === String(k));
+        if (!x) return "";
+        const sub = (Number(x.rate ?? x.price) || 0) * v;
+        tot += sub;
+        return `<div class="flex justify-between bg-gray-50 p-2 rounded-lg"><span>${escapeHtml(x.name)} × ${v}</span><b>₹${sub}</b></div>`;
       }).join("");
+      document.getElementById("checkoutTotalAmt").textContent = `₹${tot}`;
+      document.getElementById("checkoutErr").classList.add("hidden");
+
+      try {
+        const saved = JSON.parse(localStorage.getItem("gbs_last_customer") || "null");
+        if (saved) {
+          if (!document.getElementById("cName").value && saved.customer_name) document.getElementById("cName").value = saved.customer_name;
+          if (!document.getElementById("cPhone").value && saved.mobile_number) document.getElementById("cPhone").value = saved.mobile_number;
+          if (!document.getElementById("cShop").value && saved.shop_name_or_number) document.getElementById("cShop").value = saved.shop_name_or_number;
+          if (!document.getElementById("cAddress").value && saved.full_address) document.getElementById("cAddress").value = saved.full_address;
+          if (!document.getElementById("cArea").value && saved.area_locality) document.getElementById("cArea").value = saved.area_locality;
+          if (!document.getElementById("cPin").value && saved.pin_code) document.getElementById("cPin").value = saved.pin_code;
+        }
+      } catch (err) {}
+
       document.getElementById("checkoutModal").classList.remove("hidden");
     }
-    function sendWhatsAppOrder() {
-      const n = document.getElementById("cName").value.trim();
-      const p = document.getElementById("cPhone").value.trim();
-      if (!n || !p) return alert("Naam aur Mobile Number bharein");
-      let msg = `*ORDER — GHUMO BIKE STORE*\nName: ${n}\nPhone: ${p}\n\n`, tot = 0;
-      Object.entries(cart).forEach(([k, v], idx) => {
-        const x = items.find(i => i.id === Number(k));
-        if (x) { tot += x.price * v; msg += `${idx + 1}. ${x.name} (${v} pcs) = ₹${x.price * v}\n`; }
+
+    async function sendWhatsAppOrder() {
+      const customer_name = document.getElementById("cName").value.trim();
+      const rawMobile = document.getElementById("cPhone").value.trim();
+      const shop_name_or_number = document.getElementById("cShop").value.trim();
+      const full_address = document.getElementById("cAddress").value.trim();
+      const area_locality = document.getElementById("cArea").value.trim();
+      const pin_code = document.getElementById("cPin").value.trim();
+      const errEl = document.getElementById("checkoutErr");
+
+      if (!customer_name || !rawMobile || !shop_name_or_number || !full_address || !area_locality || !pin_code) {
+        errEl.textContent = "Please fill all required customer & address fields (*)";
+        errEl.classList.remove("hidden");
+        return;
+      }
+
+      const digitsOnly = rawMobile.replace(/\D/g, "");
+      const mobile_number = digitsOnly.length === 12 && digitsOnly.startsWith("91") ? digitsOnly.slice(2) : digitsOnly;
+      if (mobile_number.length < 10) {
+        errEl.textContent = "Please enter a valid 10-digit Mobile Number.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+      if (!/^\d{6}$/.test(pin_code)) {
+        errEl.textContent = "Please enter a valid 6-digit Pin Code.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+      errEl.classList.add("hidden");
+
+      const orderItems = [];
+      let total_amount = 0;
+      getActiveCheckoutEntries().forEach(([k, v]) => {
+        const x = items.find(i => String(i.id) === String(k));
+        if (x && v > 0) {
+          const rate = Number(x.rate ?? x.price) || 0;
+          const subtotal = rate * v;
+          total_amount += subtotal;
+          orderItems.push({
+            id: x.id,
+            serial_code: x.serial_code || x.code || "",
+            name: x.name,
+            spec: x.spec,
+            rate,
+            qty: v,
+            subtotal
+          });
+        }
       });
-      msg += `\n*Total: ₹${tot}*`;
-      window.open(`https://wa.me/91${WA_NUM}?text=${encodeURIComponent(msg)}`, "_blank");
+
+      if (!orderItems.length) {
+        errEl.textContent = "Your cart is empty.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+
+      try {
+        localStorage.setItem("gbs_last_customer", JSON.stringify({
+          customer_name, mobile_number, shop_name_or_number, full_address, area_locality, pin_code
+        }));
+      } catch (err) {}
+
+      const btn = document.getElementById("sendOrderBtn");
+      if (btn) { btn.disabled = true; btn.textContent = "Saving order..."; }
+
+      let cloudSaved = false;
+      let cloudErrorMsg = "";
+      if (sb) {
+        try {
+          const nowIso = new Date().toISOString();
+          const { data: existingCust, error: lookupErr } = await sb
+            .from("customers")
+            .select("*")
+            .eq("mobile_number", mobile_number)
+            .maybeSingle();
+
+          if (lookupErr) console.error("Customer lookup error:", lookupErr);
+
+          const nextOrders = (Number(existingCust?.total_orders) || 0) + 1;
+          const custPayload = {
+            customer_name,
+            mobile_number,
+            shop_name_or_number,
+            full_address,
+            area_locality,
+            pin_code,
+            total_orders: nextOrders,
+            last_order_at: nowIso
+          };
+
+          let custErr = null;
+          const { error: upsertErr } = await sb
+            .from("customers")
+            .upsert(custPayload, { onConflict: "mobile_number" });
+
+          if (upsertErr) {
+            if (existingCust) {
+              const updRes = await sb.from("customers").update(custPayload).eq("mobile_number", mobile_number);
+              custErr = updRes.error;
+            } else {
+              const insRes = await sb.from("customers").insert(custPayload);
+              custErr = insRes.error;
+            }
+          }
+
+          if (custErr) {
+            console.error("Customer save error:", custErr);
+            cloudErrorMsg = custErr.message || "Customer save failed";
+          }
+
+          const { error: orderErr } = await sb.from("customer_orders").insert({
+            customer_name,
+            mobile_number,
+            shop_name_or_number,
+            full_address,
+            area_locality,
+            pin_code,
+            items: orderItems,
+            total_amount
+          });
+
+          if (!orderErr && !custErr) {
+            cloudSaved = true;
+            crmLoaded = false;
+          } else if (orderErr) {
+            console.error("Order insert error:", orderErr);
+            cloudErrorMsg = orderErr.message || "Order save failed";
+          }
+        } catch (err) {
+          console.error("Supabase checkout save error:", err);
+          cloudErrorMsg = err.message || "Cloud save failed";
+        }
+      }
+
+      if (btn) { btn.disabled = false; btn.textContent = "💬 Save & Send Order on WhatsApp"; }
+
+      let msg = `*ORDER — GHUMO BIKE STORE*\n`;
+      msg += `Customer: ${customer_name}\n`;
+      msg += `Mobile: ${mobile_number}\n`;
+      msg += `Shop: ${shop_name_or_number}\n`;
+      msg += `Address: ${full_address}\n`;
+      msg += `Area: ${area_locality} | PIN: ${pin_code}\n\n`;
+      msg += `*Items:*\n`;
+      orderItems.forEach((it, idx) => {
+        const codePrefix = it.serial_code ? `${it.serial_code} ` : "";
+        msg += `${idx + 1}. ${codePrefix}${it.name} (${it.qty} pcs × ₹${it.rate}) = ₹${it.subtotal}\n`;
+      });
+      msg += `\n*Total Amount: ₹${total_amount}*`;
+
+      const wasSingle = singleCheckoutItemId !== null;
+      closeCheckout();
+      if (!wasSingle) {
+        cart = {};
+      }
+      renderCatalog();
+      updateCartBar();
+      if (cloudSaved) {
+        showToast("Saved to Cloud ✓");
+      } else if (cloudErrorMsg) {
+        showToast("Order sent via WhatsApp (Cloud: " + cloudErrorMsg + ")", 3200, true);
+      }
+
+      const waUrl = `https://wa.me/91${WA_NUM}?text=${encodeURIComponent(msg)}`;
+      const link = document.createElement("a");
+      link.href = waUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     renderAll();
-    hydratePhotosFromDB();
+    loadProductsFromSupabase();
   </script>
 </body>
 </html>
