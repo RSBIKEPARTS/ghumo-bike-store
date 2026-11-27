@@ -57,6 +57,13 @@
         </div>
 
         <div class="flex items-center gap-1.5 shrink-0">
+          <button id="headerCartBtn" type="button" onclick="openCartDrawer()" aria-label="Open Cart" class="relative w-8 h-8 rounded-lg bg-white/10 hover:bg-white/15 border border-white/15 flex items-center justify-center text-white shrink-0">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 7h12l-1 13H7L6 7Z" />
+              <path d="M9 7V6a3 3 0 0 1 6 0v1" />
+            </svg>
+            <span id="headerCartBadge" class="hidden absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-white text-[10px] font-extrabold flex items-center justify-center shadow">0</span>
+          </button>
           <a href="tel:+919625489457" aria-label="Call GHUMO BIKE STORE" class="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center text-white shrink-0">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true">
               <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.01l-2.2 2.2Z"/>
@@ -155,11 +162,11 @@
 
   <!-- STICKY CART BAR -->
   <div id="cartBar" class="hidden fixed bottom-3 left-3 right-3 max-w-xl mx-auto z-30 bg-[#141518] text-white rounded-2xl p-3 shadow-xl flex items-center justify-between gap-2">
-    <div>
-      <div class="text-[10px] text-gray-400 font-bold uppercase">Order Estimate</div>
+    <button type="button" onclick="openCartDrawer()" class="text-left min-w-0">
+      <div class="text-[10px] text-gray-400 font-bold uppercase">Order Estimate • Tap to Review</div>
       <div id="cartSummary" class="text-sm font-extrabold">₹0 (0 pcs)</div>
-    </div>
-    <button onclick="openCheckout()" class="bg-red-600 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl">Send Order →</button>
+    </button>
+    <button type="button" onclick="openCheckout()" class="bg-red-600 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shrink-0">Send Order →</button>
   </div>
 
   <!-- ADMIN LOGIN MODAL -->
@@ -238,30 +245,72 @@
     </div>
   </div>
 
+  <!-- CART SUMMARY DRAWER / MODAL (CUSTOMER MODE) -->
+  <div id="cartDrawerModal" onclick="if(event.target===this) closeCartDrawer()" class="hidden fixed inset-0 z-40 bg-black/60 flex items-end sm:items-center justify-center">
+    <div class="bg-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl p-4 space-y-3 max-h-[88vh] flex flex-col">
+      <div class="flex justify-between items-center border-b pb-2.5 shrink-0">
+        <div>
+          <h2 class="text-sm font-extrabold text-gray-900">Your Cart</h2>
+          <p id="cartDrawerSubtitle" class="text-[11px] text-gray-500">0 items selected</p>
+        </div>
+        <button type="button" onclick="closeCartDrawer()" class="w-7 h-7 rounded-lg bg-gray-100 text-gray-600 font-bold text-xs flex items-center justify-center">✕</button>
+      </div>
+      <div id="cartDrawerList" class="space-y-2 overflow-y-auto flex-1 pr-0.5"></div>
+      <div id="cartDrawerFooter" class="hidden border-t pt-3 space-y-2.5 shrink-0">
+        <div class="flex items-center justify-between bg-red-50 px-3 py-2.5 rounded-xl">
+          <span class="text-xs font-bold text-gray-700">Order Total</span>
+          <span id="cartDrawerTotal" class="text-base font-extrabold text-red-600">₹0</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="clearCartItems()" class="px-3 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-xs font-bold">Clear</button>
+          <button type="button" onclick="proceedFromCartDrawer()" class="flex-1 bg-red-600 text-white font-extrabold text-xs py-2.5 rounded-xl">Proceed to Order →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- CHECKOUT MODAL -->
   <div id="checkoutModal" onclick="if(event.target===this) closeCheckout()" class="hidden fixed inset-0 z-40 bg-black/60 flex items-end sm:items-center justify-center">
     <div class="bg-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl p-4 space-y-2.5 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
-        <h2 class="text-sm font-extrabold">WhatsApp Order Details</h2>
+        <h2 id="checkoutModalTitle" class="text-sm font-extrabold">WhatsApp Order Details</h2>
         <button type="button" onclick="closeCheckout()" class="font-bold text-gray-500">✕</button>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        <input id="cName" type="text" required placeholder="Customer Name *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
-        <input id="cPhone" type="tel" required placeholder="Mobile Number *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
+
+      <!-- SAVED DETAILS SUMMARY VIEW (RETURNING CUSTOMERS) -->
+      <div id="checkoutSavedCard" class="hidden bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-1.5">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-[11px] font-extrabold text-gray-900 uppercase tracking-wide">Saved Delivery Details</span>
+          <button type="button" onclick="switchCheckoutToEdit()" class="text-[11px] font-extrabold text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-lg">Edit Details</button>
+        </div>
+        <div id="checkoutSavedDetailsBody" class="text-xs text-gray-700 space-y-0.5 leading-relaxed"></div>
       </div>
-      <input id="cShop" type="text" required placeholder="Shop Name / Number *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
-      <textarea id="cAddress" rows="2" required placeholder="Full Address *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs resize-none"></textarea>
-      <div class="grid grid-cols-2 gap-2">
-        <input id="cArea" type="text" required placeholder="Area / Locality *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
-        <input id="cPin" type="text" inputmode="numeric" maxlength="6" required placeholder="Pin Code *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
+
+      <!-- CUSTOMER DETAILS FORM (FIRST-TIME OR EDITING) -->
+      <div id="checkoutFormFields" class="space-y-2">
+        <div id="checkoutBackToSummaryWrap" class="hidden flex justify-end">
+          <button type="button" onclick="switchCheckoutToSummary()" class="text-[11px] font-bold text-gray-600 underline">← Back to Saved Summary</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <input id="cName" type="text" required placeholder="Customer Name *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
+          <input id="cPhone" type="tel" required placeholder="Mobile Number *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
+        </div>
+        <input id="cShop" type="text" required placeholder="Shop Name / Number *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
+        <textarea id="cAddress" rows="2" required placeholder="Full Address *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs resize-none"></textarea>
+        <div class="grid grid-cols-2 gap-2">
+          <input id="cArea" type="text" required placeholder="Area / Locality *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
+          <input id="cPin" type="text" inputmode="numeric" maxlength="6" required placeholder="Pin Code *" class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs" />
+        </div>
       </div>
+
       <p id="checkoutErr" class="hidden text-xs text-red-600 font-bold"></p>
+      <div id="checkoutStatusBox" class="hidden rounded-xl p-3 text-xs space-y-2"></div>
       <div id="checkoutItems" class="space-y-1.5 text-xs border-t pt-2"></div>
       <div id="checkoutTotalRow" class="flex justify-between items-center text-sm font-extrabold text-gray-900 bg-red-50 px-3 py-2 rounded-xl">
         <span>Order Total</span>
         <span id="checkoutTotalAmt" class="text-red-600">₹0</span>
       </div>
-      <button id="sendOrderBtn" type="button" onclick="sendWhatsAppOrder()" class="w-full bg-green-600 text-white font-extrabold text-xs py-3 rounded-xl">💬 Save &amp; Send Order on WhatsApp</button>
+      <button id="sendOrderBtn" type="button" onclick="sendWhatsAppOrder()" class="w-full bg-green-600 text-white font-extrabold text-xs py-3 rounded-xl">💬 Confirm &amp; Submit Order on WhatsApp</button>
     </div>
   </div>
 
@@ -303,13 +352,26 @@
         <button type="button" onclick="closeRlsHelpModal()" class="text-gray-400 font-bold">✕</button>
       </div>
       <p class="text-xs text-gray-300 leading-relaxed">
-        Your change is saved locally, but Supabase Row-Level Security (RLS) blocked writing to the <code class="text-amber-300">product</code> table. Run this SQL once in your Supabase <b>SQL Editor</b>, then tap <b>Sync All 38 to Cloud</b>:
+        Supabase Row-Level Security (RLS) blocked writing to your tables. Run this SQL once in your Supabase <b>SQL Editor</b>, then retry or tap <b>Sync All 38 to Cloud</b>:
       </p>
-      <pre id="rlsSqlText" class="bg-black border border-gray-700 rounded-xl p-3 text-[11px] text-emerald-300 overflow-x-auto whitespace-pre-wrap select-all">ALTER TABLE public.product ENABLE ROW LEVEL SECURITY;
+      <pre id="rlsSqlText" class="bg-black border border-gray-700 rounded-xl p-3 text-[11px] text-emerald-300 overflow-x-auto whitespace-pre-wrap select-all max-h-60 overflow-y-auto">CREATE UNIQUE INDEX IF NOT EXISTS customers_mobile_number_key ON public.customers (mobile_number);
+
+ALTER TABLE public.product ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow all on product" ON public.product;
-CREATE POLICY "Allow all on product" ON public.product
-  FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
-GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
+CREATE POLICY "Allow all on product" ON public.product FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+GRANT ALL ON TABLE public.product TO anon, authenticated;
+
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow all on customers" ON public.customers;
+CREATE POLICY "Allow all on customers" ON public.customers FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+GRANT ALL ON TABLE public.customers TO anon, authenticated;
+
+ALTER TABLE public.customer_orders ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow all on customer_orders" ON public.customer_orders;
+CREATE POLICY "Allow all on customer_orders" ON public.customer_orders FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+GRANT ALL ON TABLE public.customer_orders TO anon, authenticated;
+
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</pre>
       <div class="flex items-center gap-2">
         <button type="button" onclick="copyRlsSql()" class="flex-1 bg-emerald-600 text-white text-xs font-extrabold py-2.5 rounded-xl">Copy SQL</button>
         <button type="button" onclick="closeRlsHelpModal()" class="px-4 bg-white/10 text-white text-xs font-bold py-2.5 rounded-xl">Close</button>
@@ -1138,6 +1200,14 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
 
     function renderAll() {
       document.getElementById("adminBar").classList.toggle("hidden", !isAdmin);
+      const headerCartBtn = document.getElementById("headerCartBtn");
+      if (headerCartBtn) headerCartBtn.classList.toggle("hidden", isAdmin);
+      if (isAdmin) {
+        closeCartDrawer();
+        closeCheckout();
+      }
+      updateCartBar();
+
       const showCrm = isAdmin && adminTab === "customers";
       const prodBtn = document.getElementById("adminTabProductsBtn");
       const ordBtn = document.getElementById("adminTabOrdersBtn");
@@ -1247,11 +1317,14 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
           <div class="mt-2.5 pt-2 border-t flex justify-between items-center">
             <div class="text-base font-extrabold text-red-600">₹${rate}</div>
             <div class="flex items-center gap-1.5">
-              ${isAdmin ? `<button onclick="askDeletePart('${sid}')" class="bg-red-50 text-red-600 text-xs px-2 py-1 rounded-lg">🗑️</button>` : ''}
-              <button type="button" onclick="openSingleOrderCheckout('${sid}')" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-xl">WA</button>
-              ${qty > 0
-                ? `<div class="bg-gray-900 text-white rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center gap-2"><button onclick="addCart('${sid}',-1)">−</button><span>${qty}</span><button onclick="addCart('${sid}',1)">+</button></div>`
-                : `<button onclick="addCart('${sid}',1)" class="bg-gray-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl">+ Add</button>`}
+              ${isAdmin
+                ? `<button onclick="askDeletePart('${sid}')" class="bg-red-50 text-red-600 text-xs px-2.5 py-1.5 rounded-lg font-bold" title="Delete part">🗑️</button>`
+                : `
+                  <button type="button" onclick="openSingleOrderCheckout('${sid}')" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-xl">WA</button>
+                  ${qty > 0
+                    ? `<div class="bg-gray-900 text-white rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center gap-2"><button onclick="addCart('${sid}',-1)">−</button><span>${qty}</span><button onclick="addCart('${sid}',1)">+</button></div>`
+                    : `<button onclick="addCart('${sid}',1)" class="bg-gray-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl">+ Add</button>`}
+                `}
             </div>
           </div>
         </div>`;
@@ -1805,26 +1878,59 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
       }
     }
 
+    function getLastCrmError() {
+      try {
+        return JSON.parse(sessionStorage.getItem("gbs_last_crm_error") || "null");
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function setLastCrmError(errObj) {
+      try {
+        if (!errObj) sessionStorage.removeItem("gbs_last_crm_error");
+        else sessionStorage.setItem("gbs_last_crm_error", JSON.stringify(errObj));
+      } catch (err) {}
+    }
+
+    function dismissCrmError() {
+      setLastCrmError(null);
+      renderCrmView();
+    }
+
     // ADMIN CUSTOMERS & ORDERS TAB (SUPABASE LIVE DATA)
     async function loadAdminCrmData(showLoading = false) {
       const box = document.getElementById("crmContent");
       if (showLoading && box) {
         box.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center text-xs text-gray-500 border">Loading from Supabase...</div>`;
       }
-      if (!sb) return;
+      if (!sb) {
+        renderCrmView({ message: "Supabase client is not initialized." });
+        return;
+      }
       try {
         const [custRes, ordRes] = await Promise.all([
           sb.from("customers").select("*").order("last_order_at", { ascending: false, nullsFirst: false }),
           sb.from("customer_orders").select("*").order("created_at", { ascending: false })
         ]);
-        if (custRes.error) console.error("Customers load error:", custRes.error);
-        if (ordRes.error) console.error("Orders load error:", ordRes.error);
+        const errs = [];
+        if (custRes.error) {
+          console.warn("Customers load error:", custRes.error);
+          errs.push(`customers: ${custRes.error.code ? `[${custRes.error.code}] ` : ""}${custRes.error.message}`);
+        }
+        if (ordRes.error) {
+          console.warn("Orders load error:", ordRes.error);
+          errs.push(`customer_orders: ${ordRes.error.code ? `[${ordRes.error.code}] ` : ""}${ordRes.error.message}`);
+        }
         if (Array.isArray(custRes.data)) crmCustomers = custRes.data;
         if (Array.isArray(ordRes.data)) crmOrders = ordRes.data;
         crmLoaded = true;
-        renderCrmView(custRes.error || ordRes.error);
+        const combinedErr = errs.length
+          ? { code: custRes.error?.code || ordRes.error?.code || "", message: errs.join(" | ") }
+          : null;
+        renderCrmView(combinedErr);
       } catch (err) {
-        console.error("CRM load exception:", err);
+        console.warn("CRM load exception:", err);
         renderCrmView(err);
       }
     }
@@ -1836,6 +1942,20 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
       } catch (err) {
         return String(iso);
       }
+    }
+
+    function renderCrmErrorBanner(errObj, allowDismiss = false) {
+      if (!errObj) return "";
+      const codePrefix = errObj.code ? `[${errObj.code}] ` : "";
+      const rlsHint = isRlsError(errObj);
+      return `<div class="bg-red-50 rounded-2xl p-3.5 border border-red-200 space-y-2 text-left">
+        <div class="flex items-start justify-between gap-2">
+          <div class="text-xs font-extrabold text-red-700">Supabase Error${errObj.context ? ` (${escapeHtml(errObj.context)})` : ""}</div>
+          ${allowDismiss ? `<button type="button" onclick="dismissCrmError()" class="text-[11px] font-bold text-red-500">✕</button>` : ""}
+        </div>
+        <p class="text-[11px] text-red-700 break-words">${escapeHtml(codePrefix + (errObj.message || "Unable to read or save Supabase records."))}</p>
+        ${rlsHint ? `<button type="button" onclick="showRlsHelpModal()" class="bg-red-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">View Supabase SQL Fix</button>` : ""}
+      </div>`;
     }
 
     function renderCrmView(loadErr = null) {
@@ -1864,19 +1984,19 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
       if (!box) return;
 
       if (loadErr) {
-        box.innerHTML = `<div class="bg-white rounded-2xl p-5 text-center border border-red-200 space-y-1.5">
-          <div class="text-xs font-extrabold text-red-600">Unable to load cloud records</div>
-          <p class="text-[11px] text-gray-600">${escapeHtml(loadErr.message || "Check Supabase permissions for customers & customer_orders tables.")}</p>
-        </div>`;
+        box.innerHTML = renderCrmErrorBanner({ code: loadErr.code || "", context: "Fetch", message: loadErr.message || "Check Supabase permissions for customers & customer_orders tables." }, false);
         return;
       }
 
+      const lastSaveErr = getLastCrmError();
+      const saveErrBanner = lastSaveErr ? renderCrmErrorBanner(lastSaveErr, true) : "";
+
       if (crmSubTab === "customers") {
         if (!filteredCustomers.length) {
-          box.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center border text-xs text-gray-500">${q ? "No matching customers found." : "No saved customers yet. Customer details will appear here automatically when orders are placed."}</div>`;
+          box.innerHTML = saveErrBanner + `<div class="bg-white rounded-2xl p-6 text-center border text-xs text-gray-500">${q ? "No matching customers found." : "No saved customers yet. Customer details will appear here automatically when orders are placed."}</div>`;
           return;
         }
-        box.innerHTML = filteredCustomers.map(c => {
+        box.innerHTML = saveErrBanner + filteredCustomers.map(c => {
           const phone = String(c.mobile_number || "").replace(/\D/g, "");
           const dialPhone = phone.length === 12 && phone.startsWith("91") ? phone.slice(2) : phone;
           return `<div class="bg-white rounded-2xl p-3.5 border border-gray-200 space-y-1.5">
@@ -1903,11 +2023,11 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
       }
 
       if (!filteredOrders.length) {
-        box.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center border text-xs text-gray-500">${q ? "No matching orders found." : "No orders recorded yet. Submitted WhatsApp orders will appear here automatically."}</div>`;
+        box.innerHTML = saveErrBanner + `<div class="bg-white rounded-2xl p-6 text-center border text-xs text-gray-500">${q ? "No matching orders found." : "No orders recorded yet. Submitted WhatsApp orders will appear here automatically."}</div>`;
         return;
       }
 
-      box.innerHTML = filteredOrders.map(o => {
+      box.innerHTML = saveErrBanner + filteredOrders.map(o => {
         const orderItems = Array.isArray(o.items) ? o.items : (typeof o.items === "string" ? (() => { try { return JSON.parse(o.items); } catch { return []; } })() : []);
         const phone = String(o.mobile_number || "").replace(/\D/g, "");
         const dialPhone = phone.length === 12 && phone.startsWith("91") ? phone.slice(2) : phone;
@@ -1940,26 +2060,155 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
     }
 
     // CART & CHECKOUT (SAVES TO SUPABASE customers + customer_orders BEFORE OPENING WHATSAPP)
+    let checkoutMode = "form";
+
+    function getSavedCustomerDetails() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("gbs_last_customer") || "null");
+        if (
+          saved &&
+          String(saved.customer_name || "").trim() &&
+          String(saved.mobile_number || "").trim() &&
+          String(saved.shop_name_or_number || "").trim() &&
+          String(saved.full_address || "").trim() &&
+          String(saved.area_locality || "").trim() &&
+          String(saved.pin_code || "").trim()
+        ) {
+          return {
+            customer_name: String(saved.customer_name).trim(),
+            mobile_number: String(saved.mobile_number).trim(),
+            shop_name_or_number: String(saved.shop_name_or_number).trim(),
+            full_address: String(saved.full_address).trim(),
+            area_locality: String(saved.area_locality).trim(),
+            pin_code: String(saved.pin_code).trim()
+          };
+        }
+      } catch (err) {}
+      return null;
+    }
+
     function updateCartBar() {
       const entries = Object.entries(cart);
       const bar = document.getElementById("cartBar");
-      if (!entries.length) return bar.classList.add("hidden");
+      const badge = document.getElementById("headerCartBadge");
       let q = 0, t = 0;
       entries.forEach(([k, v]) => {
         const x = items.find(i => String(i.id) === String(k));
-        if (x) { q += v; t += (Number(x.rate ?? x.price) || 0) * v; }
+        if (x && v > 0) { q += v; t += (Number(x.rate ?? x.price) || 0) * v; }
       });
-      if (!q) return bar.classList.add("hidden");
+
+      if (badge) {
+        if (!isAdmin && q > 0) {
+          badge.textContent = q > 99 ? "99+" : String(q);
+          badge.classList.remove("hidden");
+        } else {
+          badge.classList.add("hidden");
+        }
+      }
+
+      if (isAdmin || !q) {
+        if (bar) bar.classList.add("hidden");
+        return;
+      }
       document.getElementById("cartSummary").textContent = `₹${t} (${q} pcs)`;
-      bar.classList.remove("hidden");
+      if (bar) bar.classList.remove("hidden");
     }
 
     function addCart(id, d) {
+      if (isAdmin) return;
       const key = String(id);
       const n = (cart[key] || 0) + d;
       if (n <= 0) delete cart[key]; else cart[key] = n;
       renderCatalog();
       updateCartBar();
+      const drawer = document.getElementById("cartDrawerModal");
+      if (drawer && !drawer.classList.contains("hidden")) {
+        renderCartDrawer();
+      }
+    }
+
+    function clearCartItems() {
+      cart = {};
+      renderCatalog();
+      updateCartBar();
+      renderCartDrawer();
+    }
+
+    function openCartDrawer() {
+      if (isAdmin) return;
+      renderCartDrawer();
+      const modal = document.getElementById("cartDrawerModal");
+      if (modal) modal.classList.remove("hidden");
+    }
+
+    function closeCartDrawer() {
+      const modal = document.getElementById("cartDrawerModal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    function renderCartDrawer() {
+      const listEl = document.getElementById("cartDrawerList");
+      const subEl = document.getElementById("cartDrawerSubtitle");
+      const footEl = document.getElementById("cartDrawerFooter");
+      const totEl = document.getElementById("cartDrawerTotal");
+      if (!listEl) return;
+
+      const validEntries = [];
+      let totalQty = 0;
+      let totalAmt = 0;
+      Object.entries(cart).forEach(([k, v]) => {
+        const x = items.find(i => String(i.id) === String(k));
+        if (x && v > 0) {
+          const rate = Number(x.rate ?? x.price) || 0;
+          const sub = rate * v;
+          totalQty += v;
+          totalAmt += sub;
+          validEntries.push({ item: x, qty: v, rate, sub });
+        }
+      });
+
+      if (subEl) {
+        subEl.textContent = validEntries.length
+          ? `${validEntries.length} part${validEntries.length > 1 ? "s" : ""} • ${totalQty} pcs`
+          : "0 items selected";
+      }
+
+      if (!validEntries.length) {
+        if (footEl) footEl.classList.add("hidden");
+        listEl.innerHTML = `<div class="py-8 text-center space-y-2">
+          <div class="text-3xl">🛍️</div>
+          <div class="text-xs font-extrabold text-gray-800">Your cart is empty</div>
+          <p class="text-[11px] text-gray-500">Tap "+ Add" on spare parts to build your multi-item order.</p>
+          <button type="button" onclick="closeCartDrawer()" class="mt-2 bg-gray-900 text-white text-xs font-bold px-4 py-2 rounded-xl">Browse Parts</button>
+        </div>`;
+        return;
+      }
+
+      if (footEl) footEl.classList.remove("hidden");
+      if (totEl) totEl.textContent = `₹${totalAmt}`;
+      listEl.innerHTML = validEntries.map(({ item, qty, rate, sub }) => {
+        const sid = escapeHtml(String(item.id));
+        return `<div class="bg-gray-50 border border-gray-200 rounded-xl p-2.5 flex items-center justify-between gap-2">
+          <div class="min-w-0 flex-1">
+            <div class="text-xs font-extrabold text-gray-900 truncate">${escapeHtml(item.name)}</div>
+            <div class="text-[10px] text-gray-500 truncate">${escapeHtml(item.serial_code || item.code || "")} • ₹${rate} each</div>
+            <div class="text-xs font-extrabold text-red-600 mt-0.5">₹${sub}</div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <div class="bg-gray-900 text-white rounded-lg px-2 py-1 text-xs font-bold flex items-center gap-2">
+              <button type="button" onclick="addCart('${sid}',-1)">−</button>
+              <span>${qty}</span>
+              <button type="button" onclick="addCart('${sid}',1)">+</button>
+            </div>
+            <button type="button" onclick="addCart('${sid}',-${qty})" aria-label="Remove item" class="w-7 h-7 rounded-lg bg-red-50 text-red-600 text-xs font-bold flex items-center justify-center">✕</button>
+          </div>
+        </div>`;
+      }).join("");
+    }
+
+    function proceedFromCartDrawer() {
+      closeCartDrawer();
+      openCheckout(false);
     }
 
     function getActiveCheckoutEntries() {
@@ -1973,41 +2222,123 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
 
     function closeCheckout() {
       singleCheckoutItemId = null;
-      document.getElementById("checkoutModal").classList.add("hidden");
+      const modal = document.getElementById("checkoutModal");
+      if (modal) modal.classList.add("hidden");
+      const statusEl = document.getElementById("checkoutStatusBox");
+      if (statusEl) { statusEl.classList.add("hidden"); statusEl.innerHTML = ""; }
+      const btn = document.getElementById("sendOrderBtn");
+      if (btn) {
+        btn.classList.remove("hidden");
+        btn.disabled = false;
+      }
     }
 
     function openSingleOrderCheckout(id) {
+      if (isAdmin) return;
       singleCheckoutItemId = String(id);
       openCheckout(true);
     }
 
+    function applyCheckoutModeUI(mode) {
+      checkoutMode = mode;
+      const saved = getSavedCustomerDetails();
+      const titleEl = document.getElementById("checkoutModalTitle");
+      const savedCard = document.getElementById("checkoutSavedCard");
+      const savedBody = document.getElementById("checkoutSavedDetailsBody");
+      const formWrap = document.getElementById("checkoutFormFields");
+      const backWrap = document.getElementById("checkoutBackToSummaryWrap");
+      const btn = document.getElementById("sendOrderBtn");
+
+      if (mode === "summary" && saved) {
+        if (titleEl) titleEl.textContent = "Order Summary & Confirm";
+        if (savedCard) savedCard.classList.remove("hidden");
+        if (formWrap) formWrap.classList.add("hidden");
+        if (backWrap) backWrap.classList.add("hidden");
+        if (savedBody) {
+          savedBody.innerHTML = `
+            <div class="font-extrabold text-gray-900">${escapeHtml(saved.customer_name)} • <span class="text-red-600">${escapeHtml(saved.mobile_number)}</span></div>
+            <div><b>Shop:</b> ${escapeHtml(saved.shop_name_or_number)}</div>
+            <div><b>Address:</b> ${escapeHtml(saved.full_address)}</div>
+            <div class="text-[11px] text-gray-500">${escapeHtml(saved.area_locality)} • PIN ${escapeHtml(saved.pin_code)}</div>
+          `;
+        }
+        if (btn) btn.textContent = "💬 Confirm & Submit Order on WhatsApp";
+      } else {
+        if (titleEl) titleEl.textContent = saved ? "Edit Delivery Details" : "WhatsApp Order Details";
+        if (savedCard) savedCard.classList.add("hidden");
+        if (formWrap) formWrap.classList.remove("hidden");
+        if (backWrap) backWrap.classList.toggle("hidden", !saved);
+        if (btn) btn.textContent = "💬 Confirm & Submit Order on WhatsApp";
+      }
+    }
+
+    function switchCheckoutToEdit() {
+      applyCheckoutModeUI("form");
+      const nameInput = document.getElementById("cName");
+      if (nameInput) nameInput.focus();
+    }
+
+    function switchCheckoutToSummary() {
+      const saved = getSavedCustomerDetails();
+      if (saved) {
+        document.getElementById("cName").value = saved.customer_name;
+        document.getElementById("cPhone").value = saved.mobile_number;
+        document.getElementById("cShop").value = saved.shop_name_or_number;
+        document.getElementById("cAddress").value = saved.full_address;
+        document.getElementById("cArea").value = saved.area_locality;
+        document.getElementById("cPin").value = saved.pin_code;
+        document.getElementById("checkoutErr").classList.add("hidden");
+        applyCheckoutModeUI("summary");
+      }
+    }
+
     function openCheckout(isSingle = false) {
+      if (isAdmin) return;
       if (!isSingle) singleCheckoutItemId = null;
       let tot = 0;
       const entries = getActiveCheckoutEntries();
       document.getElementById("checkoutItems").innerHTML = entries.map(([k, v]) => {
         const x = items.find(i => String(i.id) === String(k));
         if (!x) return "";
-        const sub = (Number(x.rate ?? x.price) || 0) * v;
+        const rate = Number(x.rate ?? x.price) || 0;
+        const sub = rate * v;
         tot += sub;
-        return `<div class="flex justify-between bg-gray-50 p-2 rounded-lg"><span>${escapeHtml(x.name)} × ${v}</span><b>₹${sub}</b></div>`;
+        return `<div class="flex justify-between items-center gap-2 bg-gray-50 p-2 rounded-lg">
+          <span class="min-w-0 truncate">${escapeHtml(x.serial_code || x.code || "")} ${escapeHtml(x.name)} <span class="text-gray-500">(${v} × ₹${rate})</span></span>
+          <b class="shrink-0">₹${sub}</b>
+        </div>`;
       }).join("");
       document.getElementById("checkoutTotalAmt").textContent = `₹${tot}`;
       document.getElementById("checkoutErr").classList.add("hidden");
+      const statusEl = document.getElementById("checkoutStatusBox");
+      if (statusEl) { statusEl.classList.add("hidden"); statusEl.innerHTML = ""; }
+      const btn = document.getElementById("sendOrderBtn");
+      if (btn) { btn.classList.remove("hidden"); btn.disabled = false; }
 
-      try {
-        const saved = JSON.parse(localStorage.getItem("gbs_last_customer") || "null");
-        if (saved) {
-          if (!document.getElementById("cName").value && saved.customer_name) document.getElementById("cName").value = saved.customer_name;
-          if (!document.getElementById("cPhone").value && saved.mobile_number) document.getElementById("cPhone").value = saved.mobile_number;
-          if (!document.getElementById("cShop").value && saved.shop_name_or_number) document.getElementById("cShop").value = saved.shop_name_or_number;
-          if (!document.getElementById("cAddress").value && saved.full_address) document.getElementById("cAddress").value = saved.full_address;
-          if (!document.getElementById("cArea").value && saved.area_locality) document.getElementById("cArea").value = saved.area_locality;
-          if (!document.getElementById("cPin").value && saved.pin_code) document.getElementById("cPin").value = saved.pin_code;
-        }
-      } catch (err) {}
+      const saved = getSavedCustomerDetails();
+      if (saved) {
+        document.getElementById("cName").value = saved.customer_name;
+        document.getElementById("cPhone").value = saved.mobile_number;
+        document.getElementById("cShop").value = saved.shop_name_or_number;
+        document.getElementById("cAddress").value = saved.full_address;
+        document.getElementById("cArea").value = saved.area_locality;
+        document.getElementById("cPin").value = saved.pin_code;
+        applyCheckoutModeUI("summary");
+      } else {
+        applyCheckoutModeUI("form");
+      }
 
       document.getElementById("checkoutModal").classList.remove("hidden");
+    }
+
+    function openWhatsAppUrl(waUrl) {
+      const link = document.createElement("a");
+      link.href = waUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     async function sendWhatsAppOrder() {
@@ -2018,8 +2349,10 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
       const area_locality = document.getElementById("cArea").value.trim();
       const pin_code = document.getElementById("cPin").value.trim();
       const errEl = document.getElementById("checkoutErr");
+      const statusEl = document.getElementById("checkoutStatusBox");
 
       if (!customer_name || !rawMobile || !shop_name_or_number || !full_address || !area_locality || !pin_code) {
+        if (checkoutMode === "summary") applyCheckoutModeUI("form");
         errEl.textContent = "Please fill all required customer & address fields (*)";
         errEl.classList.remove("hidden");
         return;
@@ -2028,11 +2361,13 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
       const digitsOnly = rawMobile.replace(/\D/g, "");
       const mobile_number = digitsOnly.length === 12 && digitsOnly.startsWith("91") ? digitsOnly.slice(2) : digitsOnly;
       if (mobile_number.length < 10) {
+        if (checkoutMode === "summary") applyCheckoutModeUI("form");
         errEl.textContent = "Please enter a valid 10-digit Mobile Number.";
         errEl.classList.remove("hidden");
         return;
       }
       if (!/^\d{6}$/.test(pin_code)) {
+        if (checkoutMode === "summary") applyCheckoutModeUI("form");
         errEl.textContent = "Please enter a valid 6-digit Pin Code.";
         errEl.classList.remove("hidden");
         return;
@@ -2072,10 +2407,14 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
       } catch (err) {}
 
       const btn = document.getElementById("sendOrderBtn");
-      if (btn) { btn.disabled = true; btn.textContent = "Saving order..."; }
+      if (btn) { btn.disabled = true; btn.textContent = "Saving order to cloud..."; }
+      if (statusEl) {
+        statusEl.className = "rounded-xl p-3 text-xs bg-blue-50 border border-blue-200 text-blue-800 font-bold";
+        statusEl.textContent = "⏳ Saving your order to cloud...";
+      }
 
       let cloudSaved = false;
-      let cloudErrorMsg = "";
+      let cloudErrorObj = null;
       if (sb) {
         try {
           const nowIso = new Date().toISOString();
@@ -2085,7 +2424,7 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
             .eq("mobile_number", mobile_number)
             .maybeSingle();
 
-          if (lookupErr) console.error("Customer lookup error:", lookupErr);
+          if (lookupErr) console.warn("Customer lookup warning:", lookupErr);
 
           const nextOrders = (Number(existingCust?.total_orders) || 0) + 1;
           const custPayload = {
@@ -2102,21 +2441,28 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
           let custErr = null;
           const { error: upsertErr } = await sb
             .from("customers")
-            .upsert(custPayload, { onConflict: "mobile_number" });
+            .upsert(custPayload, { onConflict: "mobile_number" })
+            .select("*");
 
           if (upsertErr) {
-            if (existingCust) {
-              const updRes = await sb.from("customers").update(custPayload).eq("mobile_number", mobile_number);
+            if (isRlsError(upsertErr)) {
+              custErr = upsertErr;
+            } else if (existingCust) {
+              const updRes = await sb.from("customers").update(custPayload).eq("mobile_number", mobile_number).select("*");
               custErr = updRes.error;
             } else {
-              const insRes = await sb.from("customers").insert(custPayload);
+              const insRes = await sb.from("customers").insert(custPayload).select("*");
               custErr = insRes.error;
             }
           }
 
           if (custErr) {
-            console.error("Customer save error:", custErr);
-            cloudErrorMsg = custErr.message || "Customer save failed";
+            console.warn("Customer save error:", custErr);
+            cloudErrorObj = {
+              code: custErr.code || "",
+              context: "customers",
+              message: custErr.message || "Customer save failed"
+            };
           }
 
           const { error: orderErr } = await sb.from("customer_orders").insert({
@@ -2128,22 +2474,31 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
             pin_code,
             items: orderItems,
             total_amount
-          });
+          }).select("*");
 
           if (!orderErr && !custErr) {
             cloudSaved = true;
             crmLoaded = false;
+            setLastCrmError(null);
           } else if (orderErr) {
-            console.error("Order insert error:", orderErr);
-            cloudErrorMsg = orderErr.message || "Order save failed";
+            console.warn("Order insert error:", orderErr);
+            cloudErrorObj = {
+              code: orderErr.code || cloudErrorObj?.code || "",
+              context: custErr ? "customers & customer_orders" : "customer_orders",
+              message: custErr ? `${custErr.message} | ${orderErr.message}` : (orderErr.message || "Order save failed")
+            };
           }
         } catch (err) {
-          console.error("Supabase checkout save error:", err);
-          cloudErrorMsg = err.message || "Cloud save failed";
+          console.warn("Supabase checkout save error:", err);
+          cloudErrorObj = {
+            code: err.code || "",
+            context: "checkout",
+            message: err.message || "Cloud save failed"
+          };
         }
+      } else {
+        cloudErrorObj = { code: "", context: "Supabase", message: "Supabase client not initialized." };
       }
-
-      if (btn) { btn.disabled = false; btn.textContent = "💬 Save & Send Order on WhatsApp"; }
 
       let msg = `*ORDER — GHUMO BIKE STORE*\n`;
       msg += `Customer: ${customer_name}\n`;
@@ -2158,27 +2513,45 @@ GRANT ALL ON TABLE public.product TO anon, authenticated;</pre>
       });
       msg += `\n*Total Amount: ₹${total_amount}*`;
 
+      const waUrl = `https://wa.me/91${WA_NUM}?text=${encodeURIComponent(msg)}`;
       const wasSingle = singleCheckoutItemId !== null;
-      closeCheckout();
-      if (!wasSingle) {
-        cart = {};
-      }
-      renderCatalog();
-      updateCartBar();
+
       if (cloudSaved) {
-        showToast("Saved to Cloud ✓");
-      } else if (cloudErrorMsg) {
-        showToast("Order sent via WhatsApp (Cloud: " + cloudErrorMsg + ")", 3200, true);
+        if (!wasSingle) cart = {};
+        renderCatalog();
+        updateCartBar();
+        if (btn) btn.classList.add("hidden");
+        if (statusEl) {
+          statusEl.className = "rounded-xl p-3 text-xs bg-emerald-50 border border-emerald-200 text-emerald-800 space-y-2";
+          statusEl.innerHTML = `<div class="font-extrabold">✅ Order Saved to Cloud! Opening WhatsApp...</div>
+            <div class="flex items-center gap-2">
+              <a href="${waUrl}" target="_blank" rel="noopener noreferrer" onclick="setTimeout(closeCheckout, 300)" class="flex-1 text-center bg-green-600 text-white font-extrabold py-2 rounded-lg">Open WhatsApp Now →</a>
+              <button type="button" onclick="closeCheckout()" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 text-emerald-800 font-bold">Done</button>
+            </div>`;
+        }
+        showToast("Order Saved to Cloud ✓");
+        setTimeout(() => {
+          openWhatsAppUrl(waUrl);
+        }, 550);
+        return;
       }
 
-      const waUrl = `https://wa.me/91${WA_NUM}?text=${encodeURIComponent(msg)}`;
-      const link = document.createElement("a");
-      link.href = waUrl;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      if (cloudErrorObj) {
+        setLastCrmError(cloudErrorObj);
+        const prefix = cloudErrorObj.code ? `[${cloudErrorObj.code}] ` : "";
+        const errText = `${prefix}${cloudErrorObj.message}`;
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "↻ Retry Cloud Save";
+        }
+        if (statusEl) {
+          statusEl.className = "rounded-xl p-3 text-xs bg-red-50 border border-red-200 text-red-700 space-y-2";
+          statusEl.innerHTML = `<div class="font-extrabold">⚠️ Supabase Save Error (${escapeHtml(cloudErrorObj.context || "Cloud")})</div>
+            <p class="text-[11px] break-words">${escapeHtml(errText)}</p>
+            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" onclick="if(singleCheckoutItemId===null){cart={};renderCatalog();updateCartBar();}setTimeout(closeCheckout,300);" class="block w-full text-center bg-green-600 text-white font-extrabold py-2 rounded-lg">💬 Continue &amp; Open WhatsApp Anyway →</a>`;
+        }
+        showToast(`Cloud save failed: ${errText}`, 5500, true);
+      }
     }
 
     renderAll();
