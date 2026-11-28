@@ -117,7 +117,6 @@
         </div>
         <div id="searchSuggestions" class="hidden absolute left-0 right-0 top-full mt-1.5 z-40 bg-[#1b1d23] border border-white/15 rounded-xl shadow-2xl overflow-hidden max-h-72 overflow-y-auto divide-y divide-white/10"></div>
       </div>
-      <div id="voiceStatus" class="hidden text-[11px] text-amber-300 mt-1 text-center font-semibold">🎙️ Boliye... part ka naam sun rahe hain...</div>
     </div>
 
     <!-- CATEGORY PILLS -->
@@ -138,6 +137,7 @@
       </div>
     </div>
 
+    <div id="visualSearchBanner" class="hidden mb-3"></div>
     <div id="catalogBox" class="space-y-3"></div>
 
     <!-- ADMIN CUSTOMERS & ORDERS PANEL -->
@@ -172,17 +172,18 @@
     </div>
   </div>
 
-  <!-- ADMIN LOGIN MODAL -->
-  <div id="loginModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
-    <div class="bg-[#181b20] text-white w-full max-w-xs rounded-2xl p-5 space-y-3">
+  <!-- ADMIN LOGIN MODAL (SUPABASE AUTH) -->
+  <div id="loginModal" onclick="if(event.target===this) closeLoginModal()" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
+    <div class="bg-[#181b20] text-white w-full max-w-xs rounded-2xl p-5 space-y-3 border border-white/10">
       <div class="flex justify-between items-center">
         <h2 class="text-sm font-extrabold">🔒 Admin Login</h2>
-        <button onclick="document.getElementById('loginModal').classList.add('hidden')" class="text-gray-400 font-bold">✕</button>
+        <button type="button" onclick="closeLoginModal()" aria-label="Close login" class="text-gray-400 hover:text-white font-bold">✕</button>
       </div>
+      <p class="text-[11px] text-gray-400 leading-snug">Sign in with your Supabase Admin email &amp; password.</p>
       <form onsubmit="checkLogin(event)" class="space-y-2.5">
-        <input id="uid" type="text" required placeholder="Admin ID" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
+        <input id="uid" type="email" autocomplete="username" required placeholder="Admin Email" class="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-xs text-white" />
         <div class="relative">
-          <input id="pwd" type="password" required placeholder="Password" class="w-full bg-black border border-gray-700 rounded-xl pl-3 pr-10 py-2 text-xs text-white" />
+          <input id="pwd" type="password" autocomplete="current-password" required placeholder="Password" class="w-full bg-black border border-gray-700 rounded-xl pl-3 pr-10 py-2 text-xs text-white" />
           <button id="pwdToggleBtn" type="button" onclick="togglePasswordVisibility()" aria-label="Show password" class="absolute inset-y-0 right-0 px-2.5 flex items-center justify-center text-gray-300 hover:text-white focus:outline-none">
             <svg id="eyeOpenIcon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
@@ -196,18 +197,18 @@
             </svg>
           </button>
         </div>
-        <p id="loginErr" class="hidden text-xs text-red-400 font-bold">Galat ID ya Password!</p>
-        <button type="submit" class="w-full bg-red-600 text-white font-extrabold text-xs py-2.5 rounded-xl">Unlock Admin</button>
+        <p id="loginErr" class="hidden text-xs text-red-400 font-bold">Invalid email or password.</p>
+        <button id="loginSubmitBtn" type="submit" class="w-full bg-red-600 text-white font-extrabold text-xs py-2.5 rounded-xl">Unlock Admin</button>
       </form>
     </div>
   </div>
 
   <!-- ADD / EDIT PART MODAL -->
-  <div id="partModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
+  <div id="partModal" onclick="if(event.target===this && !isSavingPart) closePartForm()" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
     <div class="bg-[#181b20] text-white w-full max-w-sm rounded-2xl p-4 space-y-2.5 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center">
         <h2 id="formHeading" class="text-sm font-extrabold">Add / Edit Part</h2>
-        <button type="button" onclick="closePartForm()" class="text-gray-400 font-bold">✕</button>
+        <button type="button" onclick="if(!isSavingPart) closePartForm()" class="text-gray-400 font-bold">✕</button>
       </div>
       <input type="hidden" id="editId" />
       <div class="grid grid-cols-2 gap-2">
@@ -284,11 +285,11 @@
   </div>
 
   <!-- CHECKOUT MODAL -->
-  <div id="checkoutModal" onclick="if(event.target===this) closeCheckout()" class="hidden fixed inset-0 z-40 bg-black/60 flex items-end sm:items-center justify-center">
+  <div id="checkoutModal" onclick="if(event.target===this && !isSubmittingOrder) closeCheckout()" class="hidden fixed inset-0 z-40 bg-black/60 flex items-end sm:items-center justify-center">
     <div class="bg-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl p-4 space-y-2.5 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
         <h2 id="checkoutModalTitle" class="text-sm font-extrabold">WhatsApp Order Details</h2>
-        <button type="button" onclick="closeCheckout()" class="font-bold text-gray-500">✕</button>
+        <button type="button" onclick="if(!isSubmittingOrder) closeCheckout()" aria-label="Close checkout" class="font-bold text-gray-500">✕</button>
       </div>
 
       <!-- SAVED DETAILS SUMMARY VIEW (RETURNING CUSTOMERS) -->
@@ -368,32 +369,69 @@
     </div>
   </div>
 
+  <!-- PRODUCT PHOTO ZOOM / LIGHTBOX MODAL -->
+  <div id="photoLightboxModal" onclick="if(event.target===this) closePhotoLightbox()" class="hidden fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+    <div class="bg-[#181b20] text-white w-full max-w-md rounded-2xl p-3.5 space-y-2.5 border border-white/10 shadow-2xl">
+      <div class="flex items-start justify-between gap-2">
+        <div class="min-w-0">
+          <div id="lightboxTitle" class="text-xs font-extrabold text-white truncate">Part Preview</div>
+          <div id="lightboxMeta" class="text-[11px] text-gray-300 truncate"></div>
+        </div>
+        <button type="button" onclick="closePhotoLightbox()" aria-label="Close photo preview" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center shrink-0">✕</button>
+      </div>
+      <div class="w-full aspect-square bg-black rounded-xl overflow-hidden border border-white/10 flex items-center justify-center">
+        <img id="lightboxImg" src="" alt="Part full preview" class="w-full h-full object-contain" />
+      </div>
+    </div>
+  </div>
+
   <!-- SUPABASE RLS FIX MODAL (ADMIN ONLY, SHOWN ONLY ON 42501 RLS ERROR) -->
   <div id="rlsHelpModal" onclick="if(event.target===this) closeRlsHelpModal()" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
     <div class="bg-[#181b20] text-white w-full max-w-md rounded-2xl p-4 space-y-3 border border-white/10">
       <div class="flex justify-between items-center">
-        <h2 class="text-sm font-extrabold text-amber-400">Enable Supabase Write Policy</h2>
+        <h2 class="text-sm font-extrabold text-amber-400">Configure Secure Supabase RLS</h2>
         <button type="button" onclick="closeRlsHelpModal()" class="text-gray-400 font-bold">✕</button>
       </div>
       <p class="text-xs text-gray-300 leading-relaxed">
-        Supabase Row-Level Security (RLS) blocked writing to your tables. Run this SQL once in your Supabase <b>SQL Editor</b>, then retry or tap <b>Sync All 38 to Cloud</b>:
+        Run this SQL once in Supabase <b>SQL Editor</b> so customers can browse products &amp; submit orders while only logged-in Admin (<b>authenticated</b>) can edit parts or read customer records:
       </p>
       <pre id="rlsSqlText" class="bg-black border border-gray-700 rounded-xl p-3 text-[11px] text-emerald-300 overflow-x-auto whitespace-pre-wrap select-all max-h-60 overflow-y-auto">CREATE UNIQUE INDEX IF NOT EXISTS customers_mobile_number_key ON public.customers (mobile_number);
 
+-- 1. PRODUCT: Public read, Admin (authenticated) write/delete only
 ALTER TABLE public.product ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow all on product" ON public.product;
-CREATE POLICY "Allow all on product" ON public.product FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
-GRANT ALL ON TABLE public.product TO anon, authenticated;
+DROP POLICY IF EXISTS "Public read products" ON public.product;
+DROP POLICY IF EXISTS "Admin manage products" ON public.product;
+CREATE POLICY "Public read products" ON public.product FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "Admin manage products" ON public.product FOR ALL TO authenticated USING (true) WITH CHECK (true);
+GRANT SELECT ON TABLE public.product TO anon;
+GRANT ALL ON TABLE public.product TO authenticated;
 
+-- 2. CUSTOMERS: Checkout upsert allowed, Admin-only read/delete (protects PII)
 ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow all on customers" ON public.customers;
-CREATE POLICY "Allow all on customers" ON public.customers FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
-GRANT ALL ON TABLE public.customers TO anon, authenticated;
+DROP POLICY IF EXISTS "Checkout insert customers" ON public.customers;
+DROP POLICY IF EXISTS "Checkout update customers" ON public.customers;
+DROP POLICY IF EXISTS "Admin read customers" ON public.customers;
+DROP POLICY IF EXISTS "Admin delete customers" ON public.customers;
+CREATE POLICY "Checkout insert customers" ON public.customers FOR INSERT TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "Checkout update customers" ON public.customers FOR UPDATE TO anon, authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Admin read customers" ON public.customers FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Admin delete customers" ON public.customers FOR DELETE TO authenticated USING (true);
+GRANT INSERT, UPDATE ON TABLE public.customers TO anon;
+GRANT ALL ON TABLE public.customers TO authenticated;
 
+-- 3. CUSTOMER_ORDERS: Checkout insert allowed, Admin-only read/manage
 ALTER TABLE public.customer_orders ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow all on customer_orders" ON public.customer_orders;
-CREATE POLICY "Allow all on customer_orders" ON public.customer_orders FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
-GRANT ALL ON TABLE public.customer_orders TO anon, authenticated;
+DROP POLICY IF EXISTS "Checkout insert orders" ON public.customer_orders;
+DROP POLICY IF EXISTS "Admin manage orders" ON public.customer_orders;
+CREATE POLICY "Checkout insert orders" ON public.customer_orders FOR INSERT TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "Admin manage orders" ON public.customer_orders FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Admin update orders" ON public.customer_orders FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Admin delete orders" ON public.customer_orders FOR DELETE TO authenticated USING (true);
+GRANT INSERT ON TABLE public.customer_orders TO anon;
+GRANT ALL ON TABLE public.customer_orders TO authenticated;
 
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</pre>
       <div class="flex items-center gap-2">
@@ -405,7 +443,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
 
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-lg whitespace-nowrap pointer-events-none">
-    ✅ Photo Saved!
+    ✅ Saved!
   </div>
 
   <script>
@@ -414,9 +452,23 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
     const PHOTO_BUCKET = "part-photos";
 
-    const ADMIN_ID = "Ghumostore";
-    const ADMIN_PASS = "sonuRs879012";
     const WA_NUM = "9625489457";
+    const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
+    function sanitizeImageUrl(url) {
+      const raw = String(url || "").trim();
+      if (!raw) return "";
+      if (/^data:image\/(jpeg|jpg|png|webp|gif);base64,[a-zA-Z0-9+/=]+$/i.test(raw)) {
+        return raw;
+      }
+      try {
+        const parsed = new URL(raw);
+        if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+          return parsed.href;
+        }
+      } catch (err) {}
+      return "";
+    }
 
     const DEFAULT_ITEMS = [
       { id: 1, code: "#01", category: "Chain Kit", name: "Chain kit set super spl", spec: "hero orginal", price: 580, visible: true, image: "" },
@@ -464,8 +516,9 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
         ? Number(row.sort_order)
         : (Number.isFinite(Number(row.id)) ? Number(row.id) : idx + 1);
       const code = row.serial_code || row.code || ("#" + String(sortOrder).padStart(2, "0"));
-      const rate = Number(row.rate !== undefined ? row.rate : row.price) || 0;
-      const imageUrl = row.image_url !== undefined ? (row.image_url || "") : (row.image || "");
+      const rate = Math.max(0, Number(row.rate !== undefined ? row.rate : row.price) || 0);
+      const rawImg = row.image_url !== undefined ? (row.image_url || "") : (row.image || "");
+      const imageUrl = sanitizeImageUrl(rawImg);
       return {
         id: String(row.id),
         serial_code: code,
@@ -491,10 +544,10 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       });
     }
 
-    let isAdmin = sessionStorage.getItem("gbs_admin") === "1";
+    let adminUser = null;
+    let isAdmin = false;
     let adminTab = "products";
     let crmSubTab = "orders";
-    let adminHistoryPushed = false;
     let items = sortItemsList(DEFAULT_ITEMS.map((i, idx) => normalizeProduct(i, idx)));
     let productsLoadingPromise = null;
     let hasSeededDefaults = false;
@@ -502,6 +555,14 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     let crmOrders = [];
     let crmCustomers = [];
     let crmLoaded = false;
+    let isSavingPart = false;
+    let isSyncingAll = false;
+    let isSubmittingOrder = false;
+    let checkoutOrderCompleted = false;
+    let checkoutAttemptCustomerSaved = false;
+    let pendingFallbackCustomerPayload = null;
+    let visualSearchPreviewDataUrl = "";
+    const busyPartOps = new Set();
     function loadCartStorage() {
       try {
         const raw = localStorage.getItem("gbs_cart");
@@ -561,7 +622,80 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
 
     loadCacheIfAny();
 
-    // SUPABASE PRODUCTS FETCH & INITIAL 38-ITEM AUTO-SEED
+    function isCloudCatalogInitialized() {
+      try { return localStorage.getItem("gbs_cloud_initialized") === "1"; } catch (err) { return false; }
+    }
+
+    function markCloudCatalogInitialized() {
+      try { localStorage.setItem("gbs_cloud_initialized", "1"); } catch (err) {}
+    }
+
+    // SUPABASE AUTH SESSION GUARD FOR ADMIN WRITE/DELETE/CRM ACTIONS
+    async function requireAdminSession() {
+      if (!sb) {
+        showToast("Supabase not connected", 2600, true);
+        return false;
+      }
+      try {
+        const { data, error } = await sb.auth.getSession();
+        if (error || !data?.session?.user) {
+          isAdmin = false;
+          adminUser = null;
+          adminTab = "products";
+          crmOrders = [];
+          crmCustomers = [];
+          crmLoaded = false;
+          closePartForm();
+          closeDeleteModal();
+          closeRlsHelpModal();
+          renderAll();
+          showToast("Admin session required. Please sign in.", 3200, true);
+          return false;
+        }
+        adminUser = data.session.user;
+        isAdmin = true;
+        return true;
+      } catch (err) {
+        showToast("Auth check failed. Please sign in again.", 3000, true);
+        return false;
+      }
+    }
+
+    async function initAdminAuth() {
+      // Remove legacy insecure flag if present
+      try { sessionStorage.removeItem("gbs_admin"); } catch (err) {}
+      if (!sb || !sb.auth) return;
+      try {
+        const { data } = await sb.auth.getSession();
+        if (data?.session?.user) {
+          adminUser = data.session.user;
+          isAdmin = true;
+          renderAll();
+        }
+      } catch (err) {
+        console.warn("Auth session restore warning:", err);
+      }
+      sb.auth.onAuthStateChange((_event, session) => {
+        const nextAdmin = Boolean(session && session.user);
+        adminUser = session?.user || null;
+        if (isAdmin !== nextAdmin) {
+          isAdmin = nextAdmin;
+          if (!isAdmin) {
+            adminTab = "products";
+            crmOrders = [];
+            crmCustomers = [];
+            crmLoaded = false;
+            closePartForm();
+            closeDeleteModal();
+            closeRlsHelpModal();
+          }
+          renderAll();
+          if (isAdmin) loadProductsFromSupabase();
+        }
+      });
+    }
+
+    // SUPABASE PRODUCTS FETCH & SAFE INITIAL AUTO-SEED (ONLY ON FIRST EMPTY INIT BY AUTHENTICATED ADMIN)
     async function loadProductsFromSupabase() {
       if (!sb) return;
       if (productsLoadingPromise) return productsLoadingPromise;
@@ -579,7 +713,16 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
           }
 
           if (Array.isArray(data) && data.length === 0) {
-            if (!hasSeededDefaults) {
+            const alreadyInitialized = isCloudCatalogInitialized();
+            if (alreadyInitialized) {
+              hasSeededDefaults = true;
+              productsLoadedFromCloud = true;
+              items = [];
+              saveCache();
+              renderAll();
+              return;
+            }
+            if (!hasSeededDefaults && isAdmin && adminUser) {
               hasSeededDefaults = true;
               const seedRows = DEFAULT_ITEMS.map((d, idx) => ({
                 id: toCloudProductId(d.id ?? (idx + 1)),
@@ -590,7 +733,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
                 spec: d.spec,
                 rate: Number(d.price) || 0,
                 visible: true,
-                image_url: d.image || ""
+                image_url: sanitizeImageUrl(d.image || "")
               }));
               const { data: seeded, error: seedErr } = await sb
                 .from("product")
@@ -599,17 +742,14 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
               if (!seedErr && Array.isArray(seeded) && seeded.length) {
                 items = sortItemsList(seeded.map((r, idx) => normalizeProduct(r, idx)));
                 productsLoadedFromCloud = true;
+                markCloudCatalogInitialized();
                 saveCache();
                 renderAll();
                 return;
               }
               if (seedErr) {
-                if (isRlsError(seedErr)) {
-                  console.warn("Supabase product table RLS blocks initial auto-seed; using local catalog until RLS policy is enabled.");
-                } else {
-                  hasSeededDefaults = false;
-                  console.warn("Supabase auto-seed warning:", seedErr.message || seedErr);
-                }
+                hasSeededDefaults = false;
+                console.warn("Supabase auto-seed warning:", seedErr.message || seedErr);
               }
             }
             return;
@@ -618,6 +758,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
           if (Array.isArray(data) && data.length > 0) {
             hasSeededDefaults = true;
             productsLoadedFromCloud = true;
+            markCloudCatalogInitialized();
             items = sortItemsList(data.map((r, idx) => normalizeProduct(r, idx)));
             saveCache();
             renderAll();
@@ -631,47 +772,70 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       return productsLoadingPromise;
     }
 
-    function pushAdminHistory() {
-      if (!adminHistoryPushed) {
-        try {
-          history.pushState({ gbsAdmin: true }, "");
-          adminHistoryPushed = true;
-        } catch (err) {}
-      }
-    }
-
-    if (isAdmin) pushAdminHistory();
-
-    window.addEventListener("popstate", () => {
-      if (isAdmin) {
-        adminHistoryPushed = false;
-        isAdmin = false;
-        adminTab = "products";
-        sessionStorage.removeItem("gbs_admin");
-        closePartForm();
-        closeDeleteModal();
-        renderAll();
-      }
-    });
-
-    // 3-SECOND HOLD TRIGGER
+    // 3-SECOND HOLD TRIGGER (DUPLICATE-TIMER & DRAG-SAFE)
     const trigger = document.getElementById("adminHoldTrigger");
     let holdTimer = null;
-    const startHold = () => {
-      document.getElementById("storeLogo").classList.add("ring-2", "ring-amber-400");
+    let holdStartPos = null;
+    let lastTouchHoldTs = 0;
+
+    const endHold = () => {
+      const logo = document.getElementById("storeLogo");
+      if (logo) logo.classList.remove("ring-2", "ring-amber-400");
+      if (holdTimer) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+      holdStartPos = null;
+    };
+
+    const startHold = (ev) => {
+      if (ev.type === "mousedown" && Date.now() - lastTouchHoldTs < 700) return;
+      if (ev.type === "touchstart") {
+        lastTouchHoldTs = Date.now();
+        const t = ev.touches && ev.touches[0];
+        holdStartPos = t ? { x: t.clientX, y: t.clientY } : null;
+      } else {
+        holdStartPos = { x: ev.clientX || 0, y: ev.clientY || 0 };
+      }
+      endHold();
+      const logo = document.getElementById("storeLogo");
+      if (logo) logo.classList.add("ring-2", "ring-amber-400");
       holdTimer = setTimeout(() => {
-        document.getElementById("storeLogo").classList.remove("ring-2", "ring-amber-400");
-        if (!isAdmin) document.getElementById("loginModal").classList.remove("hidden");
+        endHold();
+        if (!isAdmin) openLoginModal();
       }, 3000);
     };
-    const endHold = () => {
-      document.getElementById("storeLogo").classList.remove("ring-2", "ring-amber-400");
-      clearTimeout(holdTimer);
+
+    const handleHoldMove = (ev) => {
+      if (!holdTimer || !holdStartPos) return;
+      const t = ev.touches && ev.touches[0];
+      const cx = t ? t.clientX : (ev.clientX || 0);
+      const cy = t ? t.clientY : (ev.clientY || 0);
+      if (Math.hypot(cx - holdStartPos.x, cy - holdStartPos.y) > 12) {
+        endHold();
+      }
     };
+
     trigger.addEventListener("touchstart", startHold, { passive: true });
+    trigger.addEventListener("touchmove", handleHoldMove, { passive: true });
     trigger.addEventListener("touchend", endHold);
+    trigger.addEventListener("touchcancel", endHold);
     trigger.addEventListener("mousedown", startHold);
+    trigger.addEventListener("mousemove", handleHoldMove);
     trigger.addEventListener("mouseup", endHold);
+    trigger.addEventListener("mouseleave", endHold);
+    window.addEventListener("blur", endHold);
+
+    function resetPasswordVisibility() {
+      const pwdEl = document.getElementById("pwd");
+      const openIcon = document.getElementById("eyeOpenIcon");
+      const offIcon = document.getElementById("eyeOffIcon");
+      const btn = document.getElementById("pwdToggleBtn");
+      if (pwdEl) pwdEl.type = "password";
+      if (openIcon) openIcon.classList.remove("hidden");
+      if (offIcon) offIcon.classList.add("hidden");
+      if (btn) btn.setAttribute("aria-label", "Show password");
+    }
 
     function togglePasswordVisibility() {
       const pwdEl = document.getElementById("pwd");
@@ -686,40 +850,115 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       if (btn) btn.setAttribute("aria-label", show ? "Hide password" : "Show password");
     }
 
-    function checkLogin(e) {
+    function openLoginModal() {
+      closeLoginModal();
+      const modal = document.getElementById("loginModal");
+      if (modal) modal.classList.remove("hidden");
+      const uidEl = document.getElementById("uid");
+      if (uidEl) setTimeout(() => uidEl.focus(), 50);
+    }
+
+    function closeLoginModal() {
+      const modal = document.getElementById("loginModal");
+      if (modal) modal.classList.add("hidden");
+      const uidEl = document.getElementById("uid");
+      const pwdEl = document.getElementById("pwd");
+      const errEl = document.getElementById("loginErr");
+      const submitBtn = document.getElementById("loginSubmitBtn");
+      if (uidEl) uidEl.value = "";
+      if (pwdEl) pwdEl.value = "";
+      if (errEl) {
+        errEl.classList.add("hidden");
+        errEl.textContent = "Invalid email or password.";
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Unlock Admin";
+      }
+      resetPasswordVisibility();
+    }
+
+    async function checkLogin(e) {
       e.preventDefault();
-      if (document.getElementById("uid").value.trim() === ADMIN_ID && document.getElementById("pwd").value.trim() === ADMIN_PASS) {
+      const email = (document.getElementById("uid")?.value || "").trim();
+      const password = (document.getElementById("pwd")?.value || "");
+      const errEl = document.getElementById("loginErr");
+      const submitBtn = document.getElementById("loginSubmitBtn");
+
+      if (!sb || !sb.auth) {
+        if (errEl) {
+          errEl.textContent = "Supabase Auth is unavailable. Check connection.";
+          errEl.classList.remove("hidden");
+        }
+        return;
+      }
+
+      if (!email || !password) {
+        if (errEl) {
+          errEl.textContent = "Please enter your Admin email and password.";
+          errEl.classList.remove("hidden");
+        }
+        return;
+      }
+
+      if (errEl) errEl.classList.add("hidden");
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Signing in..."; }
+
+      try {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        if (error || !data?.session?.user) {
+          if (errEl) {
+            errEl.textContent = error?.message || "Invalid email or password.";
+            errEl.classList.remove("hidden");
+          }
+          return;
+        }
+        adminUser = data.session.user;
         isAdmin = true;
         adminTab = "products";
         crmLoaded = false;
-        sessionStorage.setItem("gbs_admin", "1");
-        document.getElementById("loginErr").classList.add("hidden");
-        document.getElementById("loginModal").classList.add("hidden");
-        const pwdEl = document.getElementById("pwd");
-        if (pwdEl && pwdEl.type !== "password") togglePasswordVisibility();
-        pushAdminHistory();
+        closeLoginModal();
         renderAll();
         loadProductsFromSupabase();
-      } else {
-        document.getElementById("loginErr").classList.remove("hidden");
+        showToast("Admin Signed In ✓");
+      } catch (err) {
+        if (errEl) {
+          errEl.textContent = err?.message || "Sign-in failed. Please try again.";
+          errEl.classList.remove("hidden");
+        }
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Unlock Admin"; }
       }
     }
 
-    function lockAdmin() {
+    async function lockAdmin() {
+      if (sb && sb.auth) {
+        try { await sb.auth.signOut(); } catch (err) { console.warn("Sign out warning:", err); }
+      }
       isAdmin = false;
+      adminUser = null;
       adminTab = "products";
-      sessionStorage.removeItem("gbs_admin");
+      crmOrders = [];
+      crmCustomers = [];
+      crmLoaded = false;
+      try { sessionStorage.removeItem("gbs_admin"); } catch (err) {}
       closePartForm();
       closeDeleteModal();
+      closeRlsHelpModal();
+      stopVoiceSearch();
+      closePhotoLightbox();
+      hideSuggestions();
       renderAll();
-      if (adminHistoryPushed) {
-        adminHistoryPushed = false;
-        try { history.back(); } catch (err) {}
-      }
+      showToast("Customer Panel active", 1600);
     }
 
     function setAdminTab(tab) {
+      if (!isAdmin) return;
       adminTab = tab;
+      hideSuggestions();
+      if (tab === "customers") {
+        clearVisualSearchPreview();
+      }
       renderAll();
       if (tab === "customers") loadAdminCrmData(!crmLoaded);
     }
@@ -729,7 +968,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       renderCrmView();
     }
 
-    // VOICE SEARCH (EN-IN & HI-IN WITH PULSING WAVE MODAL, 5S SILENCE TIMEOUT & INLINE PREVIEW FALLBACK)
+    // VOICE SEARCH (EN-IN & HI-IN WITH PULSING WAVE MODAL, GRACEFUL STOP & ERROR FEEDBACK)
     let activeRec = null;
     let voiceLang = "en-IN";
     let voiceSilenceTimer = null;
@@ -763,10 +1002,12 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       if (mid) mid.classList.toggle("hidden", !active);
     }
 
-    function showVoicePreviewFallback() {
+    function showVoiceFeedback(titleText, messageText, closeAfterMs = 2600) {
       clearTimeout(voiceSilenceTimer);
       clearTimeout(voiceEndTimer);
       clearTimeout(voicePreviewCloseTimer);
+      voiceSilenceTimer = null;
+      voiceEndTimer = null;
       const rec = activeRec;
       activeRec = null;
       if (rec) {
@@ -778,13 +1019,17 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       const liveText = document.getElementById("voiceLiveText");
       const voiceBtn = document.getElementById("voiceBtn");
       if (voiceBtn) voiceBtn.classList.remove("bg-white/20", "animate-pulse");
-      if (titleEl) titleEl.textContent = "Listening...";
+      if (titleEl) titleEl.textContent = titleText;
       if (liveText) {
-        liveText.textContent = "Mic unavailable in preview — works on live site";
+        liveText.textContent = messageText;
         liveText.className = "text-xs text-amber-300 min-h-[18px]";
       }
       if (modal) modal.classList.remove("hidden");
-      voicePreviewCloseTimer = setTimeout(() => stopVoiceSearch(), 3000);
+      voicePreviewCloseTimer = setTimeout(() => stopVoiceSearch(), closeAfterMs);
+    }
+
+    function showVoicePreviewFallback() {
+      showVoiceFeedback("Mic Unavailable", "Mic blocked or unavailable — check mic permission", 3000);
     }
 
     function setVoiceLang(lang) {
@@ -795,7 +1040,9 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
         enBtn.className = lang === "en-IN" ? "px-2 py-1 rounded-md bg-red-600 text-white" : "px-2 py-1 rounded-md text-gray-300";
         hiBtn.className = lang === "hi-IN" ? "px-2 py-1 rounded-md bg-red-600 text-white" : "px-2 py-1 rounded-md text-gray-300";
       }
-      if (activeRec) {
+      const modal = document.getElementById("voiceModal");
+      const isModalOpen = modal && !modal.classList.contains("hidden");
+      if (activeRec || voicePreviewCloseTimer || isModalOpen) {
         stopVoiceSearch();
         startVoiceSearch();
       }
@@ -814,10 +1061,8 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
         try { rec.onresult = null; rec.onspeechend = null; rec.onerror = null; rec.onend = null; rec.abort(); } catch (err) {}
       }
       const modal = document.getElementById("voiceModal");
-      const statusEl = document.getElementById("voiceStatus");
       const voiceBtn = document.getElementById("voiceBtn");
       if (modal) modal.classList.add("hidden");
-      if (statusEl) statusEl.classList.add("hidden");
       setVoiceWaveActive(true);
       if (voiceBtn) {
         voiceBtn.classList.remove("bg-white/20", "animate-pulse");
@@ -829,9 +1074,12 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       hideSuggestions();
       const voiceBtn = document.getElementById("voiceBtn");
       if (voiceBtn) voiceBtn.blur();
-      if (activeRec || voicePreviewCloseTimer) {
+      if (activeRec) {
         stopVoiceSearch();
         return;
+      }
+      if (voicePreviewCloseTimer) {
+        stopVoiceSearch();
       }
 
       lastVoiceTranscript = "";
@@ -859,26 +1107,28 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       rec.interimResults = true;
       rec.maxAlternatives = 1;
 
-      const armSilenceTimer = () => {
+      const armSilenceTimer = (ms = 5500) => {
         clearTimeout(voiceSilenceTimer);
         voiceSilenceTimer = setTimeout(() => {
           if (lastVoiceTranscript) {
             const finalText = normalizeSpokenQuery(lastVoiceTranscript);
             document.getElementById("searchInput").value = finalText;
             runSearch(finalText, true);
+            stopVoiceSearch();
+          } else {
+            showVoiceFeedback("No Speech Heard", "Nothing detected — tap mic and speak clearly", 2200);
           }
-          stopVoiceSearch();
-        }, 5000);
+        }, ms);
       };
 
-      armSilenceTimer();
+      armSilenceTimer(5500);
 
       rec.onspeechstart = () => {
-        armSilenceTimer();
+        armSilenceTimer(5500);
       };
 
       rec.onresult = (e) => {
-        armSilenceTimer();
+        armSilenceTimer(5000);
         let combined = "";
         let isFinal = false;
         for (let i = 0; i < e.results.length; i++) {
@@ -899,17 +1149,28 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
 
       rec.onspeechend = () => {
         clearTimeout(voiceEndTimer);
+        // Gracefully request finalization instead of aborting prematurely on slow networks
         voiceEndTimer = setTimeout(() => {
-          stopVoiceSearch();
-        }, 700);
+          if (activeRec === rec) {
+            try { rec.stop(); } catch (err) { stopVoiceSearch(); }
+          }
+        }, 1200);
       };
 
       rec.onerror = (ev) => {
         const code = ev && ev.error ? ev.error : "";
+        if (code === "aborted") {
+          stopVoiceSearch();
+          return;
+        }
         if (code === "not-allowed" || code === "service-not-allowed" || code === "audio-capture") {
           showVoicePreviewFallback();
+        } else if (code === "no-speech") {
+          showVoiceFeedback("No Speech Heard", "Nothing heard — tap mic to try again", 2200);
+        } else if (code === "network") {
+          showVoiceFeedback("Network Issue", "Voice search requires an active internet connection", 2600);
         } else {
-          stopVoiceSearch();
+          showVoiceFeedback("Voice Search Stopped", "Could not recognize speech — please try again", 2200);
         }
       };
 
@@ -934,7 +1195,18 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       if (document.hidden && (activeRec || voicePreviewCloseTimer)) stopVoiceSearch();
     });
 
-    // CAMERA PHOTO SEARCH WITH CLEAN PRESS & RESET
+    // CAMERA PHOTO SEARCH WITH DEDICATED STATE, SIZE/TYPE VALIDATION & HONEST WHATSAPP COPY
+    function validateImageFile(file) {
+      if (!file) return "No file selected.";
+      if (!file.type || !file.type.startsWith("image/")) {
+        return "Please select a valid image file (JPG, PNG, or WebP).";
+      }
+      if (file.size > MAX_IMAGE_BYTES) {
+        return "Image is too large (max 10 MB allowed).";
+      }
+      return null;
+    }
+
     function resetCameraBtn() {
       const btn = document.getElementById("lensBtn");
       if (btn) {
@@ -944,6 +1216,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     }
 
     function openCameraSearch(btn) {
+      if (isAdmin && adminTab === "customers") return;
       stopVoiceSearch();
       hideSuggestions();
       if (btn) btn.blur();
@@ -954,27 +1227,126 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       input.click();
     }
 
-    function handleVisualSearch(e) {
+    function clearVisualSearchPreview() {
+      visualSearchPreviewDataUrl = "";
+      renderVisualSearchBanner();
+    }
+
+    function renderVisualSearchBanner() {
+      const banner = document.getElementById("visualSearchBanner");
+      if (!banner) return;
+      const showCrm = isAdmin && adminTab === "customers";
+      const safePreview = sanitizeImageUrl(visualSearchPreviewDataUrl);
+      if (!safePreview || showCrm) {
+        banner.classList.add("hidden");
+        banner.innerHTML = "";
+        return;
+      }
+      const waUrl = `https://wa.me/91${WA_NUM}?text=${encodeURIComponent("Hello GHUMO BIKE STORE, main ek spare part ki photo bhej raha hu — kripya iska exact rate aur stock bata dein.")}`;
+      banner.innerHTML = `<div class="bg-white rounded-2xl p-4 text-center border-2 border-emerald-500 space-y-2.5 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-extrabold text-emerald-700 uppercase tracking-wide">📷 Part Photo Inquiry</span>
+          <button type="button" onclick="clearVisualSearchPreview()" aria-label="Close photo preview" class="w-7 h-7 rounded-lg bg-gray-100 text-gray-600 text-xs font-bold flex items-center justify-center">✕</button>
+        </div>
+        <button type="button" onclick="openVisualPreviewLightbox()" class="w-36 h-36 mx-auto block aspect-square rounded-xl overflow-hidden bg-gray-100 border hover:opacity-95">
+          <img src="${escapeHtml(safePreview)}" alt="Selected part photo" class="w-full h-full object-cover" onerror="handleImgError(this)" />
+        </button>
+        <div class="space-y-1">
+          <h3 class="text-sm font-extrabold text-gray-900">Photo Ready Hai!</h3>
+          <p class="text-[11px] text-gray-600 leading-relaxed">Niche button dabane par WhatsApp chat khul jayegi — chat mein ye photo attach karke bhej dein, hum turant exact rate aur stock bata denge.</p>
+        </div>
+        <div class="flex items-center justify-center gap-2 flex-wrap pt-0.5">
+          <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="inline-block bg-green-600 hover:bg-green-700 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow">💬 WhatsApp Kholen (Photo Attach Karein)</a>
+          <button type="button" onclick="clearVisualSearchPreview()" class="text-xs text-gray-600 bg-gray-100 font-bold px-3 py-2.5 rounded-xl">Hide Preview</button>
+        </div>
+      </div>`;
+      banner.classList.remove("hidden");
+    }
+
+    function openVisualPreviewLightbox() {
+      const safe = sanitizeImageUrl(visualSearchPreviewDataUrl);
+      if (!safe) return;
+      openPhotoLightboxUrl(safe, "Selected Part Photo", "Attach this photo in WhatsApp chat for rate & availability");
+    }
+
+    async function handleVisualSearch(e) {
       resetCameraBtn();
       const file = e.target.files[0];
       e.target.value = "";
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const box = document.getElementById("catalogBox");
-        const waUrl = `https://wa.me/91${WA_NUM}?text=${encodeURIComponent("Hello GHUMO BIKE STORE, main is photo wale spare part ka rate aur availability puchna chahta hu.")}`;
-        box.innerHTML = `<div class="bg-white rounded-2xl p-5 text-center border-2 border-emerald-500 space-y-3">
-          <div class="w-40 h-40 mx-auto aspect-square rounded-xl overflow-hidden bg-gray-100 border">
-            <img src="${reader.result}" alt="Selected part photo" class="w-full h-full object-cover" />
-          </div>
-          <h3 class="text-sm font-extrabold text-gray-900">Photo Select Ho Gayi Hai!</h3>
-          <p class="text-xs text-gray-600">Is part ka exact rate aur stock check karne ke liye niche button dabakar WhatsApp par photo bhej dein:</p>
-          <a href="${waUrl}" target="_blank" class="inline-block bg-green-600 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow">💬 WhatsApp Par Photo Bhejein</a>
-          <div><button onclick="clearSearch()" class="text-xs text-red-600 font-bold underline mt-1">← Rate List Par Wapas Jayein</button></div>
-        </div>`;
-      };
-      reader.readAsDataURL(file);
+      const errMsg = validateImageFile(file);
+      if (errMsg) {
+        showToast(errMsg, 3000, true);
+        return;
+      }
+      try {
+        const { dataUrl } = await cropImageToSquareJpeg(file, 480, 0.8);
+        visualSearchPreviewDataUrl = sanitizeImageUrl(dataUrl);
+        renderVisualSearchBanner();
+      } catch (err) {
+        showToast("Could not load selected image", 2600, true);
+      }
     }
+
+    // PRODUCT PHOTO ZOOM LIGHTBOX & BROKEN IMAGE FALLBACK
+    function handleImgError(imgEl) {
+      if (!imgEl || imgEl.dataset.fallbackApplied === "1") return;
+      imgEl.dataset.fallbackApplied = "1";
+      const parent = imgEl.parentElement;
+      if (!parent) return;
+      parent.innerHTML = `<div class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400" aria-label="Image unavailable">
+        <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      </div>`;
+    }
+
+    function openPhotoLightboxUrl(url, title, meta) {
+      const safe = sanitizeImageUrl(url);
+      if (!safe) return;
+      const modal = document.getElementById("photoLightboxModal");
+      const imgEl = document.getElementById("lightboxImg");
+      const titleEl = document.getElementById("lightboxTitle");
+      const metaEl = document.getElementById("lightboxMeta");
+      if (!modal || !imgEl) return;
+      imgEl.onerror = () => {
+        showToast("Photo could not be loaded", 2200, true);
+        closePhotoLightbox();
+      };
+      imgEl.src = safe;
+      if (titleEl) titleEl.textContent = title || "Part Preview";
+      if (metaEl) metaEl.textContent = meta || "";
+      modal.classList.remove("hidden");
+    }
+
+    function openPartPhotoLightbox(id) {
+      const x = items.find(i => String(i.id) === String(id));
+      if (!x) return;
+      const safe = sanitizeImageUrl(x.image_url || x.image || "");
+      if (!safe) return;
+      const rate = Number(x.rate ?? x.price) || 0;
+      const code = x.serial_code || x.code || "";
+      openPhotoLightboxUrl(safe, `${code ? code + " " : ""}${x.name}`, `₹${rate}${x.spec ? " • " + x.spec : ""}`);
+    }
+
+    function closePhotoLightbox() {
+      const modal = document.getElementById("photoLightboxModal");
+      const imgEl = document.getElementById("lightboxImg");
+      if (modal) modal.classList.add("hidden");
+      if (imgEl) {
+        imgEl.onerror = null;
+        imgEl.src = "";
+      }
+    }
+
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape") {
+        closePhotoLightbox();
+        closeLoginModal();
+        if (!isSavingPart) closePartForm();
+      }
+    });
 
     // SMART TYPO-TOLERANT FUZZY SEARCH & DYNAMIC AUTOCOMPLETE
     const TYPO_ALIASES = {
@@ -1146,7 +1518,12 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     }
 
     function escapeHtml(s) {
-      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      return String(s ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
     }
 
     function hideSuggestions() {
@@ -1158,7 +1535,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       const box = document.getElementById("searchSuggestions");
       if (!box) return;
       const q = (val || "").trim();
-      if (!q) {
+      if (!q || (isAdmin && adminTab === "customers")) {
         box.classList.add("hidden");
         box.innerHTML = "";
         return;
@@ -1185,28 +1562,33 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       };
 
       box.innerHTML = ranked.map(s => {
-        const safeVal = encodeURIComponent(s.searchVal);
-        return `<button type="button" onmousedown="event.preventDefault(); selectSuggestion('${safeVal}')" onclick="selectSuggestion('${safeVal}')" class="w-full text-left px-3.5 py-2.5 hover:bg-white/10 active:bg-white/15 flex items-center justify-between gap-2 transition">
+        const safeVal = escapeHtml(s.searchVal);
+        return `<button type="button" data-val="${safeVal}" onmousedown="event.preventDefault(); selectSuggestion(this.dataset.val)" onclick="selectSuggestion(this.dataset.val)" class="w-full text-left px-3.5 py-2.5 hover:bg-white/10 active:bg-white/15 flex items-center justify-between gap-2 transition">
           <div class="min-w-0">
             <div class="text-xs font-bold text-white truncate">${escapeHtml(s.label)}</div>
             <div class="text-[10px] text-gray-400 truncate">${escapeHtml(s.meta)}</div>
           </div>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0 ${badgeClass[s.type] || 'bg-white/10 text-gray-300'}">${s.type}</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0 ${badgeClass[s.type] || 'bg-white/10 text-gray-300'}">${escapeHtml(s.type)}</span>
         </button>`;
       }).join("");
       box.classList.remove("hidden");
     }
 
-    function selectSuggestion(encodedVal) {
-      const val = decodeURIComponent(encodedVal);
+    function selectSuggestion(val) {
+      const text = String(val || "");
       const input = document.getElementById("searchInput");
       if (input) {
-        input.value = val;
+        input.value = text;
         input.blur();
       }
       activeCat = "All Items";
       hideSuggestions();
-      runSearch(val, true);
+      runSearch(text, true);
+      renderAll();
+    }
+
+    function selectCategory(cat) {
+      activeCat = String(cat || "All Items");
       renderAll();
     }
 
@@ -1245,13 +1627,22 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       return isAdmin ? items : items.filter(i => i.visible === true);
     }
 
+    function updateSyncAllButtonLabel() {
+      const btn = document.getElementById("syncAllCloudBtn");
+      if (!btn || isSyncingAll) return;
+      btn.textContent = `Sync All ${items.length} to Cloud`;
+    }
+
     function renderAll() {
       document.getElementById("adminBar").classList.toggle("hidden", !isAdmin);
+      updateSyncAllButtonLabel();
       const headerCartBtn = document.getElementById("headerCartBtn");
       if (headerCartBtn) headerCartBtn.classList.toggle("hidden", isAdmin);
       if (isAdmin) {
         closeCartDrawer();
         closeCheckout();
+      } else {
+        pruneUnavailableCartItems();
       }
       updateCartBar();
 
@@ -1267,10 +1658,20 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
           : "bg-white/10 text-gray-200 text-[11px] font-bold px-2.5 py-1 rounded-lg";
       }
 
+      const searchInput = document.getElementById("searchInput");
+      if (searchInput) {
+        searchInput.placeholder = showCrm
+          ? "Search customer name, mobile, shop, order..."
+          : "Search part, bike model...";
+      }
+      const lensBtn = document.getElementById("lensBtn");
+      if (lensBtn) lensBtn.classList.toggle("hidden", showCrm);
+
       document.getElementById("categoryBar").classList.toggle("hidden", showCrm);
       document.getElementById("catalogToolbar").classList.toggle("hidden", showCrm);
       document.getElementById("catalogBox").classList.toggle("hidden", showCrm);
       document.getElementById("adminCrmBox").classList.toggle("hidden", !showCrm);
+      renderVisualSearchBanner();
 
       if (showCrm) {
         renderCrmView();
@@ -1281,9 +1682,21 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       const cats = ["All Items", ...new Set(list.map(i => i.category))];
       if (!cats.includes(activeCat)) activeCat = "All Items";
       document.getElementById("categoryBar").innerHTML = cats.map(c => `
-        <button onclick="activeCat='${c.replace(/'/g,"\\'")}';renderAll()" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${activeCat===c?'bg-red-600 text-white':'bg-gray-100 text-gray-700'}">${escapeHtml(c)}</button>
+        <button type="button" data-cat="${escapeHtml(c)}" onclick="selectCategory(this.dataset.cat)" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${activeCat===c?'bg-red-600 text-white':'bg-gray-100 text-gray-700'}">${escapeHtml(c)}</button>
       `).join("");
       renderCatalog();
+
+      // Keep open Cart / Checkout modals synced with latest cloud prices & availability
+      if (!isAdmin) {
+        const drawer = document.getElementById("cartDrawerModal");
+        if (drawer && !drawer.classList.contains("hidden")) {
+          renderCartDrawer();
+        }
+        const checkout = document.getElementById("checkoutModal");
+        if (checkout && !checkout.classList.contains("hidden") && !isSubmittingOrder && !checkoutOrderCompleted) {
+          refreshCheckoutSummaryItems();
+        }
+      }
     }
 
     function renderCatalog() {
@@ -1302,13 +1715,13 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
 
       // CUSTOM FRIENDLY "PRODUCT NOT FOUND / ON-DEMAND" CARD
       if (!list.length) {
-        const askText = encodeURIComponent(`Hello GHUMO BIKE STORE, mujhe "${query}" chahiye. Kya ye stock me available hai?`);
+        const askText = encodeURIComponent(`Hello GHUMO BIKE STORE, mujhe "${query || "spare part"}" chahiye. Kya ye stock me available hai?`);
         box.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center border-2 border-dashed border-amber-400 space-y-2.5">
           <div class="text-3xl">🛠️</div>
-          <h3 class="text-sm font-extrabold text-gray-900">"${escapeHtml(query)}" Abhi Online List Me Nahi Hai</h3>
+          <h3 class="text-sm font-extrabold text-gray-900">${query ? `"${escapeHtml(query)}" Abhi Online List Me Nahi Hai` : "Abhi Koi Part Available Nahi Hai"}</h3>
           <p class="text-xs text-gray-600">Chinta na karein! Hamare paas sabhi bikes ke parts order par bhi milte hain. Niche click karke sidha WhatsApp par mangwayein:</p>
-          <a href="https://wa.me/91${WA_NUM}?text=${askText}" target="_blank" class="inline-block bg-green-600 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow">💬 WhatsApp Par Part Mangwayein</a>
-          <div><button onclick="clearSearch()" class="text-xs text-gray-500 font-bold underline mt-1">Sabhi Parts Dekhein</button></div>
+          <a href="https://wa.me/91${WA_NUM}?text=${askText}" target="_blank" rel="noopener noreferrer" class="inline-block bg-green-600 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow">💬 WhatsApp Par Part Mangwayein</a>
+          ${query ? `<div><button type="button" onclick="clearSearch()" class="text-xs text-gray-500 font-bold underline mt-1">Sabhi Parts Dekhein</button></div>` : ""}
         </div>`;
         return;
       }
@@ -1323,16 +1736,17 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
               ${list.map(i => {
                 const sid = escapeHtml(String(i.id));
                 const qty = cart[String(i.id)] || 0;
-                const rate = Number(i.rate ?? i.price) || 0;
+                const rate = Math.max(0, Number(i.rate ?? i.price) || 0);
+                const visBusy = busyPartOps.has(`vis:${i.id}`);
                 return `<tr>
                   <td class="p-2.5"><div class="font-bold">${escapeHtml(i.name)}</div><div class="text-[10px] text-gray-500">${escapeHtml(i.serial_code || i.code)} • ${escapeHtml(i.spec)}</div></td>
                   <td class="p-2.5 text-right font-extrabold text-red-600">₹${rate}</td>
                   <td class="p-2.5 text-right whitespace-nowrap">
                     ${isAdmin
-                      ? `<button onclick="openPartForm('${sid}')" class="bg-gray-100 border text-[10px] font-bold px-2 py-1 rounded mr-1">Edit</button><button onclick="toggleVis('${sid}')" class="text-[10px] font-bold px-2 py-1 rounded ${i.visible!==false?'bg-emerald-100 text-emerald-800':'bg-red-100 text-red-700'}">${i.visible!==false?'SHOW':'HIDE'}</button>`
+                      ? `<button type="button" data-id="${sid}" onclick="openPartForm(this.dataset.id)" class="bg-gray-100 border text-[10px] font-bold px-2 py-1 rounded mr-1">Edit</button><button type="button" data-id="${sid}" ${visBusy ? "disabled" : ""} onclick="toggleVis(this.dataset.id)" class="text-[10px] font-bold px-2 py-1 rounded ${visBusy ? "opacity-50" : ""} ${i.visible!==false?'bg-emerald-100 text-emerald-800':'bg-red-100 text-red-700'}">${i.visible!==false?'SHOW':'HIDE'}</button>`
                       : (qty > 0
-                        ? `<div class="bg-gray-900 text-white rounded-lg px-2 py-1 text-[10px] font-bold inline-flex items-center gap-2"><button type="button" onclick="addCart('${sid}',-1)" aria-label="Decrease quantity">−</button><span>${qty}</span><button type="button" onclick="addCart('${sid}',1)" aria-label="Increase quantity">+</button></div>`
-                        : `<button type="button" onclick="addCart('${sid}',1)" class="bg-gray-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">+ Add to Cart</button>`)}
+                        ? `<div class="bg-gray-900 text-white rounded-lg px-2 py-1 text-[10px] font-bold inline-flex items-center gap-2"><button type="button" data-id="${sid}" onclick="addCart(this.dataset.id,-1)" aria-label="Decrease quantity">−</button><span>${qty}</span><button type="button" data-id="${sid}" onclick="addCart(this.dataset.id,1)" aria-label="Increase quantity">+</button></div>`
+                        : `<button type="button" data-id="${sid}" onclick="addCart(this.dataset.id,1)" class="bg-gray-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">+ Add to Cart</button>`)}
                   </td>
                 </tr>`;
               }).join("")}
@@ -1346,34 +1760,36 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
         const sid = escapeHtml(String(i.id));
         const qty = cart[String(i.id)] || 0;
         const vis = i.visible !== false;
-        const rate = Number(i.rate ?? i.price) || 0;
-        const imgUrl = i.image_url || i.image || "";
+        const rate = Math.max(0, Number(i.rate ?? i.price) || 0);
+        const imgUrl = sanitizeImageUrl(i.image_url || i.image || "");
+        const visBusy = busyPartOps.has(`vis:${i.id}`);
+        const photoBusy = busyPartOps.has(`photo:${i.id}`);
         return `<div class="bg-white rounded-2xl p-3 border ${!vis?'border-red-400 bg-red-50/40':'border-gray-200'}">
           <div class="flex justify-between items-center gap-1.5 mb-1.5">
             <div class="flex items-center gap-1.5 flex-wrap">
               <span class="bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded">${escapeHtml(i.serial_code || i.code)}</span>
               ${isAdmin ? `
-                <button onclick="openPartForm('${sid}')" class="bg-gray-100 border text-[10px] font-bold px-2 py-0.5 rounded">Edit</button>
-                <button onclick="toggleVis('${sid}')" class="text-[10px] font-bold px-2 py-0.5 rounded ${vis?'bg-emerald-100 text-emerald-800':'bg-red-100 text-red-700'}">${vis?'SHOW':'HIDE'}</button>
-                <button onclick="pickPhoto('${sid}')" class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded" title="Upload or replace photo">📷</button>
-                ${imgUrl ? `<button onclick="removePartPhoto('${sid}')" class="bg-red-50 text-red-700 border border-red-200 text-[10px] font-bold px-2 py-0.5 rounded" title="Remove photo">✕ Photo</button>` : ''}
+                <button type="button" data-id="${sid}" onclick="openPartForm(this.dataset.id)" class="bg-gray-100 border text-[10px] font-bold px-2 py-0.5 rounded">Edit</button>
+                <button type="button" data-id="${sid}" ${visBusy ? "disabled" : ""} onclick="toggleVis(this.dataset.id)" class="text-[10px] font-bold px-2 py-0.5 rounded ${visBusy ? "opacity-50" : ""} ${vis?'bg-emerald-100 text-emerald-800':'bg-red-100 text-red-700'}">${vis?'SHOW':'HIDE'}</button>
+                <button type="button" data-id="${sid}" ${photoBusy ? "disabled" : ""} onclick="pickPhoto(this.dataset.id)" class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded ${photoBusy ? "opacity-50" : ""}" title="Upload or replace photo">📷</button>
+                ${imgUrl ? `<button type="button" data-id="${sid}" ${photoBusy ? "disabled" : ""} onclick="removePartPhoto(this.dataset.id)" class="bg-red-50 text-red-700 border border-red-200 text-[10px] font-bold px-2 py-0.5 rounded ${photoBusy ? "opacity-50" : ""}" title="Remove photo">✕ Photo</button>` : ''}
               ` : ''}
             </div>
             <span class="text-[10px] text-gray-500 font-semibold shrink-0">${escapeHtml(i.category)}</span>
           </div>
-          ${imgUrl ? `<div class="w-full max-w-[400px] mx-auto aspect-square bg-gray-50 rounded-xl overflow-hidden mb-2.5 border border-gray-100"><img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(i.name)}" class="w-full h-full object-cover" /></div>` : ''}
+          ${imgUrl ? `<button type="button" data-id="${sid}" onclick="openPartPhotoLightbox(this.dataset.id)" aria-label="Zoom part photo" class="block w-full max-w-[400px] mx-auto aspect-square bg-gray-50 rounded-xl overflow-hidden mb-2.5 border border-gray-100 cursor-zoom-in"><img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(i.name)}" class="w-full h-full object-cover" onerror="handleImgError(this)" /></button>` : ''}
           <div class="text-sm font-extrabold text-gray-900">${escapeHtml(i.name)}</div>
           <div class="text-[10px] text-emerald-800 bg-emerald-50 inline-block px-2 py-0.5 rounded font-bold mt-1">• ${escapeHtml(i.spec)}</div>
           <div class="mt-2.5 pt-2 border-t flex justify-between items-center">
             <div class="text-base font-extrabold text-red-600">₹${rate}</div>
             <div class="flex items-center gap-1.5">
               ${isAdmin
-                ? `<button onclick="askDeletePart('${sid}')" class="bg-red-50 text-red-600 text-xs px-2.5 py-1.5 rounded-lg font-bold" title="Delete part">🗑️</button>`
+                ? `<button type="button" data-id="${sid}" onclick="askDeletePart(this.dataset.id)" class="bg-red-50 text-red-600 text-xs px-2.5 py-1.5 rounded-lg font-bold" title="Delete part">🗑️</button>`
                 : `
-                  <button type="button" onclick="openSingleOrderCheckout('${sid}')" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-xl">WA</button>
+                  <button type="button" data-id="${sid}" onclick="openSingleOrderCheckout(this.dataset.id)" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-xl">WA</button>
                   ${qty > 0
-                    ? `<div class="bg-gray-900 text-white rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center gap-2"><button type="button" onclick="addCart('${sid}',-1)" aria-label="Decrease quantity">−</button><span>${qty}</span><button type="button" onclick="addCart('${sid}',1)" aria-label="Increase quantity">+</button></div>`
-                    : `<button type="button" onclick="addCart('${sid}',1)" class="bg-gray-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl">+ Add to Cart</button>`}
+                    ? `<div class="bg-gray-900 text-white rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center gap-2"><button type="button" data-id="${sid}" onclick="addCart(this.dataset.id,-1)" aria-label="Decrease quantity">−</button><span>${qty}</span><button type="button" data-id="${sid}" onclick="addCart(this.dataset.id,1)" aria-label="Increase quantity">+</button></div>`
+                    : `<button type="button" data-id="${sid}" onclick="addCart(this.dataset.id,1)" class="bg-gray-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl">+ Add to Cart</button>`}
                 `}
             </div>
           </div>
@@ -1432,18 +1848,21 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
 
     function buildProductPayload(item, overrides = {}) {
       const merged = { ...item, ...overrides };
-      const sort_order = Number.isFinite(Number(merged.sort_order)) ? Number(merged.sort_order) : 1;
-      const serial_code = merged.serial_code || merged.code || ("#" + String(sort_order).padStart(2, "0"));
-      const rate = Number(merged.rate ?? merged.price) || 0;
-      const image_url = merged.image_url !== undefined ? (merged.image_url || "") : (merged.image || "");
+      const sort_order = Number.isFinite(Number(merged.sort_order)) && Number(merged.sort_order) >= 1
+        ? Math.floor(Number(merged.sort_order))
+        : 1;
+      const serial_code = String(merged.serial_code || merged.code || ("#" + String(sort_order).padStart(2, "0"))).trim();
+      const rate = Math.max(0, Number(merged.rate ?? merged.price) || 0);
+      const rawImg = merged.image_url !== undefined ? (merged.image_url || "") : (merged.image || "");
+      const image_url = sanitizeImageUrl(rawImg);
       const visible = merged.visible !== false;
       return {
         id: toCloudProductId(merged.id),
         serial_code,
         sort_order,
-        category: merged.category || "General",
-        name: merged.name || "",
-        spec: merged.spec || "Standard",
+        category: String(merged.category || "General").trim() || "General",
+        name: String(merged.name || "").trim(),
+        spec: String(merged.spec || "Standard").trim() || "Standard",
         rate,
         image_url,
         visible
@@ -1483,86 +1902,108 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     }
 
     async function syncAllProductsToCloud() {
-      if (!sb) {
-        showToast("Supabase not connected", 2500, true);
+      if (isSyncingAll) return;
+      if (!(await requireAdminSession())) return;
+      if (!items.length) {
+        showToast("No parts to sync", 2000, true);
         return;
       }
+      isSyncingAll = true;
       const btn = document.getElementById("syncAllCloudBtn");
-      const originalLabel = btn ? btn.textContent : "Sync All 38 to Cloud";
       if (btn) {
         btn.disabled = true;
         btn.textContent = "Syncing...";
       }
       try {
         const rows = items.map(i => buildProductPayload(i));
-        const { data, error } = await sb
+        const { error } = await sb
           .from("product")
-          .upsert(rows, { onConflict: "id" })
-          .select("*");
+          .upsert(rows, { onConflict: "id" });
         if (error) throw error;
-        if (Array.isArray(data) && data.length) {
-          items = sortItemsList(data.map((r, idx) => normalizeProduct(r, idx)));
+        markCloudCatalogInitialized();
+        // Re-fetch full table so parts added from any other device stay merged in UI
+        const { data: fullCloud, error: fetchErr } = await sb
+          .from("product")
+          .select("*")
+          .order("sort_order", { ascending: true })
+          .order("serial_code", { ascending: true });
+        if (!fetchErr && Array.isArray(fullCloud)) {
+          items = sortItemsList(fullCloud.map((r, idx) => normalizeProduct(r, idx)));
           productsLoadedFromCloud = true;
           hasSeededDefaults = true;
           saveCache();
           renderAll();
         }
-        showToast(`Saved to Cloud ✓ (${rows.length} parts)`);
+        showToast(`Saved to Cloud ✓ (${rows.length} parts synced)`);
       } catch (err) {
         if (isRlsError(err)) {
           console.warn("Supabase RLS blocked syncAllProductsToCloud:", err.message);
           showRlsHelpModal();
-          showToast("Enable Supabase RLS policy to sync", 3200, true);
+          showToast("Enable Supabase authenticated RLS policy to sync", 3400, true);
         } else {
           console.warn("Sync all products error:", err);
           showToast("Cloud sync error: " + (err.message || "Failed to sync"), 3500, true);
         }
       } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = originalLabel;
-        }
+        isSyncingAll = false;
+        if (btn) btn.disabled = false;
+        updateSyncAllButtonLabel();
       }
     }
 
-    // ADMIN ACTIONS SYNCED TO SUPABASE
+    // ADMIN ACTIONS SYNCED TO SUPABASE (WITH AUTH SESSION CHECK & IN-FLIGHT LOCKS)
     async function toggleVis(id) {
+      const opKey = `vis:${id}`;
+      if (busyPartOps.has(opKey)) return;
+      if (!(await requireAdminSession())) return;
       const x = items.find(i => String(i.id) === String(id));
-      if (!x) return;
+      if (!x) {
+        showToast("Part not found — catalog refreshed", 2400, true);
+        renderAll();
+        return;
+      }
+      busyPartOps.add(opKey);
       const prevVis = x.visible === true;
       const nextVis = !prevVis;
       x.visible = nextVis;
       renderAll();
-      if (sb) {
+      try {
         const payload = buildProductPayload(x, { visible: nextVis });
         const { data, error } = await sb
           .from("product")
           .upsert(payload, { onConflict: "id" })
           .select("*");
         if (error) {
-          if (isRlsError(error)) {
-            console.warn("Supabase RLS blocked visibility sync:", error.message);
-            saveCache();
-            showRlsHelpModal();
-            showToast("Saved locally — enable RLS to sync", 3200, true);
-            return;
-          }
           x.visible = prevVis;
           renderAll();
-          console.warn("Supabase visibility error:", error);
-          showToast("Cloud sync error: " + error.message, 3200, true);
+          if (isRlsError(error)) {
+            showRlsHelpModal();
+            showToast("Cloud save blocked by RLS — reverted", 3400, true);
+          } else {
+            showToast("Cloud sync error: " + error.message, 3200, true);
+          }
           return;
         }
         if (Array.isArray(data) && data[0]) {
           Object.assign(x, normalizeProduct(data[0]));
         }
+        markCloudCatalogInitialized();
+        saveCache();
+        showToast("Saved to Cloud ✓");
+      } catch (err) {
+        x.visible = prevVis;
+        showToast("Cloud sync error: " + (err.message || "Failed"), 3200, true);
+      } finally {
+        busyPartOps.delete(opKey);
+        renderAll();
       }
-      saveCache();
-      renderAll();
-      showToast("Saved to Cloud ✓");
     }
 
     function askDeletePart(id) {
+      if (!isAdmin || !adminUser) {
+        showToast("Admin sign-in required", 2400, true);
+        return;
+      }
       const x = items.find(i => String(i.id) === String(id));
       if (!x) return;
       pendingDeleteId = String(x.id);
@@ -1580,45 +2021,54 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     async function confirmDeletePart() {
       if (!pendingDeleteId) return;
       const targetId = pendingDeleteId;
+      const opKey = `del:${targetId}`;
+      if (busyPartOps.has(opKey)) return;
+      if (!(await requireAdminSession())) return;
+
+      busyPartOps.add(opKey);
       const btn = document.getElementById("confirmDeleteBtn");
       if (btn) { btn.disabled = true; btn.textContent = "Deleting..."; }
       try {
-        let rlsBlocked = false;
-        if (sb) {
-          const { error } = await sb.from("product").delete().eq("id", toCloudProductId(targetId));
-          if (error) {
-            if (isRlsError(error)) {
-              console.warn("Supabase RLS blocked delete:", error.message);
-              rlsBlocked = true;
-            } else {
-              console.warn("Supabase delete error:", error);
-              showToast("Cloud delete error: " + error.message, 3200, true);
-              return;
-            }
+        const { error } = await sb.from("product").delete().eq("id", toCloudProductId(targetId));
+        if (error) {
+          if (isRlsError(error)) {
+            showRlsHelpModal();
+            showToast("Delete blocked by Supabase RLS — part kept unchanged", 3600, true);
+          } else {
+            showToast("Cloud delete failed: " + error.message + " — part kept unchanged", 3600, true);
           }
-          try {
-            const safeKey = `part-${String(targetId).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
-            await sb.storage.from(PHOTO_BUCKET).remove([safeKey]);
-          } catch (err) {}
+          return;
         }
+        try {
+          const safeKey = `part-${String(targetId).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
+          await sb.storage.from(PHOTO_BUCKET).remove([safeKey]);
+        } catch (err) {}
+
+        markCloudCatalogInitialized();
         items = items.filter(i => String(i.id) !== String(targetId));
-        delete cart[targetId];
+        if (cart[String(targetId)]) {
+          delete cart[String(targetId)];
+          saveCartStorage();
+        }
         saveCache();
         closeDeleteModal();
         renderAll();
         updateCartBar();
-        if (rlsBlocked) {
-          showRlsHelpModal();
-          showToast("Deleted locally — enable RLS to sync", 3200, true);
-        } else {
-          showToast("Saved to Cloud ✓");
-        }
+        showToast("Part Deleted from Cloud ✓");
+      } catch (err) {
+        showToast("Cloud delete failed: " + (err.message || "Unknown error"), 3400, true);
       } finally {
+        busyPartOps.delete(opKey);
         if (btn) { btn.disabled = false; btn.textContent = "Delete"; }
       }
     }
 
     function pickPhoto(id) {
+      if (!isAdmin || !adminUser) {
+        showToast("Admin sign-in required", 2400, true);
+        return;
+      }
+      if (busyPartOps.has(`photo:${id}`)) return;
       photoId = String(id);
       document.getElementById("adminPhotoFile").click();
     }
@@ -1628,47 +2078,54 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       e.target.value = "";
       if (!f || !photoId) return;
       const targetId = photoId;
+      photoId = null;
+
+      const fileErr = validateImageFile(f);
+      if (fileErr) {
+        showToast(fileErr, 3000, true);
+        return;
+      }
+
+      const opKey = `photo:${targetId}`;
+      if (busyPartOps.has(opKey)) return;
+      if (!(await requireAdminSession())) return;
+
       const x = items.find(i => String(i.id) === String(targetId));
-      if (!x) return;
+      if (!x) {
+        showToast("Part no longer exists", 2500, true);
+        return;
+      }
+
+      busyPartOps.add(opKey);
+      renderCatalog();
       showToast("Uploading photo...", 4000);
       try {
-        const { blob, dataUrl } = await cropImageToSquareJpeg(f, 320, 0.75);
-        let finalUrl = dataUrl;
-        let rlsBlocked = false;
-        if (sb) {
-          finalUrl = await uploadBlobToPartPhotos(x.id, blob);
-          const payload = buildProductPayload(x, { image_url: finalUrl });
-          const { data, error } = await sb
-            .from("product")
-            .upsert(payload, { onConflict: "id" })
-            .select("*");
-          if (error) {
-            if (isRlsError(error)) {
-              console.warn("Photo uploaded to Storage, but Supabase product RLS blocked table save:", error.message);
-              rlsBlocked = true;
-              x.image_url = finalUrl;
-              x.image = finalUrl;
-            } else {
-              throw error;
-            }
-          } else if (Array.isArray(data) && data[0]) {
-            Object.assign(x, normalizeProduct(data[0]));
-          } else {
-            x.image_url = finalUrl;
-            x.image = finalUrl;
+        const { blob } = await cropImageToSquareJpeg(f, 320, 0.75);
+        const finalUrl = sanitizeImageUrl(await uploadBlobToPartPhotos(x.id, blob));
+        if (!finalUrl) throw new Error("Invalid photo URL returned");
+
+        const payload = buildProductPayload(x, { image_url: finalUrl });
+        const { data, error } = await sb
+          .from("product")
+          .upsert(payload, { onConflict: "id" })
+          .select("*");
+        if (error) {
+          if (isRlsError(error)) {
+            showRlsHelpModal();
+            showToast("Photo table save blocked by RLS — check policy", 3600, true);
+            return;
           }
+          throw error;
+        }
+        if (Array.isArray(data) && data[0]) {
+          Object.assign(x, normalizeProduct(data[0]));
         } else {
           x.image_url = finalUrl;
           x.image = finalUrl;
         }
+        markCloudCatalogInitialized();
         saveCache();
-        renderAll();
-        if (rlsBlocked) {
-          showRlsHelpModal();
-          showToast("Photo uploaded — enable RLS then Sync All", 3500, true);
-        } else {
-          showToast("Saved to Cloud ✓");
-        }
+        showToast("Photo Saved to Cloud ✓");
       } catch (err) {
         console.warn("Photo upload error:", err);
         if (isRlsError(err)) {
@@ -1677,14 +2134,22 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
         } else {
           showToast("Photo upload failed: " + (err.message || "Check Storage policy"), 3500, true);
         }
+      } finally {
+        busyPartOps.delete(opKey);
+        renderAll();
       }
     }
 
     async function removePartPhoto(id) {
+      const opKey = `photo:${id}`;
+      if (busyPartOps.has(opKey)) return;
+      if (!(await requireAdminSession())) return;
       const x = items.find(i => String(i.id) === String(id));
       if (!x) return;
-      let rlsBlocked = false;
-      if (sb) {
+
+      busyPartOps.add(opKey);
+      renderCatalog();
+      try {
         const payload = buildProductPayload(x, { image_url: "" });
         const { data, error } = await sb
           .from("product")
@@ -1692,38 +2157,31 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
           .select("*");
         if (error) {
           if (isRlsError(error)) {
-            console.warn("Supabase RLS blocked photo remove:", error.message);
-            rlsBlocked = true;
-            x.image_url = "";
-            x.image = "";
+            showRlsHelpModal();
+            showToast("Remove photo blocked by Supabase RLS", 3400, true);
           } else {
-            console.warn("Photo remove error:", error);
             showToast("Cloud sync error: " + error.message, 3200, true);
-            return;
           }
-        } else {
-          try {
-            const safeKey = `part-${String(x.id).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
-            await sb.storage.from(PHOTO_BUCKET).remove([safeKey]);
-          } catch (err) {}
-          if (Array.isArray(data) && data[0]) {
-            Object.assign(x, normalizeProduct(data[0]));
-          } else {
-            x.image_url = "";
-            x.image = "";
-          }
+          return;
         }
-      } else {
-        x.image_url = "";
-        x.image = "";
-      }
-      saveCache();
-      renderAll();
-      if (rlsBlocked) {
-        showRlsHelpModal();
-        showToast("Removed locally — enable RLS to sync", 3200, true);
-      } else {
-        showToast("Saved to Cloud ✓");
+        try {
+          const safeKey = `part-${String(x.id).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
+          await sb.storage.from(PHOTO_BUCKET).remove([safeKey]);
+        } catch (err) {}
+        if (Array.isArray(data) && data[0]) {
+          Object.assign(x, normalizeProduct(data[0]));
+        } else {
+          x.image_url = "";
+          x.image = "";
+        }
+        markCloudCatalogInitialized();
+        saveCache();
+        showToast("Photo Removed from Cloud ✓");
+      } catch (err) {
+        showToast("Photo remove error: " + (err.message || "Failed"), 3200, true);
+      } finally {
+        busyPartOps.delete(opKey);
+        renderAll();
       }
     }
 
@@ -1748,11 +2206,18 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       const f = e.target.files[0];
       e.target.value = "";
       if (!f) return;
+      const fileErr = validateImageFile(f);
+      if (fileErr) {
+        showToast(fileErr, 3000, true);
+        return;
+      }
       try {
         const { blob, dataUrl } = await cropImageToSquareJpeg(f, 320, 0.75);
+        const safeDataUrl = sanitizeImageUrl(dataUrl);
+        if (!safeDataUrl) throw new Error("Invalid image data");
         pendingFormPhotoBlob = blob;
         pendingFormPhotoRemoved = false;
-        document.getElementById("fPhotoPreview").src = dataUrl;
+        document.getElementById("fPhotoPreview").src = safeDataUrl;
         document.getElementById("fPhotoPreviewWrap").classList.remove("hidden");
         document.getElementById("fRemovePhotoBtn").classList.remove("hidden");
       } catch (err) {
@@ -1761,7 +2226,16 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     }
 
     function openPartForm(id) {
+      if (!isAdmin || !adminUser) {
+        showToast("Admin sign-in required", 2400, true);
+        return;
+      }
       const x = id ? items.find(i => String(i.id) === String(id)) : null;
+      if (id && !x) {
+        showToast("This part is no longer in the catalog.", 2600, true);
+        renderAll();
+        return;
+      }
       const maxOrder = items.length ? Math.max(...items.map(i => Number(i.sort_order) || 0)) : 0;
       const nextOrder = maxOrder + 1;
       pendingFormPhotoBlob = null;
@@ -1774,13 +2248,18 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       document.getElementById("fName").value = x ? x.name : "";
       document.getElementById("fSpec").value = x ? x.spec : "";
       document.getElementById("fPrice").value = x ? (x.rate ?? x.price) : "";
-      const existingUrl = x ? (x.image_url || x.image || "") : "";
+      const existingUrl = x ? sanitizeImageUrl(x.image_url || x.image || "") : "";
+      const previewImg = document.getElementById("fPhotoPreview");
       if (existingUrl) {
-        document.getElementById("fPhotoPreview").src = existingUrl;
+        previewImg.onerror = () => {
+          document.getElementById("fPhotoPreviewWrap").classList.add("hidden");
+        };
+        previewImg.src = existingUrl;
         document.getElementById("fPhotoPreviewWrap").classList.remove("hidden");
         document.getElementById("fRemovePhotoBtn").classList.remove("hidden");
       } else {
-        document.getElementById("fPhotoPreview").src = "";
+        previewImg.onerror = null;
+        previewImg.src = "";
         document.getElementById("fPhotoPreviewWrap").classList.add("hidden");
         document.getElementById("fRemovePhotoBtn").classList.add("hidden");
       }
@@ -1788,7 +2267,32 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       document.getElementById("partModal").classList.remove("hidden");
     }
 
+    async function computeSafeNextProductId() {
+      const localMax = items.reduce((m, i) => {
+        const n = Number(i.id);
+        return Number.isInteger(n) && n > m ? n : m;
+      }, 0);
+      let cloudMax = 0;
+      if (sb) {
+        try {
+          const { data } = await sb
+            .from("product")
+            .select("id")
+            .order("id", { ascending: false })
+            .limit(1);
+          if (Array.isArray(data) && data[0]) {
+            const n = Number(data[0].id);
+            if (Number.isInteger(n) && n > 0) cloudMax = n;
+          }
+        } catch (err) {}
+      }
+      return Math.max(localMax, cloudMax) + 1;
+    }
+
     async function savePart() {
+      if (isSavingPart) return;
+      if (!(await requireAdminSession())) return;
+
       const editId = document.getElementById("editId").value.trim();
       const rawCode = document.getElementById("fCode").value.trim();
       const rawOrderStr = document.getElementById("fOrder").value.trim();
@@ -1796,34 +2300,46 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       const category = document.getElementById("fCat").value.trim() || "General";
       const name = document.getElementById("fName").value.trim();
       const spec = document.getElementById("fSpec").value.trim() || "Standard";
-      const rate = Number(document.getElementById("fPrice").value) || 0;
+      const rawPriceStr = document.getElementById("fPrice").value.trim();
+      const rate = Number(rawPriceStr);
       const errEl = document.getElementById("partFormErr");
+
       if (!name) {
         errEl.textContent = "Please enter the Part Name.";
         errEl.classList.remove("hidden");
         return;
       }
+      if (!rawPriceStr || !Number.isFinite(rate) || rate <= 0) {
+        errEl.textContent = "Please enter a valid Wholesale Rate greater than ₹0.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+      if (rawOrderStr !== "" && (!Number.isFinite(rawOrder) || rawOrder < 1)) {
+        errEl.textContent = "Sort Order must be 1 or greater.";
+        errEl.classList.remove("hidden");
+        return;
+      }
       errEl.classList.add("hidden");
 
+      isSavingPart = true;
       const saveBtn = document.getElementById("savePartBtn");
       if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Saving to Cloud..."; }
 
-      let rlsBlocked = false;
       try {
         if (editId) {
           const x = items.find(i => String(i.id) === String(editId));
-          if (!x) return;
-          const sort_order = Number.isFinite(rawOrder) && rawOrder >= 0 ? rawOrder : (x.sort_order || 1);
+          if (!x) {
+            closePartForm();
+            renderAll();
+            showToast("This part was removed or changed. Please reopen from the updated list.", 3400, true);
+            return;
+          }
+          const sort_order = Number.isFinite(rawOrder) && rawOrder >= 1 ? Math.floor(rawOrder) : (x.sort_order || 1);
           const serial_code = rawCode || x.serial_code || ("#" + String(sort_order).padStart(2, "0"));
-          let image_url = pendingFormPhotoRemoved ? "" : (x.image_url || x.image || "");
+          let image_url = pendingFormPhotoRemoved ? "" : sanitizeImageUrl(x.image_url || x.image || "");
 
-          if (pendingFormPhotoBlob && sb) {
-            image_url = await uploadBlobToPartPhotos(x.id, pendingFormPhotoBlob);
-          } else if (pendingFormPhotoRemoved && sb) {
-            try {
-              const safeKey = `part-${String(x.id).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
-              await sb.storage.from(PHOTO_BUCKET).remove([safeKey]);
-            } catch (err) {}
+          if (pendingFormPhotoBlob) {
+            image_url = sanitizeImageUrl(await uploadBlobToPartPhotos(x.id, pendingFormPhotoBlob));
           }
 
           const payload = buildProductPayload(x, {
@@ -1837,93 +2353,114 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
             visible: x.visible !== false
           });
 
-          if (sb) {
-            const { data, error } = await sb
-              .from("product")
-              .upsert(payload, { onConflict: "id" })
-              .select("*");
-            if (error) {
-              if (isRlsError(error)) {
-                console.warn("Supabase RLS blocked part edit:", error.message);
-                rlsBlocked = true;
-                Object.assign(x, normalizeProduct(payload));
-              } else {
-                throw error;
-              }
-            } else if (Array.isArray(data) && data[0]) {
-              Object.assign(x, normalizeProduct(data[0]));
-            } else {
-              Object.assign(x, normalizeProduct(payload));
+          const { data, error } = await sb
+            .from("product")
+            .upsert(payload, { onConflict: "id" })
+            .select("*");
+          if (error) {
+            if (isRlsError(error)) {
+              showRlsHelpModal();
+              throw new Error("Blocked by Supabase RLS policy");
             }
+            throw error;
+          }
+
+          if (pendingFormPhotoRemoved && !pendingFormPhotoBlob) {
+            try {
+              const safeKey = `part-${String(x.id).replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
+              await sb.storage.from(PHOTO_BUCKET).remove([safeKey]);
+            } catch (err) {}
+          }
+
+          if (Array.isArray(data) && data[0]) {
+            Object.assign(x, normalizeProduct(data[0]));
           } else {
             Object.assign(x, normalizeProduct(payload));
           }
         } else {
           const maxOrder = items.length ? Math.max(...items.map(i => Number(i.sort_order) || 0)) : 0;
-          const maxId = items.reduce((m, i) => {
-            const n = Number(i.id);
-            return Number.isInteger(n) && n > m ? n : m;
-          }, 0);
-          const nextId = maxId + 1;
-          const sort_order = Number.isFinite(rawOrder) && rawOrder >= 0 ? rawOrder : (maxOrder + 1);
+          let nextId = await computeSafeNextProductId();
+          const sort_order = Number.isFinite(rawOrder) && rawOrder >= 1 ? Math.floor(rawOrder) : (maxOrder + 1);
           const serial_code = rawCode || ("#" + String(sort_order).padStart(2, "0"));
-          let image_url = "";
 
-          if (pendingFormPhotoBlob && sb) {
-            image_url = await uploadBlobToPartPhotos(nextId, pendingFormPhotoBlob);
-          }
-
-          const payload = {
-            id: nextId,
-            serial_code,
-            sort_order,
-            category,
-            name,
-            spec,
-            rate,
-            image_url,
-            visible: true
-          };
-
-          let insertedItem = null;
-          if (sb) {
+          let insertedRow = null;
+          let lastInsertErr = null;
+          for (let attempt = 0; attempt < 2; attempt++) {
+            const payload = {
+              id: nextId,
+              serial_code,
+              sort_order,
+              category,
+              name,
+              spec,
+              rate,
+              image_url: "",
+              visible: true
+            };
             const { data, error } = await sb
               .from("product")
-              .upsert(payload, { onConflict: "id" })
+              .insert(payload)
               .select("*")
               .single();
-            if (error) {
-              if (isRlsError(error)) {
-                console.warn("Supabase RLS blocked new part save:", error.message);
-                rlsBlocked = true;
-                insertedItem = normalizeProduct(payload, items.length);
-              } else {
-                throw error;
-              }
-            } else {
-              insertedItem = normalizeProduct(data || payload, items.length);
+            if (!error) {
+              insertedRow = data || payload;
+              lastInsertErr = null;
+              break;
             }
-          } else {
-            insertedItem = normalizeProduct(payload, items.length);
+            lastInsertErr = error;
+            if (error.code === "23505" && attempt === 0) {
+              nextId = (await computeSafeNextProductId()) + 1;
+              continue;
+            }
+            break;
           }
-          items.push(insertedItem);
+
+          if (lastInsertErr) {
+            if (isRlsError(lastInsertErr)) {
+              showRlsHelpModal();
+              throw new Error("Blocked by Supabase RLS policy");
+            }
+            throw lastInsertErr;
+          }
+
+          const finalId = insertedRow.id ?? nextId;
+          if (pendingFormPhotoBlob) {
+            try {
+              const uploadedUrl = sanitizeImageUrl(await uploadBlobToPartPhotos(finalId, pendingFormPhotoBlob));
+              if (uploadedUrl) {
+                const { data: photoUpdated, error: photoUpdErr } = await sb
+                  .from("product")
+                  .update({ image_url: uploadedUrl })
+                  .eq("id", toCloudProductId(finalId))
+                  .select("*")
+                  .single();
+                if (!photoUpdErr && photoUpdated) {
+                  insertedRow = photoUpdated;
+                } else {
+                  insertedRow.image_url = uploadedUrl;
+                }
+              }
+            } catch (photoErr) {
+              console.warn("New part saved, photo upload warning:", photoErr);
+              showToast("Part saved, but photo upload failed — try uploading photo again", 3800, true);
+            }
+          }
+
+          items.push(normalizeProduct(insertedRow, items.length));
         }
 
+        markCloudCatalogInitialized();
         sortItemsList(items);
         saveCache();
         closePartForm();
         renderAll();
-        if (rlsBlocked) {
-          showRlsHelpModal();
-          showToast("Saved locally — enable RLS then Sync All", 3500, true);
-        } else {
-          showToast("Saved to Cloud ✓");
-        }
+        showToast("Saved to Cloud ✓");
       } catch (err) {
         console.warn("Save part error:", err);
         errEl.textContent = "Cloud save error: " + (err.message || "Failed to save");
         errEl.classList.remove("hidden");
       } finally {
+        isSavingPart = false;
         if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "Save Part"; }
       }
     }
@@ -1948,15 +2485,12 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       renderCrmView();
     }
 
-    // ADMIN CUSTOMERS & ORDERS TAB (SUPABASE LIVE DATA)
+    // ADMIN CUSTOMERS & ORDERS TAB (SUPABASE LIVE DATA — REQUIRES AUTH SESSION)
     async function loadAdminCrmData(showLoading = false) {
+      if (!(await requireAdminSession())) return;
       const box = document.getElementById("crmContent");
       if (showLoading && box) {
         box.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center text-xs text-gray-500 border">Loading from Supabase...</div>`;
-      }
-      if (!sb) {
-        renderCrmView({ message: "Supabase client is not initialized." });
-        return;
       }
       try {
         const [custRes, ordRes] = await Promise.all([
@@ -2111,6 +2645,32 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
 
     // CART & CHECKOUT (SAVES TO SUPABASE customers + customer_orders BEFORE OPENING WHATSAPP)
     let checkoutMode = "form";
+    let lastPruneToastAt = 0;
+
+    function normalizeIndianMobile(raw) {
+      const digits = String(raw || "").replace(/\D/g, "");
+      if (digits.length === 12 && digits.startsWith("91")) return digits.slice(2);
+      if (digits.length === 11 && digits.startsWith("0")) return digits.slice(1);
+      return digits;
+    }
+
+    function isValidIndianMobile(mobile) {
+      return /^[6-9]\d{9}$/.test(String(mobile || ""));
+    }
+
+    function saveLastCustomerDetails(payload) {
+      if (!payload) return;
+      try {
+        localStorage.setItem("gbs_last_customer", JSON.stringify({
+          customer_name: String(payload.customer_name || "").trim(),
+          mobile_number: String(payload.mobile_number || "").trim(),
+          shop_name_or_number: String(payload.shop_name_or_number || "").trim(),
+          full_address: String(payload.full_address || "").trim(),
+          area_locality: String(payload.area_locality || "").trim(),
+          pin_code: String(payload.pin_code || "").trim()
+        }));
+      } catch (err) {}
+    }
 
     function getSavedCustomerDetails() {
       try {
@@ -2137,6 +2697,36 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       return null;
     }
 
+    function pruneUnavailableCartItems() {
+      if (isAdmin) return false;
+      let removedCount = 0;
+      let changed = false;
+      Object.keys(cart).forEach(k => {
+        const qty = Math.floor(Number(cart[k])) || 0;
+        const x = items.find(i => String(i.id) === String(k));
+        if (qty <= 0) {
+          delete cart[k];
+          changed = true;
+          return;
+        }
+        if (productsLoadedFromCloud && (!x || x.visible === false)) {
+          delete cart[k];
+          removedCount += 1;
+          changed = true;
+        } else if (x && x.visible === false) {
+          delete cart[k];
+          removedCount += 1;
+          changed = true;
+        }
+      });
+      if (changed) saveCartStorage();
+      if (removedCount > 0 && Date.now() - lastPruneToastAt > 3000) {
+        lastPruneToastAt = Date.now();
+        showToast(`${removedCount} unavailable item${removedCount > 1 ? "s" : ""} removed from cart`, 3000);
+      }
+      return changed;
+    }
+
     function getCartStats() {
       const validEntries = [];
       let totalQty = 0;
@@ -2144,8 +2734,8 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       Object.entries(cart).forEach(([k, v]) => {
         const qty = Math.floor(Number(v)) || 0;
         const x = items.find(i => String(i.id) === String(k));
-        if (x && qty > 0) {
-          const rate = Number(x.rate ?? x.price) || 0;
+        if (x && x.visible !== false && qty > 0) {
+          const rate = Math.max(0, Number(x.rate ?? x.price) || 0);
           const sub = rate * qty;
           totalQty += qty;
           totalAmt += sub;
@@ -2162,9 +2752,10 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     }
 
     function renderCartThumb(item, sizeClass = "w-14 h-14") {
-      const imgUrl = item.image_url || item.image || "";
+      const imgUrl = sanitizeImageUrl(item.image_url || item.image || "");
+      const sid = escapeHtml(String(item.id));
       if (imgUrl) {
-        return `<div class="${sizeClass} rounded-xl overflow-hidden bg-white border border-gray-200 shrink-0"><img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover" /></div>`;
+        return `<button type="button" data-id="${sid}" onclick="openPartPhotoLightbox(this.dataset.id)" title="Tap to zoom photo" class="${sizeClass} rounded-xl overflow-hidden bg-white border border-gray-200 shrink-0 p-0 cursor-zoom-in"><img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(item.name)}" onerror="handleImgError(this)" class="w-full h-full object-cover" /></button>`;
       }
       return `<div class="${sizeClass} rounded-xl bg-gray-100 border border-gray-200 shrink-0 flex items-center justify-center text-gray-400" aria-hidden="true">
         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -2183,8 +2774,8 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
 
       if (badge) {
         if (!isAdmin && totalQty > 0) {
-          badge.textContent = productCount > 99 ? "99+" : String(productCount);
-          badge.title = `${productCount} product${productCount > 1 ? "s" : ""} (${totalQty} pcs)`;
+          badge.textContent = totalQty > 99 ? "99+" : String(totalQty);
+          badge.title = `${productCount} product${productCount > 1 ? "s" : ""} • ${totalQty} pcs`;
           badge.classList.remove("hidden");
         } else {
           badge.classList.add("hidden");
@@ -2207,8 +2798,15 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     function addCart(id, d) {
       if (isAdmin) return;
       const key = String(id);
-      const prev = cart[key] || 0;
-      const n = prev + d;
+      if (d > 0) {
+        const part = items.find(i => String(i.id) === key);
+        if (!part || part.visible === false) {
+          showToast("This part is currently unavailable.", 2400, true);
+          return;
+        }
+      }
+      const prev = Math.floor(Number(cart[key])) || 0;
+      const n = Math.min(999, prev + d);
       if (n <= 0) delete cart[key]; else cart[key] = n;
       saveCartStorage();
       renderCatalog();
@@ -2249,7 +2847,9 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
 
     function openCartDrawer() {
       if (isAdmin) return;
+      pruneUnavailableCartItems();
       renderCartDrawer();
+      updateCartBar();
       const modal = document.getElementById("cartDrawerModal");
       if (modal) modal.classList.remove("hidden");
     }
@@ -2301,7 +2901,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
                 <div class="text-xs font-extrabold text-gray-900 leading-snug line-clamp-2">${escapeHtml(item.name)}</div>
                 <div class="text-[10px] text-gray-500 truncate">${escapeHtml(item.serial_code || item.code || "")}${item.spec ? " • " + escapeHtml(item.spec) : ""}</div>
               </div>
-              <button type="button" onclick="removeFromCart('${sid}')" aria-label="Remove product from cart" title="Remove" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-extrabold flex items-center justify-center shrink-0">✕</button>
+              <button type="button" data-id="${sid}" onclick="removeFromCart(this.dataset.id)" aria-label="Remove product from cart" title="Remove" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-extrabold flex items-center justify-center shrink-0">✕</button>
             </div>
             <div class="flex items-center justify-between gap-2 pt-1">
               <div>
@@ -2309,9 +2909,9 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
                 <div class="text-xs font-extrabold text-red-600">Subtotal: ₹${sub}</div>
               </div>
               <div class="bg-gray-900 text-white rounded-lg px-2 py-1 text-xs font-bold flex items-center gap-2 shrink-0">
-                <button type="button" onclick="addCart('${sid}',-1)" aria-label="Decrease quantity" class="w-5 h-5 flex items-center justify-center">−</button>
+                <button type="button" data-id="${sid}" onclick="addCart(this.dataset.id, -1)" aria-label="Decrease quantity" class="w-5 h-5 flex items-center justify-center">−</button>
                 <span class="min-w-[16px] text-center">${qty}</span>
-                <button type="button" onclick="addCart('${sid}',1)" aria-label="Increase quantity" class="w-5 h-5 flex items-center justify-center">+</button>
+                <button type="button" data-id="${sid}" onclick="addCart(this.dataset.id, 1)" aria-label="Increase quantity" class="w-5 h-5 flex items-center justify-center">+</button>
               </div>
             </div>
           </div>
@@ -2325,6 +2925,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     }
 
     function backToCartFromCheckout() {
+      if (isSubmittingOrder) return;
       closeCheckout();
       openCartDrawer();
     }
@@ -2332,27 +2933,98 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     function getActiveCheckoutEntries() {
       if (singleCheckoutItemId !== null) {
         const key = String(singleCheckoutItemId);
-        const qty = Math.max(1, Number(cart[key]) || 0);
+        const x = items.find(i => String(i.id) === key);
+        if (!x || x.visible === false) return [];
+        const qty = Math.max(1, Math.floor(Number(cart[key])) || 0);
         return [[key, qty]];
       }
-      return Object.entries(cart);
+      return Object.entries(cart).filter(([k, v]) => {
+        const qty = Math.floor(Number(v)) || 0;
+        const x = items.find(i => String(i.id) === String(k));
+        return Boolean(x && x.visible !== false && qty > 0);
+      });
+    }
+
+    function refreshCheckoutSummaryItems() {
+      const itemsEl = document.getElementById("checkoutItems");
+      const countLabel = document.getElementById("checkoutItemsCountLabel");
+      const subAmtEl = document.getElementById("checkoutSubtotalAmt");
+      const totAmtEl = document.getElementById("checkoutTotalAmt");
+      const btn = document.getElementById("sendOrderBtn");
+      if (!itemsEl) return 0;
+
+      let tot = 0;
+      let totalPcs = 0;
+      let prodCount = 0;
+      const entries = getActiveCheckoutEntries();
+
+      const rowsHtml = entries.map(([k, v]) => {
+        const qty = Math.floor(Number(v)) || 0;
+        const x = items.find(i => String(i.id) === String(k));
+        if (!x || x.visible === false || qty <= 0) return "";
+        const rate = Math.max(0, Number(x.rate ?? x.price) || 0);
+        const sub = rate * qty;
+        tot += sub;
+        totalPcs += qty;
+        prodCount += 1;
+        return `<div class="flex items-center justify-between gap-2 bg-gray-50 border border-gray-100 p-2 rounded-xl">
+          <div class="flex items-center gap-2 min-w-0 flex-1">
+            ${renderCartThumb(x, "w-10 h-10")}
+            <div class="min-w-0">
+              <div class="font-bold text-gray-900 truncate">${escapeHtml(x.serial_code || x.code || "")} ${escapeHtml(x.name)}</div>
+              <div class="text-[10px] text-gray-500">Qty: ${qty} × ₹${rate}</div>
+            </div>
+          </div>
+          <b class="shrink-0 text-red-600">₹${sub}</b>
+        </div>`;
+      }).join("");
+
+      if (prodCount === 0) {
+        itemsEl.innerHTML = `<div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3 text-center text-xs font-semibold">No available items remaining in this order.</div>`;
+        if (btn && !checkoutOrderCompleted) btn.disabled = true;
+      } else {
+        itemsEl.innerHTML = rowsHtml;
+        if (btn && !isSubmittingOrder && !checkoutOrderCompleted) btn.disabled = false;
+      }
+
+      if (countLabel) countLabel.textContent = `Subtotal (${prodCount} product${prodCount !== 1 ? "s" : ""} • ${totalPcs} pcs)`;
+      if (subAmtEl) subAmtEl.textContent = `₹${tot}`;
+      if (totAmtEl) totAmtEl.textContent = `₹${tot}`;
+      return prodCount;
     }
 
     function closeCheckout() {
+      if (isSubmittingOrder) return;
       singleCheckoutItemId = null;
+      checkoutOrderCompleted = false;
+      checkoutAttemptCustomerSaved = false;
+      pendingFallbackCustomerPayload = null;
       const modal = document.getElementById("checkoutModal");
       if (modal) modal.classList.add("hidden");
       const statusEl = document.getElementById("checkoutStatusBox");
       if (statusEl) { statusEl.classList.add("hidden"); statusEl.innerHTML = ""; }
+      const errEl = document.getElementById("checkoutErr");
+      if (errEl) { errEl.classList.add("hidden"); errEl.textContent = ""; }
+      const editCartBtn = document.getElementById("checkoutEditCartBtn");
+      if (editCartBtn) {
+        editCartBtn.disabled = false;
+        editCartBtn.classList.remove("hidden");
+      }
       const btn = document.getElementById("sendOrderBtn");
       if (btn) {
         btn.classList.remove("hidden");
         btn.disabled = false;
+        btn.textContent = "💬 Place Order on WhatsApp";
       }
     }
 
     function openSingleOrderCheckout(id) {
       if (isAdmin) return;
+      const part = items.find(i => String(i.id) === String(id));
+      if (!part || part.visible === false) {
+        showToast("This part is currently unavailable.", 2400, true);
+        return;
+      }
       singleCheckoutItemId = String(id);
       openCheckout(true);
     }
@@ -2380,23 +3052,25 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
             <div class="text-[11px] text-gray-500">${escapeHtml(saved.area_locality)} • PIN ${escapeHtml(saved.pin_code)}</div>
           `;
         }
-        if (btn) btn.textContent = "💬 Place Order on WhatsApp";
+        if (btn && !isSubmittingOrder) btn.textContent = "💬 Place Order on WhatsApp";
       } else {
         if (titleEl) titleEl.textContent = saved ? "Edit Delivery Details" : "WhatsApp Order Details";
         if (savedCard) savedCard.classList.add("hidden");
         if (formWrap) formWrap.classList.remove("hidden");
         if (backWrap) backWrap.classList.toggle("hidden", !saved);
-        if (btn) btn.textContent = "💬 Place Order on WhatsApp";
+        if (btn && !isSubmittingOrder) btn.textContent = "💬 Place Order on WhatsApp";
       }
     }
 
     function switchCheckoutToEdit() {
+      if (isSubmittingOrder || checkoutOrderCompleted) return;
       applyCheckoutModeUI("form");
       const nameInput = document.getElementById("cName");
       if (nameInput) nameInput.focus();
     }
 
     function switchCheckoutToSummary() {
+      if (isSubmittingOrder || checkoutOrderCompleted) return;
       const saved = getSavedCustomerDetails();
       if (saved) {
         document.getElementById("cName").value = saved.customer_name;
@@ -2412,38 +3086,26 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
 
     function openCheckout(isSingle = false) {
       if (isAdmin) return;
-      if (!isSingle) singleCheckoutItemId = null;
-      let tot = 0;
-      let totalPcs = 0;
-      let prodCount = 0;
-      const entries = getActiveCheckoutEntries();
-      document.getElementById("checkoutItems").innerHTML = entries.map(([k, v]) => {
-        const qty = Math.floor(Number(v)) || 0;
-        const x = items.find(i => String(i.id) === String(k));
-        if (!x || qty <= 0) return "";
-        const rate = Number(x.rate ?? x.price) || 0;
-        const sub = rate * qty;
-        tot += sub;
-        totalPcs += qty;
-        prodCount += 1;
-        return `<div class="flex items-center justify-between gap-2 bg-gray-50 border border-gray-100 p-2 rounded-xl">
-          <div class="flex items-center gap-2 min-w-0 flex-1">
-            ${renderCartThumb(x, "w-10 h-10")}
-            <div class="min-w-0">
-              <div class="font-bold text-gray-900 truncate">${escapeHtml(x.serial_code || x.code || "")} ${escapeHtml(x.name)}</div>
-              <div class="text-[10px] text-gray-500">Qty: ${qty} × ₹${rate}</div>
-            </div>
-          </div>
-          <b class="shrink-0 text-red-600">₹${sub}</b>
-        </div>`;
-      }).join("");
-      const countLabel = document.getElementById("checkoutItemsCountLabel");
-      const subAmtEl = document.getElementById("checkoutSubtotalAmt");
-      if (countLabel) countLabel.textContent = `Subtotal (${prodCount} product${prodCount !== 1 ? "s" : ""} • ${totalPcs} pcs)`;
-      if (subAmtEl) subAmtEl.textContent = `₹${tot}`;
-      document.getElementById("checkoutTotalAmt").textContent = `₹${tot}`;
+      if (!isSingle) {
+        singleCheckoutItemId = null;
+        pruneUnavailableCartItems();
+      }
+      checkoutOrderCompleted = false;
+      checkoutAttemptCustomerSaved = false;
+      pendingFallbackCustomerPayload = null;
+
+      const prodCount = refreshCheckoutSummaryItems();
+      if (prodCount === 0) {
+        singleCheckoutItemId = null;
+        showToast("Your cart has no available items.", 2400, true);
+        return;
+      }
+
       const editCartBtn = document.getElementById("checkoutEditCartBtn");
-      if (editCartBtn) editCartBtn.classList.toggle("hidden", isSingle);
+      if (editCartBtn) {
+        editCartBtn.disabled = false;
+        editCartBtn.classList.toggle("hidden", isSingle);
+      }
       document.getElementById("checkoutErr").classList.add("hidden");
       const statusEl = document.getElementById("checkoutStatusBox");
       if (statusEl) { statusEl.classList.add("hidden"); statusEl.innerHTML = ""; }
@@ -2467,21 +3129,28 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     }
 
     function openWhatsAppUrl(waUrl) {
-      const link = document.createElement("a");
-      link.href = waUrl;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      try {
+        const link = document.createElement("a");
+        link.href = waUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {}
     }
 
     async function sendWhatsAppOrder() {
-      const customer_name = document.getElementById("cName").value.trim();
+      if (isAdmin || isSubmittingOrder || checkoutOrderCompleted) return;
+
+      const isSingleOrder = singleCheckoutItemId !== null;
+      const targetSingleId = singleCheckoutItemId;
+
+      const customer_name = document.getElementById("cName").value.trim().slice(0, 120);
       const rawMobile = document.getElementById("cPhone").value.trim();
-      const shop_name_or_number = document.getElementById("cShop").value.trim();
-      const full_address = document.getElementById("cAddress").value.trim();
-      const area_locality = document.getElementById("cArea").value.trim();
+      const shop_name_or_number = document.getElementById("cShop").value.trim().slice(0, 160);
+      const full_address = document.getElementById("cAddress").value.trim().slice(0, 300);
+      const area_locality = document.getElementById("cArea").value.trim().slice(0, 120);
       const pin_code = document.getElementById("cPin").value.trim();
       const errEl = document.getElementById("checkoutErr");
       const statusEl = document.getElementById("checkoutStatusBox");
@@ -2493,11 +3162,10 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
         return;
       }
 
-      const digitsOnly = rawMobile.replace(/\D/g, "");
-      const mobile_number = digitsOnly.length === 12 && digitsOnly.startsWith("91") ? digitsOnly.slice(2) : digitsOnly;
-      if (mobile_number.length < 10) {
+      const mobile_number = normalizeIndianMobile(rawMobile);
+      if (!isValidIndianMobile(mobile_number)) {
         if (checkoutMode === "summary") applyCheckoutModeUI("form");
-        errEl.textContent = "Please enter a valid 10-digit Mobile Number.";
+        errEl.textContent = "Please enter a valid 10-digit Indian mobile number (starts with 6-9).";
         errEl.classList.remove("hidden");
         return;
       }
@@ -2512,10 +3180,11 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       const orderItems = [];
       let total_amount = 0;
       getActiveCheckoutEntries().forEach(([k, v]) => {
+        const qty = Math.min(999, Math.max(0, Math.floor(Number(v)) || 0));
         const x = items.find(i => String(i.id) === String(k));
-        if (x && v > 0) {
-          const rate = Number(x.rate ?? x.price) || 0;
-          const subtotal = rate * v;
+        if (x && x.visible !== false && qty > 0) {
+          const rate = Math.max(0, Number(x.rate ?? x.price) || 0);
+          const subtotal = rate * qty;
           total_amount += subtotal;
           orderItems.push({
             id: x.id,
@@ -2523,26 +3192,37 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
             name: x.name,
             spec: x.spec,
             rate,
-            qty: v,
+            qty,
             subtotal
           });
         }
       });
 
       if (!orderItems.length) {
-        errEl.textContent = "Your cart is empty.";
+        errEl.textContent = "Your cart has no available items.";
         errEl.classList.remove("hidden");
         return;
       }
 
-      try {
-        localStorage.setItem("gbs_last_customer", JSON.stringify({
-          customer_name, mobile_number, shop_name_or_number, full_address, area_locality, pin_code
-        }));
-      } catch (err) {}
+      const customerDetailsPayload = {
+        customer_name,
+        mobile_number,
+        shop_name_or_number,
+        full_address,
+        area_locality,
+        pin_code
+      };
+      pendingFallbackCustomerPayload = {
+        details: customerDetailsPayload,
+        isSingleOrder,
+        targetSingleId
+      };
 
+      isSubmittingOrder = true;
       const btn = document.getElementById("sendOrderBtn");
+      const editCartBtn = document.getElementById("checkoutEditCartBtn");
       if (btn) { btn.disabled = true; btn.textContent = "Saving order to cloud..."; }
+      if (editCartBtn) editCartBtn.disabled = true;
       if (statusEl) {
         statusEl.className = "rounded-xl p-3 text-xs bg-blue-50 border border-blue-200 text-blue-800 font-bold";
         statusEl.textContent = "⏳ Saving your order to cloud...";
@@ -2550,54 +3230,61 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
 
       let cloudSaved = false;
       let cloudErrorObj = null;
-      if (sb) {
-        try {
+
+      try {
+        if (sb) {
           const nowIso = new Date().toISOString();
-          const { data: existingCust, error: lookupErr } = await sb
-            .from("customers")
-            .select("*")
-            .eq("mobile_number", mobile_number)
-            .maybeSingle();
-
-          if (lookupErr) console.warn("Customer lookup warning:", lookupErr);
-
-          const nextOrders = (Number(existingCust?.total_orders) || 0) + 1;
-          const custPayload = {
-            customer_name,
-            mobile_number,
-            shop_name_or_number,
-            full_address,
-            area_locality,
-            pin_code,
-            total_orders: nextOrders,
-            last_order_at: nowIso
-          };
-
           let custErr = null;
-          const { error: upsertErr } = await sb
-            .from("customers")
-            .upsert(custPayload, { onConflict: "mobile_number" })
-            .select("*");
 
-          if (upsertErr) {
-            if (isRlsError(upsertErr)) {
-              custErr = upsertErr;
-            } else if (existingCust) {
-              const updRes = await sb.from("customers").update(custPayload).eq("mobile_number", mobile_number).select("*");
-              custErr = updRes.error;
-            } else {
-              const insRes = await sb.from("customers").insert(custPayload).select("*");
-              custErr = insRes.error;
-            }
-          }
+          if (!checkoutAttemptCustomerSaved) {
+            let existingCust = null;
+            try {
+              const { data } = await sb
+                .from("customers")
+                .select("total_orders")
+                .eq("mobile_number", mobile_number)
+                .maybeSingle();
+              existingCust = data || null;
+            } catch (lookupEx) {}
 
-          if (custErr) {
-            console.warn("Customer save error:", custErr);
-            cloudErrorObj = {
-              code: custErr.code || "",
-              context: "customers",
-              message: custErr.message || "Customer save failed"
+            const nextOrders = existingCust ? (Number(existingCust.total_orders) || 0) + 1 : 1;
+            const custPayload = {
+              customer_name,
+              mobile_number,
+              shop_name_or_number,
+              full_address,
+              area_locality,
+              pin_code,
+              total_orders: nextOrders,
+              last_order_at: nowIso
             };
+
+            const { error: upsertErr } = await sb
+              .from("customers")
+              .upsert(custPayload, { onConflict: "mobile_number" });
+
+            if (upsertErr) {
+              if (isRlsError(upsertErr)) {
+                custErr = upsertErr;
+              } else if (existingCust) {
+                const updRes = await sb.from("customers").update(custPayload).eq("mobile_number", mobile_number);
+                custErr = updRes.error;
+              } else {
+                const insRes = await sb.from("customers").insert(custPayload);
+                custErr = insRes.error;
+              }
+            }
+
+            if (custErr) {
+              console.warn("Customer save error:", custErr);
+              cloudErrorObj = {
+                code: custErr.code || "",
+                context: "customers",
+                message: custErr.message || "Customer save failed"
+              };
+            } else {
+              checkoutAttemptCustomerSaved = true;
+            }
           }
 
           const { error: orderErr } = await sb.from("customer_orders").insert({
@@ -2609,7 +3296,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
             pin_code,
             items: orderItems,
             total_amount
-          }).select("*");
+          });
 
           if (!orderErr && !custErr) {
             cloudSaved = true;
@@ -2623,16 +3310,19 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
               message: custErr ? `${custErr.message} | ${orderErr.message}` : (orderErr.message || "Order save failed")
             };
           }
-        } catch (err) {
-          console.warn("Supabase checkout save error:", err);
-          cloudErrorObj = {
-            code: err.code || "",
-            context: "checkout",
-            message: err.message || "Cloud save failed"
-          };
+        } else {
+          cloudErrorObj = { code: "", context: "Supabase", message: "Supabase client not initialized." };
         }
-      } else {
-        cloudErrorObj = { code: "", context: "Supabase", message: "Supabase client not initialized." };
+      } catch (err) {
+        console.warn("Supabase checkout save error:", err);
+        cloudErrorObj = {
+          code: err.code || "",
+          context: "checkout",
+          message: err.message || "Cloud save failed"
+        };
+      } finally {
+        isSubmittingOrder = false;
+        if (editCartBtn) editCartBtn.disabled = false;
       }
 
       const totalPcs = orderItems.reduce((sum, it) => sum + it.qty, 0);
@@ -2651,28 +3341,32 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       msg += `*Grand Total: ₹${total_amount}*`;
 
       const waUrl = `https://wa.me/91${WA_NUM}?text=${encodeURIComponent(msg)}`;
-      const wasSingle = singleCheckoutItemId !== null;
 
       if (cloudSaved) {
-        if (!wasSingle) {
+        checkoutOrderCompleted = true;
+        saveLastCustomerDetails(customerDetailsPayload);
+
+        if (!isSingleOrder) {
           cart = {};
+          saveCartStorage();
+        } else if (targetSingleId && cart[String(targetSingleId)]) {
+          delete cart[String(targetSingleId)];
           saveCartStorage();
         }
         renderCatalog();
         updateCartBar();
         if (btn) btn.classList.add("hidden");
+        if (editCartBtn) editCartBtn.classList.add("hidden");
         if (statusEl) {
           statusEl.className = "rounded-xl p-3 text-xs bg-emerald-50 border border-emerald-200 text-emerald-800 space-y-2";
-          statusEl.innerHTML = `<div class="font-extrabold">✅ Order Saved to Cloud! Opening WhatsApp...</div>
+          statusEl.innerHTML = `<div class="font-extrabold">✅ Order Saved! Tap below if WhatsApp didn't open automatically:</div>
             <div class="flex items-center gap-2">
-              <a href="${waUrl}" target="_blank" rel="noopener noreferrer" onclick="setTimeout(closeCheckout, 300)" class="flex-1 text-center bg-green-600 text-white font-extrabold py-2 rounded-lg">Open WhatsApp Now →</a>
-              <button type="button" onclick="closeCheckout()" class="px-3 py-2 rounded-lg bg-white border border-emerald-300 text-emerald-800 font-bold">Done</button>
+              <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener noreferrer" class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white font-extrabold py-2.5 rounded-lg">💬 Open WhatsApp Now →</a>
+              <button type="button" onclick="closeCheckout()" class="px-3.5 py-2.5 rounded-lg bg-white border border-emerald-300 text-emerald-800 font-bold">Done</button>
             </div>`;
         }
         showToast("Order Saved to Cloud ✓");
-        setTimeout(() => {
-          openWhatsAppUrl(waUrl);
-        }, 550);
+        openWhatsAppUrl(waUrl);
         return;
       }
 
@@ -2686,24 +3380,38 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
         }
         if (statusEl) {
           statusEl.className = "rounded-xl p-3 text-xs bg-red-50 border border-red-200 text-red-700 space-y-2";
-          statusEl.innerHTML = `<div class="font-extrabold">⚠️ Supabase Save Error (${escapeHtml(cloudErrorObj.context || "Cloud")})</div>
+          statusEl.innerHTML = `<div class="font-extrabold">⚠️ Cloud Save Failed (${escapeHtml(cloudErrorObj.context || "Cloud")})</div>
             <p class="text-[11px] break-words">${escapeHtml(errText)}</p>
-            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" onclick="completeFallbackWhatsAppOrder()" class="block w-full text-center bg-green-600 text-white font-extrabold py-2 rounded-lg">💬 Continue &amp; Place Order on WhatsApp →</a>`;
+            <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener noreferrer" onclick="completeFallbackWhatsAppOrder()" class="block w-full text-center bg-green-600 hover:bg-green-700 text-white font-extrabold py-2.5 rounded-lg">💬 Continue &amp; Place Order on WhatsApp →</a>`;
         }
         showToast(`Cloud save failed: ${errText}`, 5500, true);
       }
     }
 
     function completeFallbackWhatsAppOrder() {
-      if (singleCheckoutItemId === null) {
+      const pending = pendingFallbackCustomerPayload;
+      if (pending && pending.details) {
+        saveLastCustomerDetails(pending.details);
+        if (!pending.isSingleOrder) {
+          cart = {};
+          saveCartStorage();
+        } else if (pending.targetSingleId && cart[String(pending.targetSingleId)]) {
+          delete cart[String(pending.targetSingleId)];
+          saveCartStorage();
+        }
+        renderCatalog();
+        updateCartBar();
+      } else if (singleCheckoutItemId === null) {
         cart = {};
         saveCartStorage();
         renderCatalog();
         updateCartBar();
       }
-      setTimeout(closeCheckout, 300);
+      checkoutOrderCompleted = true;
+      setTimeout(closeCheckout, 350);
     }
 
+    initAdminAuth();
     renderAll();
     loadProductsFromSupabase();
   </script>

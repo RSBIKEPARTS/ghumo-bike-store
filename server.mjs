@@ -3,36 +3,109 @@ import fs from "node:fs";
 import path from "node:path";
 
 const PORT = Number(process.env.PORT) || 3000;
-const ROOT = process.cwd();
-const INDEX_PATH = path.join(ROOT, "index.html");
+const ROOT = path.resolve(process.cwd());
+const PUBLIC_DIR = path.resolve(ROOT, "public");
+const INDEX_PATH = path.resolve(ROOT, "index.html");
 
-const MIME = {
+const ALLOWED_PUBLIC_MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
-  ".js": "application/javascript; charset=utf-8",
-  ".json": "application/json; charset=utf-8",
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".webp": "image/webp",
   ".svg": "image/svg+xml",
-  ".ico": "image/x-icon"
+  ".ico": "image/x-icon",
+  ".webmanifest": "application/manifest+json; charset=utf-8"
 };
 
-const server = http.createServer((req, res) => {
-  const urlPath = (req.url || "/").split("?")[0];
-  let filePath = urlPath === "/" ? INDEX_PATH : path.resolve(ROOT, "." + urlPath);
+const BLOCKED_PATH_PATTERNS = [
+  /(^|\/)\./,
+  /\.(mjs|cjs|js|ts|json|env|lock|md|yml|yaml|sql|sh|log|map)$/i,
+  /^\/(server|package|metadata|node_modules|src|skills)(\/|$)/i
+];
 
-  if (!filePath.startsWith(ROOT) || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
-    filePath = INDEX_PATH;
+function sendHeaders(res, statusCode, contentType) {
+  res.writeHead(statusCode, {
+    "Content-Type": contentType,
+    "Cache-Control": "no-cache",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin"
+  });
+}
+
+const server = http.createServer((req, res) => {
+  const method = (req.method || "GET").toUpperCase();
+  if (method !== "GET" && method !== "HEAD") {
+    sendHeaders(res, 405, "text/plain; charset=utf-8");
+    res.end("Method Not Allowed");
+    return;
   }
 
-  const ext = path.extname(filePath).toLowerCase();
-  res.writeHead(200, {
-    "Content-Type": MIME[ext] || "application/octet-stream",
-    "Cache-Control": "no-cache"
-  });
-  fs.createReadStream(filePath).pipe(res);
+  let rawPath = (req.url || "/").split("?")[0];
+  let urlPath;
+  try {
+    urlPath = decodeURIComponent(rawPath);
+  } catch {
+    sendHeaders(res, 400, "text/plain; charset=utf-8");
+    res.end("Bad Request");
+    return;
+  }
+
+  if (urlPath.includes("\0") || urlPath.includes("\\")) {
+    sendHeaders(res, 400, "text/plain; charset=utf-8");
+    res.end("Bad Request");
+    return;
+  }
+
+  if (urlPath === "/" || urlPath === "/index.html") {
+    sendHeaders(res, 200, "text/html; charset=utf-8");
+    if (method === "HEAD") {
+      res.end();
+      return;
+    }
+    fs.createReadStream(INDEX_PATH).pipe(res);
+    return;
+  }
+
+  if (BLOCKED_PATH_PATTERNS.some((re) => re.test(urlPath))) {
+    sendHeaders(res, 404, "text/plain; charset=utf-8");
+    res.end("Not Found");
+    return;
+  }
+
+  const relativePath = urlPath.replace(/^\/+/, "");
+  const resolvedPublicPath = path.resolve(PUBLIC_DIR, relativePath);
+  const ext = path.extname(resolvedPublicPath).toLowerCase();
+
+  if (
+    resolvedPublicPath.startsWith(PUBLIC_DIR + path.sep) &&
+    Object.prototype.hasOwnProperty.call(ALLOWED_PUBLIC_MIME, ext) &&
+    fs.existsSync(resolvedPublicPath) &&
+    fs.statSync(resolvedPublicPath).isFile()
+  ) {
+    sendHeaders(res, 200, ALLOWED_PUBLIC_MIME[ext]);
+    if (method === "HEAD") {
+      res.end();
+      return;
+    }
+    fs.createReadStream(resolvedPublicPath).pipe(res);
+    return;
+  }
+
+  // SPA fallback only for clean extensionless routes; block missing asset probes
+  if (ext) {
+    sendHeaders(res, 404, "text/plain; charset=utf-8");
+    res.end("Not Found");
+    return;
+  }
+
+  sendHeaders(res, 200, "text/html; charset=utf-8");
+  if (method === "HEAD") {
+    res.end();
+    return;
+  }
+  fs.createReadStream(INDEX_PATH).pipe(res);
 });
 
 server.listen(PORT, "0.0.0.0", () => {
