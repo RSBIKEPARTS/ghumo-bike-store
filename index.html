@@ -83,6 +83,7 @@
         <div class="flex items-center gap-1.5 flex-wrap">
           <button id="adminTabProductsBtn" type="button" onclick="setAdminTab('products')" class="bg-white/20 text-white text-[11px] font-bold px-2 py-1 rounded-lg">Products</button>
           <button id="adminTabOrdersBtn" type="button" onclick="setAdminTab('customers')" class="bg-white/10 text-gray-200 text-[11px] font-bold px-2 py-1 rounded-lg">Customers &amp; Orders</button>
+          <button id="renumberProductsBtn" type="button" onclick="renumberAllProducts()" class="bg-indigo-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">Renumber 1..38</button>
           <button id="syncAllCloudBtn" type="button" onclick="syncAllProductsToCloud()" class="bg-emerald-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">Sync All 38 to Cloud</button>
           <button onclick="openPartForm()" class="bg-red-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">+ Add Part</button>
           <button onclick="lockAdmin()" class="bg-yellow-400 text-gray-900 text-[11px] font-extrabold px-2.5 py-1 rounded-lg">← Customer Panel</button>
@@ -511,11 +512,16 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       { id: 38, code: "#38", category: "Body Parts", name: "Petrol tank cap with 2 keys spl", spec: "rust-free", price: 115, visible: true, image: "" }
     ];
 
+    function formatSerialCode(num) {
+      const n = Math.max(1, Math.floor(Number(num)) || 1);
+      return "#" + String(n).padStart(2, "0");
+    }
+
     function normalizeProduct(row, idx = 0) {
       const sortOrder = Number.isFinite(Number(row.sort_order))
         ? Number(row.sort_order)
         : (Number.isFinite(Number(row.id)) ? Number(row.id) : idx + 1);
-      const code = row.serial_code || row.code || ("#" + String(sortOrder).padStart(2, "0"));
+      const code = row.serial_code || row.code || formatSerialCode(sortOrder);
       const rate = Math.max(0, Number(row.rate !== undefined ? row.rate : row.price) || 0);
       const rawImg = row.image_url !== undefined ? (row.image_url || "") : (row.image || "");
       const imageUrl = sanitizeImageUrl(rawImg);
@@ -540,8 +546,49 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
         const ao = Number(a.sort_order) || 0;
         const bo = Number(b.sort_order) || 0;
         if (ao !== bo) return ao - bo;
-        return String(a.serial_code || "").localeCompare(String(b.serial_code || ""), undefined, { numeric: true });
+        const sc = String(a.serial_code || "").localeCompare(String(b.serial_code || ""), undefined, { numeric: true });
+        if (sc !== 0) return sc;
+        const ai = Number(a.id);
+        const bi = Number(b.id);
+        if (Number.isFinite(ai) && Number.isFinite(bi) && ai !== bi) return ai - bi;
+        return String(a.id || "").localeCompare(String(b.id || ""), undefined, { numeric: true });
       });
+    }
+
+    function hasNumberingGaps(list) {
+      const sorted = sortItemsList([...list]);
+      for (let idx = 0; idx < sorted.length; idx++) {
+        const expectedOrder = idx + 1;
+        const expectedCode = formatSerialCode(expectedOrder);
+        if (Number(sorted[idx].sort_order) !== expectedOrder || String(sorted[idx].serial_code || "") !== expectedCode) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function buildRenumberedList(list, preserveOrder = false) {
+      const ordered = preserveOrder
+        ? list.map(item => ({ ...item }))
+        : sortItemsList(list.map(item => ({ ...item })));
+      const changed = [];
+      const renumbered = ordered.map((item, idx) => {
+        const nextOrder = idx + 1;
+        const nextCode = formatSerialCode(nextOrder);
+        const didChange =
+          Number(item.sort_order) !== nextOrder ||
+          String(item.serial_code || "") !== nextCode ||
+          String(item.code || "") !== nextCode;
+        const updated = {
+          ...item,
+          sort_order: nextOrder,
+          serial_code: nextCode,
+          code: nextCode
+        };
+        if (didChange) changed.push(updated);
+        return updated;
+      });
+      return { renumbered, changed };
     }
 
     let adminUser = null;
@@ -557,6 +604,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     let crmLoaded = false;
     let isSavingPart = false;
     let isSyncingAll = false;
+    let isRenumbering = false;
     let isSubmittingOrder = false;
     let checkoutOrderCompleted = false;
     let checkoutAttemptCustomerSaved = false;
@@ -1629,8 +1677,13 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
 
     function updateSyncAllButtonLabel() {
       const btn = document.getElementById("syncAllCloudBtn");
-      if (!btn || isSyncingAll) return;
-      btn.textContent = `Sync All ${items.length} to Cloud`;
+      if (btn && !isSyncingAll) {
+        btn.textContent = `Sync All ${items.length} to Cloud`;
+      }
+      const renumBtn = document.getElementById("renumberProductsBtn");
+      if (renumBtn && !isRenumbering) {
+        renumBtn.textContent = items.length ? `Renumber 1..${items.length}` : "Renumber 1..N";
+      }
     }
 
     function renderAll() {
@@ -1901,8 +1954,85 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       }
     }
 
+    async function syncRenumberedRowsToCloud(list, preserveOrder = false) {
+      const { renumbered, changed } = buildRenumberedList(list, preserveOrder);
+      if (!changed.length) {
+        return { renumbered, changedCount: 0, error: null };
+      }
+      const payloads = changed.map(r => buildProductPayload(r));
+      const { error } = await sb
+        .from("product")
+        .upsert(payloads, { onConflict: "id" });
+      if (error) {
+        return { renumbered: list, changedCount: 0, error };
+      }
+      return { renumbered, changedCount: changed.length, error: null };
+    }
+
+    async function renumberAllProducts() {
+      if (isRenumbering || isSyncingAll) return;
+      if (!(await requireAdminSession())) return;
+
+      isRenumbering = true;
+      const renumBtn = document.getElementById("renumberProductsBtn");
+      const syncBtn = document.getElementById("syncAllCloudBtn");
+      if (renumBtn) {
+        renumBtn.disabled = true;
+        renumBtn.textContent = "Renumbering...";
+      }
+      if (syncBtn) syncBtn.disabled = true;
+
+      try {
+        let sourceList = items;
+        const { data: cloudRows, error: fetchErr } = await sb
+          .from("product")
+          .select("*")
+          .order("sort_order", { ascending: true })
+          .order("serial_code", { ascending: true });
+        if (!fetchErr && Array.isArray(cloudRows) && cloudRows.length) {
+          sourceList = sortItemsList(cloudRows.map((r, idx) => normalizeProduct(r, idx)));
+        }
+
+        if (!sourceList.length) {
+          showToast("No parts to renumber", 2000, true);
+          return;
+        }
+
+        const { renumbered, changedCount, error } = await syncRenumberedRowsToCloud(sourceList, false);
+        if (error) throw error;
+
+        items = renumbered;
+        productsLoadedFromCloud = true;
+        hasSeededDefaults = true;
+        markCloudCatalogInitialized();
+        saveCache();
+        renderAll();
+
+        const lastCode = formatSerialCode(items.length);
+        if (changedCount > 0) {
+          showToast(`Renumbered #01–${lastCode} & Saved to Cloud ✓ (${changedCount} updated)`);
+        } else {
+          showToast(`Already numbered cleanly #01–${lastCode} ✓`);
+        }
+      } catch (err) {
+        if (isRlsError(err)) {
+          console.warn("Supabase RLS blocked renumberAllProducts:", err.message);
+          showRlsHelpModal();
+          showToast("Enable Supabase authenticated RLS policy to renumber", 3400, true);
+        } else {
+          console.warn("Renumber products error:", err);
+          showToast("Renumber sync error: " + (err.message || "Failed"), 3500, true);
+        }
+      } finally {
+        isRenumbering = false;
+        if (renumBtn) renumBtn.disabled = false;
+        if (syncBtn) syncBtn.disabled = false;
+        updateSyncAllButtonLabel();
+      }
+    }
+
     async function syncAllProductsToCloud() {
-      if (isSyncingAll) return;
+      if (isSyncingAll || isRenumbering) return;
       if (!(await requireAdminSession())) return;
       if (!items.length) {
         showToast("No parts to sync", 2000, true);
@@ -1910,31 +2040,42 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       }
       isSyncingAll = true;
       const btn = document.getElementById("syncAllCloudBtn");
+      const renumBtn = document.getElementById("renumberProductsBtn");
       if (btn) {
         btn.disabled = true;
         btn.textContent = "Syncing...";
       }
+      if (renumBtn) renumBtn.disabled = true;
       try {
-        const rows = items.map(i => buildProductPayload(i));
+        const { renumbered: preRenumbered } = buildRenumberedList(items, false);
+        const rows = preRenumbered.map(i => buildProductPayload(i));
         const { error } = await sb
           .from("product")
           .upsert(rows, { onConflict: "id" });
         if (error) throw error;
         markCloudCatalogInitialized();
-        // Re-fetch full table so parts added from any other device stay merged in UI
+        // Re-fetch full table so parts added from any other device stay merged and gap-free
         const { data: fullCloud, error: fetchErr } = await sb
           .from("product")
           .select("*")
           .order("sort_order", { ascending: true })
           .order("serial_code", { ascending: true });
         if (!fetchErr && Array.isArray(fullCloud)) {
-          items = sortItemsList(fullCloud.map((r, idx) => normalizeProduct(r, idx)));
+          const normalizedCloud = sortItemsList(fullCloud.map((r, idx) => normalizeProduct(r, idx)));
+          const { renumbered: finalCloud, error: renumErr } = await syncRenumberedRowsToCloud(normalizedCloud, false);
+          if (renumErr) throw renumErr;
+          items = finalCloud;
           productsLoadedFromCloud = true;
           hasSeededDefaults = true;
           saveCache();
           renderAll();
+        } else {
+          items = preRenumbered;
+          saveCache();
+          renderAll();
         }
-        showToast(`Saved to Cloud ✓ (${rows.length} parts synced)`);
+        const lastCode = formatSerialCode(items.length);
+        showToast(`Saved to Cloud ✓ (${items.length} parts synced, #01–${lastCode})`);
       } catch (err) {
         if (isRlsError(err)) {
           console.warn("Supabase RLS blocked syncAllProductsToCloud:", err.message);
@@ -1947,6 +2088,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       } finally {
         isSyncingAll = false;
         if (btn) btn.disabled = false;
+        if (renumBtn) renumBtn.disabled = false;
         updateSyncAllButtonLabel();
       }
     }
@@ -2045,16 +2187,37 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
         } catch (err) {}
 
         markCloudCatalogInitialized();
-        items = items.filter(i => String(i.id) !== String(targetId));
+        const remaining = items.filter(i => String(i.id) !== String(targetId));
         if (cart[String(targetId)]) {
           delete cart[String(targetId)];
           saveCartStorage();
         }
+
+        if (btn) btn.textContent = "Renumbering...";
+        const { renumbered, changedCount, error: renumErr } = await syncRenumberedRowsToCloud(remaining, false);
+        if (renumErr) {
+          items = sortItemsList(remaining);
+          saveCache();
+          closeDeleteModal();
+          renderAll();
+          updateCartBar();
+          if (isRlsError(renumErr)) {
+            showRlsHelpModal();
+          }
+          showToast("Part deleted, but renumber sync failed — tap Renumber 1..N", 4000, true);
+          return;
+        }
+
+        items = renumbered;
         saveCache();
         closeDeleteModal();
         renderAll();
         updateCartBar();
-        showToast("Part Deleted from Cloud ✓");
+        if (items.length && changedCount > 0) {
+          showToast(`Part Deleted & Renumbered #01–${formatSerialCode(items.length)} ✓`);
+        } else {
+          showToast("Part Deleted from Cloud ✓");
+        }
       } catch (err) {
         showToast("Cloud delete failed: " + (err.message || "Unknown error"), 3400, true);
       } finally {
@@ -2236,13 +2399,12 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
         renderAll();
         return;
       }
-      const maxOrder = items.length ? Math.max(...items.map(i => Number(i.sort_order) || 0)) : 0;
-      const nextOrder = maxOrder + 1;
+      const nextOrder = items.length + 1;
       pendingFormPhotoBlob = null;
       pendingFormPhotoRemoved = false;
       document.getElementById("formHeading").textContent = x ? "Edit Part" : "Add New Part";
       document.getElementById("editId").value = x ? String(x.id) : "";
-      document.getElementById("fCode").value = x ? (x.serial_code || x.code || "") : "#" + String(nextOrder).padStart(2, "0");
+      document.getElementById("fCode").value = x ? (x.serial_code || x.code || formatSerialCode(x.sort_order ?? nextOrder)) : formatSerialCode(nextOrder);
       document.getElementById("fOrder").value = x ? (x.sort_order ?? nextOrder) : nextOrder;
       document.getElementById("fCat").value = x ? x.category : "";
       document.getElementById("fName").value = x ? x.name : "";
@@ -2325,6 +2487,8 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       const saveBtn = document.getElementById("savePartBtn");
       if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Saving to Cloud..."; }
 
+      let savedToastMsg = "Saved to Cloud ✓";
+
       try {
         if (editId) {
           const x = items.find(i => String(i.id) === String(editId));
@@ -2334,8 +2498,12 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
             showToast("This part was removed or changed. Please reopen from the updated list.", 3400, true);
             return;
           }
-          const sort_order = Number.isFinite(rawOrder) && rawOrder >= 1 ? Math.floor(rawOrder) : (x.sort_order || 1);
-          const serial_code = rawCode || x.serial_code || ("#" + String(sort_order).padStart(2, "0"));
+          const prevOrder = Number(x.sort_order) || 1;
+          const sort_order = Number.isFinite(rawOrder) && rawOrder >= 1 ? Math.floor(rawOrder) : prevOrder;
+          const orderChanged = sort_order !== prevOrder;
+          const serial_code = orderChanged
+            ? formatSerialCode(sort_order)
+            : (rawCode || x.serial_code || formatSerialCode(sort_order));
           let image_url = pendingFormPhotoRemoved ? "" : sanitizeImageUrl(x.image_url || x.image || "");
 
           if (pendingFormPhotoBlob) {
@@ -2377,19 +2545,38 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
           } else {
             Object.assign(x, normalizeProduct(payload));
           }
+
+          if (orderChanged) {
+            const others = sortItemsList(items.filter(i => String(i.id) !== String(x.id)));
+            const targetIdx = Math.max(0, Math.min(others.length, sort_order - 1));
+            others.splice(targetIdx, 0, x);
+            const { renumbered, error: renumErr } = await syncRenumberedRowsToCloud(others, true);
+            if (!renumErr) {
+              items = renumbered;
+              savedToastMsg = `Saved & Renumbered #01–${formatSerialCode(items.length)} ✓`;
+            } else {
+              sortItemsList(items);
+              savedToastMsg = "Part saved, tap Renumber 1..N to tidy order";
+            }
+          } else {
+            sortItemsList(items);
+          }
         } else {
+          const expectedEndOrder = items.length + 1;
           const maxOrder = items.length ? Math.max(...items.map(i => Number(i.sort_order) || 0)) : 0;
+          const requestedOrder = Number.isFinite(rawOrder) && rawOrder >= 1 ? Math.floor(rawOrder) : expectedEndOrder;
+          const placeAtEnd = requestedOrder >= expectedEndOrder;
+          const insertOrder = placeAtEnd ? Math.max(maxOrder + 1, expectedEndOrder) : requestedOrder;
+          const insertCode = formatSerialCode(placeAtEnd ? expectedEndOrder : requestedOrder);
           let nextId = await computeSafeNextProductId();
-          const sort_order = Number.isFinite(rawOrder) && rawOrder >= 1 ? Math.floor(rawOrder) : (maxOrder + 1);
-          const serial_code = rawCode || ("#" + String(sort_order).padStart(2, "0"));
 
           let insertedRow = null;
           let lastInsertErr = null;
           for (let attempt = 0; attempt < 2; attempt++) {
             const payload = {
               id: nextId,
-              serial_code,
-              sort_order,
+              serial_code: insertCode,
+              sort_order: insertOrder,
               category,
               name,
               spec,
@@ -2446,15 +2633,35 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
             }
           }
 
-          items.push(normalizeProduct(insertedRow, items.length));
+          const normalizedNew = normalizeProduct(insertedRow, items.length);
+          const orderedExisting = sortItemsList([...items]);
+          if (placeAtEnd) {
+            orderedExisting.push(normalizedNew);
+          } else {
+            const targetIdx = Math.max(0, Math.min(orderedExisting.length, requestedOrder - 1));
+            orderedExisting.splice(targetIdx, 0, normalizedNew);
+          }
+
+          if (!placeAtEnd || hasNumberingGaps(orderedExisting)) {
+            const { renumbered, error: renumErr } = await syncRenumberedRowsToCloud(orderedExisting, true);
+            if (!renumErr) {
+              items = renumbered;
+              savedToastMsg = `Part Added (${formatSerialCode(placeAtEnd ? items.length : Math.min(items.length, requestedOrder))}) & Synced ✓`;
+            } else {
+              items = sortItemsList(orderedExisting);
+              savedToastMsg = "Part Added ✓ (Tap Renumber 1..N to tidy serials)";
+            }
+          } else {
+            items = sortItemsList(orderedExisting);
+            savedToastMsg = `Part Added as ${normalizedNew.serial_code} ✓`;
+          }
         }
 
         markCloudCatalogInitialized();
-        sortItemsList(items);
         saveCache();
         closePartForm();
         renderAll();
-        showToast("Saved to Cloud ✓");
+        showToast(savedToastMsg);
       } catch (err) {
         console.warn("Save part error:", err);
         errEl.textContent = "Cloud save error: " + (err.message || "Failed to save");
