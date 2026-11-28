@@ -161,12 +161,15 @@
   </main>
 
   <!-- STICKY CART BAR -->
-  <div id="cartBar" class="hidden fixed bottom-3 left-3 right-3 max-w-xl mx-auto z-30 bg-[#141518] text-white rounded-2xl p-3 shadow-xl flex items-center justify-between gap-2">
-    <button type="button" onclick="openCartDrawer()" class="text-left min-w-0">
-      <div class="text-[10px] text-gray-400 font-bold uppercase">Order Estimate • Tap to Review</div>
-      <div id="cartSummary" class="text-sm font-extrabold">₹0 (0 pcs)</div>
+  <div id="cartBar" class="hidden fixed bottom-3 left-3 right-3 max-w-xl mx-auto z-30 bg-[#141518] text-white rounded-2xl p-3 shadow-xl flex items-center justify-between gap-2 border border-white/10">
+    <button type="button" onclick="openCartDrawer()" class="text-left min-w-0 flex-1">
+      <div id="cartBarCount" class="text-[10px] text-gray-300 font-bold uppercase tracking-wide">0 Products • 0 Pcs • Tap to View Cart</div>
+      <div id="cartSummary" class="text-sm font-extrabold text-white">Grand Total: ₹0</div>
     </button>
-    <button type="button" onclick="openCheckout()" class="bg-red-600 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shrink-0">Send Order →</button>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button type="button" onclick="openCartDrawer()" class="bg-white/15 hover:bg-white/25 text-white text-xs font-extrabold px-3 py-2.5 rounded-xl">View Cart</button>
+      <button type="button" onclick="openCheckout(false)" class="bg-green-600 hover:bg-green-700 text-white text-xs font-extrabold px-3.5 py-2.5 rounded-xl">Place Order →</button>
+    </div>
   </div>
 
   <!-- ADMIN LOGIN MODAL -->
@@ -247,23 +250,34 @@
 
   <!-- CART SUMMARY DRAWER / MODAL (CUSTOMER MODE) -->
   <div id="cartDrawerModal" onclick="if(event.target===this) closeCartDrawer()" class="hidden fixed inset-0 z-40 bg-black/60 flex items-end sm:items-center justify-center">
-    <div class="bg-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl p-4 space-y-3 max-h-[88vh] flex flex-col">
+    <div class="bg-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl p-4 space-y-3 max-h-[88vh] flex flex-col shadow-2xl">
       <div class="flex justify-between items-center border-b pb-2.5 shrink-0">
         <div>
-          <h2 class="text-sm font-extrabold text-gray-900">Your Cart</h2>
-          <p id="cartDrawerSubtitle" class="text-[11px] text-gray-500">0 items selected</p>
+          <h2 class="text-sm font-extrabold text-gray-900">Shopping Cart</h2>
+          <p id="cartDrawerSubtitle" class="text-[11px] text-gray-500 font-semibold">0 products • 0 pcs</p>
         </div>
-        <button type="button" onclick="closeCartDrawer()" class="w-7 h-7 rounded-lg bg-gray-100 text-gray-600 font-bold text-xs flex items-center justify-center">✕</button>
+        <button type="button" onclick="closeCartDrawer()" aria-label="Close cart" class="w-8 h-8 rounded-lg bg-gray-100 text-gray-600 font-bold text-xs flex items-center justify-center">✕</button>
       </div>
-      <div id="cartDrawerList" class="space-y-2 overflow-y-auto flex-1 pr-0.5"></div>
+      <div id="cartDrawerList" class="space-y-2.5 overflow-y-auto flex-1 pr-0.5"></div>
       <div id="cartDrawerFooter" class="hidden border-t pt-3 space-y-2.5 shrink-0">
-        <div class="flex items-center justify-between bg-red-50 px-3 py-2.5 rounded-xl">
-          <span class="text-xs font-bold text-gray-700">Order Total</span>
-          <span id="cartDrawerTotal" class="text-base font-extrabold text-red-600">₹0</span>
+        <div class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 space-y-1.5">
+          <div class="flex items-center justify-between text-xs text-gray-600">
+            <span>Total Products</span>
+            <span id="cartDrawerProductCount" class="font-bold text-gray-900">0 products (0 pcs)</span>
+          </div>
+          <div class="flex items-center justify-between text-xs text-gray-600">
+            <span>Subtotal</span>
+            <span id="cartDrawerSubtotal" class="font-bold text-gray-900">₹0</span>
+          </div>
+          <div class="flex items-center justify-between border-t border-gray-200 pt-1.5">
+            <span class="text-xs font-extrabold text-gray-900 uppercase">Grand Total</span>
+            <span id="cartDrawerTotal" class="text-base font-extrabold text-red-600">₹0</span>
+          </div>
         </div>
+        <button type="button" onclick="proceedFromCartDrawer()" class="w-full bg-green-600 hover:bg-green-700 text-white font-extrabold text-xs py-3 rounded-xl shadow-sm">💬 Place Order on WhatsApp</button>
         <div class="flex items-center gap-2">
-          <button type="button" onclick="clearCartItems()" class="px-3 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-xs font-bold">Clear</button>
-          <button type="button" onclick="proceedFromCartDrawer()" class="flex-1 bg-red-600 text-white font-extrabold text-xs py-2.5 rounded-xl">Proceed to Order →</button>
+          <button type="button" onclick="closeCartDrawer()" class="flex-1 bg-gray-900 text-white text-xs font-extrabold py-2.5 rounded-xl">← Continue Shopping</button>
+          <button type="button" onclick="clearCartItems()" class="px-3.5 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-xs font-bold">Clear Cart</button>
         </div>
       </div>
     </div>
@@ -306,11 +320,21 @@
       <p id="checkoutErr" class="hidden text-xs text-red-600 font-bold"></p>
       <div id="checkoutStatusBox" class="hidden rounded-xl p-3 text-xs space-y-2"></div>
       <div id="checkoutItems" class="space-y-1.5 text-xs border-t pt-2"></div>
-      <div id="checkoutTotalRow" class="flex justify-between items-center text-sm font-extrabold text-gray-900 bg-red-50 px-3 py-2 rounded-xl">
-        <span>Order Total</span>
-        <span id="checkoutTotalAmt" class="text-red-600">₹0</span>
+      <div id="checkoutTotalRow" class="bg-red-50 border border-red-100 px-3 py-2.5 rounded-xl space-y-1">
+        <div class="flex justify-between items-center text-xs text-gray-700 font-semibold">
+          <span id="checkoutItemsCountLabel">Subtotal (0 products • 0 pcs)</span>
+          <span id="checkoutSubtotalAmt">₹0</span>
+        </div>
+        <div class="flex justify-between items-center text-sm font-extrabold text-gray-900 border-t border-red-200/70 pt-1">
+          <span>Grand Total</span>
+          <span id="checkoutTotalAmt" class="text-red-600">₹0</span>
+        </div>
       </div>
-      <button id="sendOrderBtn" type="button" onclick="sendWhatsAppOrder()" class="w-full bg-green-600 text-white font-extrabold text-xs py-3 rounded-xl">💬 Confirm &amp; Submit Order on WhatsApp</button>
+      <button id="sendOrderBtn" type="button" onclick="sendWhatsAppOrder()" class="w-full bg-green-600 hover:bg-green-700 text-white font-extrabold text-xs py-3 rounded-xl">💬 Place Order on WhatsApp</button>
+      <div id="checkoutSecondaryActions" class="flex items-center gap-2">
+        <button type="button" onclick="closeCheckout()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs py-2.5 rounded-xl">← Continue Shopping</button>
+        <button id="checkoutEditCartBtn" type="button" onclick="backToCartFromCheckout()" class="px-3.5 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-bold text-xs">Edit Cart</button>
+      </div>
     </div>
   </div>
 
@@ -478,7 +502,30 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     let crmOrders = [];
     let crmCustomers = [];
     let crmLoaded = false;
-    let activeCat = "All Items", query = "", view = "cards", cart = {}, photoId = null;
+    function loadCartStorage() {
+      try {
+        const raw = localStorage.getItem("gbs_cart");
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object") return {};
+        const cleaned = {};
+        Object.entries(parsed).forEach(([k, v]) => {
+          const qty = Math.floor(Number(v));
+          if (qty > 0) cleaned[String(k)] = qty;
+        });
+        return cleaned;
+      } catch (err) {
+        return {};
+      }
+    }
+
+    function saveCartStorage() {
+      try {
+        localStorage.setItem("gbs_cart", JSON.stringify(cart));
+      } catch (err) {}
+    }
+
+    let activeCat = "All Items", query = "", view = "cards", cart = loadCartStorage(), photoId = null;
     let pendingDeleteId = null;
     let singleCheckoutItemId = null;
     let pendingFormPhotoBlob = null;
@@ -1275,6 +1322,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
             <tbody class="divide-y">
               ${list.map(i => {
                 const sid = escapeHtml(String(i.id));
+                const qty = cart[String(i.id)] || 0;
                 const rate = Number(i.rate ?? i.price) || 0;
                 return `<tr>
                   <td class="p-2.5"><div class="font-bold">${escapeHtml(i.name)}</div><div class="text-[10px] text-gray-500">${escapeHtml(i.serial_code || i.code)} • ${escapeHtml(i.spec)}</div></td>
@@ -1282,7 +1330,9 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
                   <td class="p-2.5 text-right whitespace-nowrap">
                     ${isAdmin
                       ? `<button onclick="openPartForm('${sid}')" class="bg-gray-100 border text-[10px] font-bold px-2 py-1 rounded mr-1">Edit</button><button onclick="toggleVis('${sid}')" class="text-[10px] font-bold px-2 py-1 rounded ${i.visible!==false?'bg-emerald-100 text-emerald-800':'bg-red-100 text-red-700'}">${i.visible!==false?'SHOW':'HIDE'}</button>`
-                      : `<button onclick="addCart('${sid}',1)" class="bg-gray-900 text-white text-[10px] font-bold px-2.5 py-1 rounded">+ Add (${cart[i.id]||0})</button>`}
+                      : (qty > 0
+                        ? `<div class="bg-gray-900 text-white rounded-lg px-2 py-1 text-[10px] font-bold inline-flex items-center gap-2"><button type="button" onclick="addCart('${sid}',-1)" aria-label="Decrease quantity">−</button><span>${qty}</span><button type="button" onclick="addCart('${sid}',1)" aria-label="Increase quantity">+</button></div>`
+                        : `<button type="button" onclick="addCart('${sid}',1)" class="bg-gray-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">+ Add to Cart</button>`)}
                   </td>
                 </tr>`;
               }).join("")}
@@ -1294,7 +1344,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
 
       box.innerHTML = list.map(i => {
         const sid = escapeHtml(String(i.id));
-        const qty = cart[i.id] || 0;
+        const qty = cart[String(i.id)] || 0;
         const vis = i.visible !== false;
         const rate = Number(i.rate ?? i.price) || 0;
         const imgUrl = i.image_url || i.image || "";
@@ -1322,8 +1372,8 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
                 : `
                   <button type="button" onclick="openSingleOrderCheckout('${sid}')" class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-xl">WA</button>
                   ${qty > 0
-                    ? `<div class="bg-gray-900 text-white rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center gap-2"><button onclick="addCart('${sid}',-1)">−</button><span>${qty}</span><button onclick="addCart('${sid}',1)">+</button></div>`
-                    : `<button onclick="addCart('${sid}',1)" class="bg-gray-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl">+ Add</button>`}
+                    ? `<div class="bg-gray-900 text-white rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center gap-2"><button type="button" onclick="addCart('${sid}',-1)" aria-label="Decrease quantity">−</button><span>${qty}</span><button type="button" onclick="addCart('${sid}',1)" aria-label="Increase quantity">+</button></div>`
+                    : `<button type="button" onclick="addCart('${sid}',1)" class="bg-gray-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl">+ Add to Cart</button>`}
                 `}
             </div>
           </div>
@@ -2087,51 +2137,114 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       return null;
     }
 
+    function getCartStats() {
+      const validEntries = [];
+      let totalQty = 0;
+      let totalAmt = 0;
+      Object.entries(cart).forEach(([k, v]) => {
+        const qty = Math.floor(Number(v)) || 0;
+        const x = items.find(i => String(i.id) === String(k));
+        if (x && qty > 0) {
+          const rate = Number(x.rate ?? x.price) || 0;
+          const sub = rate * qty;
+          totalQty += qty;
+          totalAmt += sub;
+          validEntries.push({ item: x, qty, rate, sub });
+        }
+      });
+      return {
+        validEntries,
+        productCount: validEntries.length,
+        totalQty,
+        subtotal: totalAmt,
+        grandTotal: totalAmt
+      };
+    }
+
+    function renderCartThumb(item, sizeClass = "w-14 h-14") {
+      const imgUrl = item.image_url || item.image || "";
+      if (imgUrl) {
+        return `<div class="${sizeClass} rounded-xl overflow-hidden bg-white border border-gray-200 shrink-0"><img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover" /></div>`;
+      }
+      return `<div class="${sizeClass} rounded-xl bg-gray-100 border border-gray-200 shrink-0 flex items-center justify-center text-gray-400" aria-hidden="true">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      </div>`;
+    }
+
     function updateCartBar() {
-      const entries = Object.entries(cart);
+      const { productCount, totalQty, grandTotal } = getCartStats();
       const bar = document.getElementById("cartBar");
       const badge = document.getElementById("headerCartBadge");
-      let q = 0, t = 0;
-      entries.forEach(([k, v]) => {
-        const x = items.find(i => String(i.id) === String(k));
-        if (x && v > 0) { q += v; t += (Number(x.rate ?? x.price) || 0) * v; }
-      });
+      const barCount = document.getElementById("cartBarCount");
+      const barSummary = document.getElementById("cartSummary");
 
       if (badge) {
-        if (!isAdmin && q > 0) {
-          badge.textContent = q > 99 ? "99+" : String(q);
+        if (!isAdmin && totalQty > 0) {
+          badge.textContent = productCount > 99 ? "99+" : String(productCount);
+          badge.title = `${productCount} product${productCount > 1 ? "s" : ""} (${totalQty} pcs)`;
           badge.classList.remove("hidden");
         } else {
           badge.classList.add("hidden");
         }
       }
 
-      if (isAdmin || !q) {
+      if (isAdmin || !totalQty) {
         if (bar) bar.classList.add("hidden");
         return;
       }
-      document.getElementById("cartSummary").textContent = `₹${t} (${q} pcs)`;
+      if (barCount) {
+        barCount.textContent = `${productCount} Product${productCount > 1 ? "s" : ""} • ${totalQty} Pcs`;
+      }
+      if (barSummary) {
+        barSummary.textContent = `Grand Total: ₹${grandTotal}`;
+      }
       if (bar) bar.classList.remove("hidden");
     }
 
     function addCart(id, d) {
       if (isAdmin) return;
       const key = String(id);
-      const n = (cart[key] || 0) + d;
+      const prev = cart[key] || 0;
+      const n = prev + d;
       if (n <= 0) delete cart[key]; else cart[key] = n;
+      saveCartStorage();
       renderCatalog();
       updateCartBar();
       const drawer = document.getElementById("cartDrawerModal");
       if (drawer && !drawer.classList.contains("hidden")) {
         renderCartDrawer();
       }
+      if (prev === 0 && n > 0) {
+        showToast("Added to Cart ✓", 1500);
+      }
+    }
+
+    function removeFromCart(id) {
+      if (isAdmin) return;
+      const key = String(id);
+      if (cart[key]) {
+        delete cart[key];
+        saveCartStorage();
+        renderCatalog();
+        updateCartBar();
+        const drawer = document.getElementById("cartDrawerModal");
+        if (drawer && !drawer.classList.contains("hidden")) {
+          renderCartDrawer();
+        }
+        showToast("Removed from Cart", 1400);
+      }
     }
 
     function clearCartItems() {
       cart = {};
+      saveCartStorage();
       renderCatalog();
       updateCartBar();
       renderCartDrawer();
+      showToast("Cart cleared", 1400);
     }
 
     function openCartDrawer() {
@@ -2150,57 +2263,57 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       const listEl = document.getElementById("cartDrawerList");
       const subEl = document.getElementById("cartDrawerSubtitle");
       const footEl = document.getElementById("cartDrawerFooter");
+      const prodCountEl = document.getElementById("cartDrawerProductCount");
+      const subtotalEl = document.getElementById("cartDrawerSubtotal");
       const totEl = document.getElementById("cartDrawerTotal");
       if (!listEl) return;
 
-      const validEntries = [];
-      let totalQty = 0;
-      let totalAmt = 0;
-      Object.entries(cart).forEach(([k, v]) => {
-        const x = items.find(i => String(i.id) === String(k));
-        if (x && v > 0) {
-          const rate = Number(x.rate ?? x.price) || 0;
-          const sub = rate * v;
-          totalQty += v;
-          totalAmt += sub;
-          validEntries.push({ item: x, qty: v, rate, sub });
-        }
-      });
+      const { validEntries, productCount, totalQty, subtotal, grandTotal } = getCartStats();
 
       if (subEl) {
-        subEl.textContent = validEntries.length
-          ? `${validEntries.length} part${validEntries.length > 1 ? "s" : ""} • ${totalQty} pcs`
-          : "0 items selected";
+        subEl.textContent = productCount
+          ? `${productCount} product${productCount > 1 ? "s" : ""} • ${totalQty} pcs`
+          : "0 products • 0 pcs";
       }
 
       if (!validEntries.length) {
         if (footEl) footEl.classList.add("hidden");
-        listEl.innerHTML = `<div class="py-8 text-center space-y-2">
+        listEl.innerHTML = `<div class="py-8 text-center space-y-2.5">
           <div class="text-3xl">🛍️</div>
           <div class="text-xs font-extrabold text-gray-800">Your cart is empty</div>
-          <p class="text-[11px] text-gray-500">Tap "+ Add" on spare parts to build your multi-item order.</p>
-          <button type="button" onclick="closeCartDrawer()" class="mt-2 bg-gray-900 text-white text-xs font-bold px-4 py-2 rounded-xl">Browse Parts</button>
+          <p class="text-[11px] text-gray-500">Tap "+ Add to Cart" on spare parts to add multiple products to one order.</p>
+          <button type="button" onclick="closeCartDrawer()" class="mt-2 bg-gray-900 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl">← Continue Shopping</button>
         </div>`;
         return;
       }
 
       if (footEl) footEl.classList.remove("hidden");
-      if (totEl) totEl.textContent = `₹${totalAmt}`;
+      if (prodCountEl) prodCountEl.textContent = `${productCount} product${productCount > 1 ? "s" : ""} (${totalQty} pcs)`;
+      if (subtotalEl) subtotalEl.textContent = `₹${subtotal}`;
+      if (totEl) totEl.textContent = `₹${grandTotal}`;
       listEl.innerHTML = validEntries.map(({ item, qty, rate, sub }) => {
         const sid = escapeHtml(String(item.id));
-        return `<div class="bg-gray-50 border border-gray-200 rounded-xl p-2.5 flex items-center justify-between gap-2">
-          <div class="min-w-0 flex-1">
-            <div class="text-xs font-extrabold text-gray-900 truncate">${escapeHtml(item.name)}</div>
-            <div class="text-[10px] text-gray-500 truncate">${escapeHtml(item.serial_code || item.code || "")} • ₹${rate} each</div>
-            <div class="text-xs font-extrabold text-red-600 mt-0.5">₹${sub}</div>
-          </div>
-          <div class="flex items-center gap-1.5 shrink-0">
-            <div class="bg-gray-900 text-white rounded-lg px-2 py-1 text-xs font-bold flex items-center gap-2">
-              <button type="button" onclick="addCart('${sid}',-1)">−</button>
-              <span>${qty}</span>
-              <button type="button" onclick="addCart('${sid}',1)">+</button>
+        return `<div class="bg-gray-50 border border-gray-200 rounded-xl p-2.5 flex items-start gap-2.5">
+          ${renderCartThumb(item, "w-14 h-14")}
+          <div class="min-w-0 flex-1 space-y-1">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="text-xs font-extrabold text-gray-900 leading-snug line-clamp-2">${escapeHtml(item.name)}</div>
+                <div class="text-[10px] text-gray-500 truncate">${escapeHtml(item.serial_code || item.code || "")}${item.spec ? " • " + escapeHtml(item.spec) : ""}</div>
+              </div>
+              <button type="button" onclick="removeFromCart('${sid}')" aria-label="Remove product from cart" title="Remove" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-extrabold flex items-center justify-center shrink-0">✕</button>
             </div>
-            <button type="button" onclick="addCart('${sid}',-${qty})" aria-label="Remove item" class="w-7 h-7 rounded-lg bg-red-50 text-red-600 text-xs font-bold flex items-center justify-center">✕</button>
+            <div class="flex items-center justify-between gap-2 pt-1">
+              <div>
+                <div class="text-[11px] text-gray-600 font-semibold">₹${rate} × ${qty}</div>
+                <div class="text-xs font-extrabold text-red-600">Subtotal: ₹${sub}</div>
+              </div>
+              <div class="bg-gray-900 text-white rounded-lg px-2 py-1 text-xs font-bold flex items-center gap-2 shrink-0">
+                <button type="button" onclick="addCart('${sid}',-1)" aria-label="Decrease quantity" class="w-5 h-5 flex items-center justify-center">−</button>
+                <span class="min-w-[16px] text-center">${qty}</span>
+                <button type="button" onclick="addCart('${sid}',1)" aria-label="Increase quantity" class="w-5 h-5 flex items-center justify-center">+</button>
+              </div>
+            </div>
           </div>
         </div>`;
       }).join("");
@@ -2209,6 +2322,11 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
     function proceedFromCartDrawer() {
       closeCartDrawer();
       openCheckout(false);
+    }
+
+    function backToCartFromCheckout() {
+      closeCheckout();
+      openCartDrawer();
     }
 
     function getActiveCheckoutEntries() {
@@ -2262,13 +2380,13 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
             <div class="text-[11px] text-gray-500">${escapeHtml(saved.area_locality)} • PIN ${escapeHtml(saved.pin_code)}</div>
           `;
         }
-        if (btn) btn.textContent = "💬 Confirm & Submit Order on WhatsApp";
+        if (btn) btn.textContent = "💬 Place Order on WhatsApp";
       } else {
         if (titleEl) titleEl.textContent = saved ? "Edit Delivery Details" : "WhatsApp Order Details";
         if (savedCard) savedCard.classList.add("hidden");
         if (formWrap) formWrap.classList.remove("hidden");
         if (backWrap) backWrap.classList.toggle("hidden", !saved);
-        if (btn) btn.textContent = "💬 Confirm & Submit Order on WhatsApp";
+        if (btn) btn.textContent = "💬 Place Order on WhatsApp";
       }
     }
 
@@ -2296,19 +2414,36 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
       if (isAdmin) return;
       if (!isSingle) singleCheckoutItemId = null;
       let tot = 0;
+      let totalPcs = 0;
+      let prodCount = 0;
       const entries = getActiveCheckoutEntries();
       document.getElementById("checkoutItems").innerHTML = entries.map(([k, v]) => {
+        const qty = Math.floor(Number(v)) || 0;
         const x = items.find(i => String(i.id) === String(k));
-        if (!x) return "";
+        if (!x || qty <= 0) return "";
         const rate = Number(x.rate ?? x.price) || 0;
-        const sub = rate * v;
+        const sub = rate * qty;
         tot += sub;
-        return `<div class="flex justify-between items-center gap-2 bg-gray-50 p-2 rounded-lg">
-          <span class="min-w-0 truncate">${escapeHtml(x.serial_code || x.code || "")} ${escapeHtml(x.name)} <span class="text-gray-500">(${v} × ₹${rate})</span></span>
-          <b class="shrink-0">₹${sub}</b>
+        totalPcs += qty;
+        prodCount += 1;
+        return `<div class="flex items-center justify-between gap-2 bg-gray-50 border border-gray-100 p-2 rounded-xl">
+          <div class="flex items-center gap-2 min-w-0 flex-1">
+            ${renderCartThumb(x, "w-10 h-10")}
+            <div class="min-w-0">
+              <div class="font-bold text-gray-900 truncate">${escapeHtml(x.serial_code || x.code || "")} ${escapeHtml(x.name)}</div>
+              <div class="text-[10px] text-gray-500">Qty: ${qty} × ₹${rate}</div>
+            </div>
+          </div>
+          <b class="shrink-0 text-red-600">₹${sub}</b>
         </div>`;
       }).join("");
+      const countLabel = document.getElementById("checkoutItemsCountLabel");
+      const subAmtEl = document.getElementById("checkoutSubtotalAmt");
+      if (countLabel) countLabel.textContent = `Subtotal (${prodCount} product${prodCount !== 1 ? "s" : ""} • ${totalPcs} pcs)`;
+      if (subAmtEl) subAmtEl.textContent = `₹${tot}`;
       document.getElementById("checkoutTotalAmt").textContent = `₹${tot}`;
+      const editCartBtn = document.getElementById("checkoutEditCartBtn");
+      if (editCartBtn) editCartBtn.classList.toggle("hidden", isSingle);
       document.getElementById("checkoutErr").classList.add("hidden");
       const statusEl = document.getElementById("checkoutStatusBox");
       if (statusEl) { statusEl.classList.add("hidden"); statusEl.innerHTML = ""; }
@@ -2500,24 +2635,29 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
         cloudErrorObj = { code: "", context: "Supabase", message: "Supabase client not initialized." };
       }
 
+      const totalPcs = orderItems.reduce((sum, it) => sum + it.qty, 0);
       let msg = `*ORDER — GHUMO BIKE STORE*\n`;
       msg += `Customer: ${customer_name}\n`;
       msg += `Mobile: ${mobile_number}\n`;
       msg += `Shop: ${shop_name_or_number}\n`;
       msg += `Address: ${full_address}\n`;
       msg += `Area: ${area_locality} | PIN: ${pin_code}\n\n`;
-      msg += `*Items:*\n`;
+      msg += `*Items (${orderItems.length} Product${orderItems.length > 1 ? "s" : ""}, ${totalPcs} Pcs):*\n`;
       orderItems.forEach((it, idx) => {
         const codePrefix = it.serial_code ? `${it.serial_code} ` : "";
-        msg += `${idx + 1}. ${codePrefix}${it.name} (${it.qty} pcs × ₹${it.rate}) = ₹${it.subtotal}\n`;
+        msg += `${idx + 1}. ${codePrefix}${it.name}\n   Qty: ${it.qty} × ₹${it.rate} = ₹${it.subtotal}\n`;
       });
-      msg += `\n*Total Amount: ₹${total_amount}*`;
+      msg += `\n*Subtotal: ₹${total_amount}*\n`;
+      msg += `*Grand Total: ₹${total_amount}*`;
 
       const waUrl = `https://wa.me/91${WA_NUM}?text=${encodeURIComponent(msg)}`;
       const wasSingle = singleCheckoutItemId !== null;
 
       if (cloudSaved) {
-        if (!wasSingle) cart = {};
+        if (!wasSingle) {
+          cart = {};
+          saveCartStorage();
+        }
         renderCatalog();
         updateCartBar();
         if (btn) btn.classList.add("hidden");
@@ -2548,10 +2688,20 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;</p
           statusEl.className = "rounded-xl p-3 text-xs bg-red-50 border border-red-200 text-red-700 space-y-2";
           statusEl.innerHTML = `<div class="font-extrabold">⚠️ Supabase Save Error (${escapeHtml(cloudErrorObj.context || "Cloud")})</div>
             <p class="text-[11px] break-words">${escapeHtml(errText)}</p>
-            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" onclick="if(singleCheckoutItemId===null){cart={};renderCatalog();updateCartBar();}setTimeout(closeCheckout,300);" class="block w-full text-center bg-green-600 text-white font-extrabold py-2 rounded-lg">💬 Continue &amp; Open WhatsApp Anyway →</a>`;
+            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" onclick="completeFallbackWhatsAppOrder()" class="block w-full text-center bg-green-600 text-white font-extrabold py-2 rounded-lg">💬 Continue &amp; Place Order on WhatsApp →</a>`;
         }
         showToast(`Cloud save failed: ${errText}`, 5500, true);
       }
+    }
+
+    function completeFallbackWhatsAppOrder() {
+      if (singleCheckoutItemId === null) {
+        cart = {};
+        saveCartStorage();
+        renderCatalog();
+        updateCartBar();
+      }
+      setTimeout(closeCheckout, 300);
     }
 
     renderAll();
